@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Morning Brief – 2026-10-05</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#eef2f7; --bg-grad1:#eef2f7; --bg-grad2:#e2eaf2;
+  --card:#ffffff; --ink:#17202e; --muted:#5d6b7d;
+  --accent:#1a6feb; --accent-ink:#ffffff; --accent-soft:#e8f0fe;
+  --border:#e2e8f0; --shadow:0 1px 2px rgba(16,24,40,.05),0 4px 16px rgba(16,24,40,.06);
+  --ok:#12805c; --ok-bg:#e6f6ef;
+  --rain-bg:#eaf3ff; --rain-ink:#13549e; --rain-border:#c3d9f5;
+  --warn-bg:#fef2d9; --warn-ink:#8a5a00; --warn-border:#eccc8a;
+  --danger-bg:#fdeceb; --danger-ink:#b31016; --danger-border:#f0b7b4;
+  --sun:#f5a623; --chart:#6aa8f0;
+  --radius:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0d1219; --bg-grad1:#0d1219; --bg-grad2:#111827;
+    --card:#151c26; --ink:#e8eef6; --muted:#8fa0b3;
+    --accent:#5ea2ff; --accent-ink:#061018; --accent-soft:#1a2740;
+    --border:#2834477a; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+    --ok:#34c28f; --ok-bg:#0f2b22;
+    --rain-bg:#122642; --rain-ink:#8fc0ff; --rain-border:#2b4a78;
+    --warn-bg:#33290f; --warn-ink:#ecc45a; --warn-border:#6b5518;
+    --danger-bg:#3a1518; --danger-ink:#ff8f93; --danger-border:#7a2b30;
+    --sun:#ffcf6e; --chart:#6aa8f0;
+  }
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d1219; --bg-grad1:#0d1219; --bg-grad2:#111827;
+  --card:#151c26; --ink:#e8eef6; --muted:#8fa0b3;
+  --accent:#5ea2ff; --accent-ink:#061018; --accent-soft:#1a2740;
+  --border:#2834477a; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  --ok:#34c28f; --ok-bg:#0f2b22;
+  --rain-bg:#122642; --rain-ink:#8fc0ff; --rain-border:#2b4a78;
+  --warn-bg:#33290f; --warn-ink:#ecc45a; --warn-border:#6b5518;
+  --danger-bg:#3a1518; --danger-ink:#ff8f93; --danger-border:#7a2b30;
+  --sun:#ffcf6e; --chart:#6aa8f0;
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.45;background:var(--bg);
+  background:linear-gradient(180deg,var(--bg-grad1),var(--bg-grad2));}
+.wrap{max-width:2000px;margin:0 auto;padding:18px 16px 60px}
+header.top{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;margin-bottom:4px}
+header.top h1{font-size:1.5rem;margin:0;letter-spacing:-.01em}
+.brand-emoji{font-size:1.25rem;margin-right:2px;vertical-align:-2px}
+.meta{color:var(--muted);font-size:.82rem}
+.theme-btn{margin-left:auto;border:1px solid var(--border);background:var(--card);color:var(--ink);
+  border-radius:999px;padding:4px 11px;font-size:.85rem;cursor:pointer;line-height:1;
+  box-shadow:var(--shadow)}
+.theme-btn:hover{background:var(--accent-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.chip{background:var(--card);border:1px solid var(--border);border-radius:999px;
+  padding:6px 13px;font-size:.84rem;box-shadow:var(--shadow)}
+.chip strong{font-weight:700}
+.chip.warn{border-color:var(--warn-border);background:var(--warn-bg);color:var(--warn-ink)}
+.chip.danger{border-color:var(--danger-border);background:var(--danger-bg);color:var(--danger-ink)}
+.chip.up{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+.chip.down{border-color:var(--danger-border);background:var(--danger-bg);color:var(--danger-ink)}
+.grid{column-width:360px;column-gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 16px 16px;box-shadow:var(--shadow);
+  break-inside:avoid;page-break-inside:avoid;margin-bottom:16px}
+.card h2{font-size:.98rem;margin:0 0 10px;display:flex;align-items:center;gap:8px;letter-spacing:-.005em}
+.card h2 .sub{color:var(--muted);font-weight:400;font-size:.75rem;margin-left:auto}
+ul.notes{list-style:none;margin:12px 0 0;padding:0}
+ul.notes li{padding:4px 0;color:var(--muted);font-size:.92rem}
+ul.notes li.warn{color:var(--warn-ink)}
+ul.notes li.danger{color:var(--danger-ink)}
+
+/* ---- weather ---- */
+.weather-main{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.weather-now{display:flex;align-items:center;gap:8px}
+.weather-emoji{font-size:2.1rem;line-height:1}
+.temp-big{font-size:1.85rem;font-weight:600;letter-spacing:-.02em}
+.temp-big small{font-size:.72rem;color:var(--muted);font-weight:400;display:block;margin-top:1px}
+.metro{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:5px;
+  margin-top:8px}
+.metro .m{background:var(--accent-soft);border:1px solid transparent;border-radius:9px;
+  padding:4px 8px;font-size:.75rem}
+.metro .m .k{color:var(--muted);font-size:.64rem;text-transform:uppercase;letter-spacing:.04em}
+.metro .m .v{font-weight:600;margin-top:1px}
+.forecast{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;margin-top:10px}
+.fday{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:9px 8px;text-align:center}
+.fday .dow{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.fday .emoji{font-size:1.5rem;line-height:1;margin:4px 0}
+.fday .cond{font-size:.76rem;min-height:2.6em;display:flex;align-items:center;justify-content:center}
+.fday .hi{font-size:1.05rem;font-weight:700}
+.fday .lo{font-size:.78rem;color:var(--muted)}
+.fday .precip{font-size:.7rem;color:var(--rain-ink);margin-top:2px}
+.chart-wrap{margin-top:10px;border:1px solid var(--border);border-radius:10px;padding:8px 6px 4px;background:var(--bg)}
+.chart-wrap .cap{font-size:.72rem;color:var(--muted);text-align:center;margin-bottom:4px}
+
+/* ---- hydrology ---- */
+.hydro-grid{display:grid;gap:10px;grid-template-columns:1fr}
+@media (min-width:860px){.hydro-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}}
+.hydro-box{border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--bg)}
+.hydro-box>strong{font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.hydro-box.warn{border-color:var(--warn-border);background:var(--warn-bg)}
+.hydro-box.danger{border-color:var(--danger-border);background:var(--danger-bg)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:.86rem;margin-top:7px}
+.kv .k{color:var(--muted)}
+.kv .v{font-weight:600;text-align:right}
+.rainlink{color:var(--danger-ink);font-weight:600;text-decoration:none}
+.rainlink:hover{text-decoration:underline}
+.big-num{font-size:1.6rem;font-weight:700;color:var(--danger-ink);text-align:center}
+
+/* ---- agenda ---- */
+.agenda{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:560px){.agenda{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}}
+.ev-col h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 8px}
+ul.events{list-style:none;margin:0;padding:0}
+ul.events li{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--border)}
+ul.events li:last-child{border-bottom:0}
+.time{font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent);white-space:nowrap;min-width:44px}
+.ev-title{flex:1}
+.ev-loc{color:var(--muted);font-size:.82rem}
+
+/* ---- jobs & real estate ---- */
+.item{margin-bottom:11px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+.item:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.item .it-title{font-weight:600;font-size:.95rem;line-height:1.3}
+.item .it-meta{color:var(--muted);font-size:.83rem;margin-top:3px}
+.tags{margin-top:7px;display:flex;flex-wrap:wrap;gap:6px}
+.tag{display:inline-block;border:1px solid var(--border);background:var(--bg);border-radius:999px;
+  padding:2px 10px;font-size:.74rem;color:var(--muted)}
+.tag.money{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:600}
+  .tag.remote{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:600}
+.tag.deadline{border-color:var(--warn-border);background:var(--warn-bg);color:var(--warn-ink)}
+.tag.src{border-color:var(--accent-border,var(--border));background:var(--accent-soft);color:var(--accent)}
+.price{font-weight:700;color:var(--accent);white-space:nowrap;font-size:1rem}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+footer{margin-top:22px;color:var(--muted);font-size:.76rem;text-align:center}
+
+/* ---- stock watch ---- */
+.stock-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:6px}
+.stock-price{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stock-move{font-size:.92rem;font-weight:600;font-variant-numeric:tabular-nums}
+.stock-move.up{color:var(--ok)}
+.stock-move.down{color:var(--danger-ink)}
+.stock-meta{color:var(--muted);font-size:.8rem;margin-bottom:10px}
+.stock-chart{width:100%;height:auto;display:block}
+.stock-chart-wrap{position:relative;margin-top:6px}
+.stock-chart .area{fill:var(--accent);fill-opacity:.10}
+.stock-chart .line{fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+.stock-chart .dot{fill:var(--accent)}
+.stock-chart .axis{stroke:var(--border);stroke-width:1}
+.stock-chart .stock-cross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;pointer-events:none}
+.stock-axis{position:absolute;inset:0;pointer-events:none}
+.stock-axis div{position:absolute;font-size:.68rem;line-height:1;color:var(--muted);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.stock-axis .aU{font-weight:600}
+.stock-tip{position:absolute;pointer-events:none;background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:4px 9px;font-size:.78rem;font-variant-numeric:tabular-nums;
+  box-shadow:var(--shadow);white-space:nowrap;color:var(--ink);
+  transform:translate(-50%,-115%);display:none;z-index:5}
+.stock-ranges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.stock-range{padding:3px 11px;border:1px solid var(--border);background:var(--bg);border-radius:999px;
+  font-size:.78rem;color:var(--muted);cursor:pointer}
+.stock-range:hover{color:var(--accent);border-color:var(--accent)}
+.stock-range.active{color:var(--accent);border-color:var(--accent);font-weight:700}
+
+/* ---- holidays ---- */
+.holiday{display:inline-block;border:1px solid var(--warn-border);background:var(--warn-bg);
+  color:var(--warn-ink);border-radius:999px;padding:2px 11px;font-size:.82rem;margin-bottom:10px;font-weight:600}
+.holiday.up{color:var(--muted);background:var(--bg);border-color:var(--border);font-weight:400}
+
+/* ---- stale + sparkline ---- */
+.stale-chip{border-color:var(--warn-border)!important;background:var(--warn-bg)!important;color:var(--warn-ink)!important}
+.spark-wrap{margin-top:8px;border-top:1px dashed var(--border);padding-top:7px}
+.spark-wrap .spark-cap{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1><span class="brand-emoji">☀️</span>Morning Brief</h1>
+    <div class="meta">2026-10-05 · generated 2026-10-05 10:11 · openai/gpt-oss-120b</div>
+    <button type="button" id="themeToggle" class="theme-btn" aria-label="Toggle theme">☀️</button>
+  </header>
+  <div class="chips"><span class="chip"><strong>⛅ 15°C</strong></span><span class="chip">Partly cloudy</span><span class="chip">✅ No flood activity</span><span class="chip"><strong>💼 10</strong> job matches</span><span class="chip"><strong>🏠 10</strong> listing(s)</span><span class="chip"><strong>📅 6</strong> event(s)</span><span class="chip up"><strong>📈 VWCE.DE 172.32</strong> ▲ 0.69%</span></div>
+  <div class="grid">
+    <div class="card"><h2>🌤️ Weather <span class="sub">now + 3-day forecast</span></h2><div class="weather-main"><div class="weather-now"><div class="weather-emoji">⛅</div><div><div class="temp-big">15°C<small>Partly cloudy</small></div></div></div></div><div class="metro"><div class="m"><div class="k">Humidity</div><div class="v">51%</div><div class="k">Wind</div><div class="v">2.5 km/h</div><div class="k">Rain</div><div class="v">0%</div><div class="k">Feels</div><div class="v">13.4°C</div><div class="k">Daylight</div><div class="v">06:56 – 18:22 · 11h</div></div></div><div class="chart-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 155" width="100%" height="auto" role="img" fill="currentColor" aria-label="3-day temperature forecast" font-family="system-ui,sans-serif" style="color:var(--ink)"><defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0654c"/><stop offset="55%" stop-color="#f5a623"/><stop offset="100%" stop-color="#4c9cf0"/></linearGradient></defs><line x1="10" y1="130" x2="320" y2="130" stroke="var(--border)" stroke-width="1" opacity=".8"/><text x="20.0" y="130.0" font-size="9" fill="var(--muted)" text-anchor="start" stroke="var(--bg)" stroke-width="3" paint-order="stroke" transform="translate(0,8)">8.716°</text><text x="68.3" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Mon</text><text x="68.3" y="35" font-size="15" text-anchor="middle">☁️</text><rect x="60.3" y="62.5" width="16" height="50.2" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="68.3" cy="62.5" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="68.3" cy="112.7" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="82.3" y="66.0" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">22.8°</text><text x="82.3" y="116.2" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">11.3°</text><text x="68.3" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">Dry</text><text x="165.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Tue</text><text x="165.0" y="35" font-size="15" text-anchor="middle">☀️</text><rect x="157.0" y="60.3" width="16" height="47.6" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="165.0" cy="60.3" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="165.0" cy="107.9" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="179.0" y="63.8" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">23.3°</text><text x="179.0" y="111.4" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">12.4°</text><text x="165.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">Dry</text><text x="261.7" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Wed</text><text x="261.7" y="35" font-size="15" text-anchor="middle">☁️</text><rect x="253.7" y="52.9" width="16" height="60.3" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="261.7" cy="52.9" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="261.7" cy="113.1" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="275.7" y="56.4" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">25°</text><text x="275.7" y="116.6" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">11.2°</text><text x="261.7" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">Dry</text></svg></div><ul class="notes"><li style="margin-left:0px">- Partly cloudy, 13°C. Light jacket or hoodie with layers.</li>
+<li style="margin-left:0px">- Tuesday: Clear sky, high 23°C, low 12°C.</li>
+<li style="margin-left:0px">- Wednesday: Overcast, high 25°C, low 11°C.</li>
+<li class="warn" style="margin-left:0px">- Thursday: Slight rain, high 23°C, low 10°C, rain chance 77% and windy.</li></ul></div>
+    <div class="card"><h2>🌊 Hydrology <span class="sub">Danube + SHMÚ</span></h2><div class="hydro-grid"><div class="hydro-box"><strong>🌊 Thebnerstraßl</strong><div class="big-num" style="color:var(--accent)">537 <small style="font-size:.65em;font-weight:400;color:var(--muted)">m³/s</small></div><div class="kv"><div class="k">Level</div><div class="v">36 cm (08:45)</div><div class="k">Forecast peak</div><div class="v">603 m³/s (20:15)</div><div class="k">MQ</div><div class="v">2010 m³/s</div><div class="k">RNQ</div><div class="v">1040 m³/s</div></div><div class="spark-wrap"><div class="spark-cap">📈 72h trend</div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 46" width="100%" height="auto" role="img" font-family="system-ui,sans-serif" aria-label="Danube discharge trend over the last 72 hours"><line x1="5" y1="41" x2="295" y2="41" stroke="var(--border)" stroke-width="1"/><polyline points="5.0,13.3 11.0,15.1 17.1,16.5 23.1,18.3 29.2,18.3 35.2,19.8 41.2,19.8 47.3,19.8 53.3,21.6 59.4,26.2 65.4,23.0 71.5,19.8 77.5,15.1 83.5,13.3 89.6,15.1 95.6,15.1 101.7,13.3 107.7,15.1 113.8,19.8 119.8,27.7 125.8,32.7 131.9,29.5 137.9,23.0 144.0,18.3 150.0,11.8 156.0,10.0 162.1,10.0 168.1,6.8 174.2,5.0 180.2,8.6 186.2,13.3 192.3,19.8 198.3,23.0 204.4,15.1 210.4,8.6 216.5,5.0 222.5,11.8 228.5,19.8 234.6,23.0 240.6,19.8 246.7,21.6 252.7,26.2 258.8,32.7 264.8,35.6 270.8,34.2 276.9,34.2 282.9,34.2 289.0,37.0 295.0,41.0" fill="none" stroke="var(--chart)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="295.0" cy="41.0" r="3.5" fill="var(--accent)"/><text x="295" y="11" font-size="9" fill="var(--muted)" text-anchor="end">545 m³/s</text><text x="5" y="11" font-size="9" fill="var(--muted)" text-anchor="start">min 545</text></svg></div></div><div class="hydro-box"><strong>SHMÚ water</strong><div class="kv"><div class="k">Stations</div><div class="v">409</div><div class="k">Rising</div><div class="v">7</div><div class="k">Falling</div><div class="v">6</div></div></div></div><ul class="notes"><li class="warn" style="margin-left:0px">- No flood activity at any of the monitored stations.</li>
+<li class="warn" style="margin-left:0px">- No heavy rain alerts.</li>
+<li style="margin-left:0px">- Danube at Thebnerstraßl: discharge 537 m³/s, level 36 cm (below long‑term mean and low‑water threshold). Forecast peak 603 m³/s on Tuesday at 20:15.</li></ul></div>
+    <div class="card"><h2>📈 VWCE.DE<span class="sub">Vanguard FTSE All-World UCITS ETF USD Accumulation</span></h2><div class="stock-head"><div class="stock-price">172.32 EUR</div><div class="stock-move up" id="stockMove">▲ 0.69%</div></div><div class="stock-meta">Vanguard FTSE All-World UCITS ETF USD Accumulation · last close 2026-10-05</div><div class="stock-chart-wrap"><svg class="stock-chart" id="stockChart" viewBox="0 0 600 190" preserveAspectRatio="none" aria-label="Share price chart"></svg><div class="stock-axis" id="stockAxis" aria-hidden="true"></div><div class="stock-tip" id="stockTip" role="tooltip"></div></div><div class="stock-ranges" id="stockRanges"><span class="stock-range" data-range="1D">1D</span><span class="stock-range" data-range="1M">1M</span><span class="stock-range" data-range="6M">6M</span><span class="stock-range" data-range="1Y">1Y</span><span class="stock-range" data-range="3Y">3Y</span><span class="stock-range" data-range="5Y">5Y</span><span class="stock-range" data-range="MAX">MAX</span></div><script type="application/json" id="stockData">{"symbol":"VWCE.DE","currency":"EUR","name":"Vanguard FTSE All-World UCITS ETF USD Accumulation","series":[{"t":"2019-07-28","q":69.63999938964844},{"t":"2019-08-04","q":68.52999877929688},{"t":"2019-08-11","q":68.69999694824219},{"t":"2019-08-18","q":68.37000274658203},{"t":"2019-08-25","q":70.23999786376953},{"t":"2019-09-01","q":71.5},{"t":"2019-09-08","q":72.41999816894531},{"t":"2019-09-15","q":72.7300033569336},{"t":"2019-09-22","q":72.44999694824219},{"t":"2019-09-29","q":71.08000183105469},{"t":"2019-10-06","q":72.29000091552734},{"t":"2019-10-13","q":71.7300033569336},{"t":"2019-10-20","q":72.9800033569336},{"t":"2019-10-27","q":73.30000305175781},{"t":"2019-11-03","q":74.8499984741211},{"t":"2019-11-10","q":75.06999969482422},{"t":"2019-11-17","q":74.8499984741211},{"t":"2019-11-24","q":75.61000061035156},{"t":"2019-12-01","q":75.70999908447266},{"t":"2019-12-08","q":75.86000061035156},{"t":"2019-12-15","q":77.58000183105469},{"t":"2019-12-22","q":77.5},{"t":"2019-12-29","q":77.3499984741211},{"t":"2020-01-05","q":78.37999725341797},{"t":"2020-01-12","q":79.54000091552734},{"t":"2020-01-19","q":79.54000091552734},{"t":"2020-01-26","q":76.79000091552734},{"t":"2020-02-02","q":79.94999694824219},{"t":"2020-02-09","q":81.5199966430664},{"t":"2020-02-16","q":80.5999984741211},{"t":"2020-02-23","q":70.44000244140625},{"t":"2020-03-01","q":68.98999786376953},{"t":"2020-03-08","q":59.709999084472656},{"t":"2020-03-15","q":58.119998931884766},{"t":"2020-03-22","q":60.33000183105469},{"t":"2020-03-29","q":60.310001373291016},{"t":"2020-04-05","q":65.80000305175781},{"t":"2020-04-12","q":66.9000015258789},{"t":"2020-04-19","q":66.47000122070312},{"t":"2020-04-26","q":68.37999725341797},{"t":"2020-05-03","q":69.0999984741211},{"t":"2020-05-10","q":67.26000213623047},{"t":"2020-05-17","q":69.08999633789062},{"t":"2020-05-24","q":69.83999633789062},{"t":"2020-05-31","q":73.83000183105469},{"t":"2020-06-07","q":70.6500015258789},{"t":"2020-06-14","q":72.94000244140625},{"t":"2020-06-21","q":70.94999694824219},{"t":"2020-06-28","q":72.7699966430664},{"t":"2020-07-05","q":73.38999938964844},{"t":"2020-07-12","q":73.72000122070312},{"t":"2020-07-19","q":72.52999877929688},{"t":"2020-07-26","q":71.37000274658203},{"t":"2020-08-02","q":73.5199966430664},{"t":"2020-08-09","q":74.16999816894531},{"t":"2020-08-16","q":74.4800033569336},{"t":"2020-08-23","q":75.80999755859375},{"t":"2020-08-30","q":74.06999969482422},{"t":"2020-09-06","q":73.94000244140625},{"t":"2020-09-13","q":73.95999908447266},{"t":"2020-09-20","q":73.18000030517578},{"t":"2020-09-27","q":74.56999969482422},{"t":"2020-10-04","q":76.30999755859375},{"t":"2020-10-11","q":77.05000305175781},{"t":"2020-10-18","q":75.66000366210938},{"t":"2020-10-25","q":73.18000030517578},{"t":"2020-11-01","q":76.9800033569336},{"t":"2020-11-08","q":78.91999816894531},{"t":"2020-11-15","q":79.73999786376953},{"t":"2020-11-22","q":80.70999908447266},{"t":"2020-11-29","q":80.68000030517578},{"t":"2020-12-06","q":80.0999984741211},{"t":"2020-12-13","q":80.76000213623047},{"t":"2020-12-20","q":80.8499984741211},{"t":"2020-12-27","q":81.41999816894531},{"t":"2021-01-03","q":83.66999816894531},{"t":"2021-01-10","q":84.01000213623047},{"t":"2021-01-17","q":84.62000274658203},{"t":"2021-01-24","q":82.2300033569336},{"t":"2021-01-31","q":86.36000061035156},{"t":"2021-02-07","q":87.16000366210938},{"t":"2021-02-14","q":87.19999694824219},{"t":"2021-02-21","q":84.62000274658203},{"t":"2021-02-28","q":84.30000305175781},{"t":"2021-03-07","q":87.4000015258789},{"t":"2021-03-14","q":87.80999755859375},{"t":"2021-03-21","q":88.31999969482422},{"t":"2021-03-28","q":90.0},{"t":"2021-04-04","q":90.58000183105469},{"t":"2021-04-11","q":91.45999908447266},{"t":"2021-04-18","q":90.75},{"t":"2021-04-25","q":90.79000091552734},{"t":"2021-05-02","q":91.27999877929688},{"t":"2021-05-09","q":89.80000305175781},{"t":"2021-05-16","q":89.95999908447266},{"t":"2021-05-23","q":91.16999816894531},{"t":"2021-05-30","q":91.77999877929688},{"t":"2021-06-06","q":92.62999725341797},{"t":"2021-06-13","q":92.83999633789062},{"t":"2021-06-20","q":94.22000122070312},{"t":"2021-06-27","q":95.22000122070312},{"t":"2021-07-04","q":95.29000091552734},{"t":"2021-07-11","q":95.26000213623047},{"t":"2021-07-18","q":96.41999816894531},{"t":"2021-07-25","q":95.36000061035156},{"t":"2021-08-01","q":96.91000366210938},{"t":"2021-08-08","q":97.37999725341797},{"t":"2021-08-15","q":96.58000183105469},{"t":"2021-08-22","q":97.70999908447266},{"t":"2021-08-29","q":98.20999908447266},{"t":"2021-09-05","q":97.72000122070312},{"t":"2021-09-12","q":97.16999816894531},{"t":"2021-09-19","q":97.23999786376953},{"t":"2021-09-26","q":95.75},{"t":"2021-10-03","q":97.19000244140625},{"t":"2021-10-10","q":98.86000061035156},{"t":"2021-10-17","q":99.54000091552734},{"t":"2021-10-24","q":100.69999694824219},{"t":"2021-10-31","q":102.5999984741211},{"t":"2021-11-07","q":103.41999816894531},{"t":"2021-11-14","q":104.4800033569336},{"t":"2021-11-21","q":101.0},{"t":"2021-11-28","q":100.18000030517578},{"t":"2021-12-05","q":102.91999816894531},{"t":"2021-12-12","q":102.36000061035156},{"t":"2021-12-19","q":103.81999969482422},{"t":"2021-12-26","q":104.72000122070312},{"t":"2022-01-02","q":102.77999877929688},{"t":"2022-01-09","q":101.87999725341797},{"t":"2022-01-16","q":99.81999969482422},{"t":"2022-01-23","q":98.20999908447266},{"t":"2022-01-30","q":98.20999908447266},{"t":"2022-02-06","q":99.5},{"t":"2022-02-13","q":97.52999877929688},{"t":"2022-02-20","q":97.5},{"t":"2022-02-27","q":96.88999938964844},{"t":"2022-03-06","q":95.87999725341797},{"t":"2022-03-13","q":99.55999755859375},{"t":"2022-03-20","q":101.27999877929688},{"t":"2022-03-27","q":101.45999908447266},{"t":"2022-04-03","q":102.0},{"t":"2022-04-10","q":101.27999877929688},{"t":"2022-04-17","q":99.13999938964844},{"t":"2022-04-24","q":99.41999816894531},{"t":"2022-05-01","q":96.06999969482422},{"t":"2022-05-08","q":95.76000213623047},{"t":"2022-05-15","q":92.80000305175781},{"t":"2022-05-22","q":96.30000305175781},{"t":"2022-05-29","q":95.86000061035156},{"t":"2022-06-05","q":93.11000061035156},{"t":"2022-06-12","q":88.51000213623047},{"t":"2022-06-19","q":91.83999633789062},{"t":"2022-06-26","q":90.97000122070312},{"t":"2022-07-03","q":95.19999694824219},{"t":"2022-07-10","q":94.12999725341797},{"t":"2022-07-17","q":95.93000030517578},{"t":"2022-07-24","q":98.69000244140625},{"t":"2022-07-31","q":99.36000061035156},{"t":"2022-08-07","q":101.30000305175781},{"t":"2022-08-14","q":102.12000274658203},{"t":"2022-08-21","q":100.5199966430664},{"t":"2022-08-28","q":97.77999877929688},{"t":"2022-09-04","q":98.55000305175781},{"t":"2022-09-11","q":94.48999786376953},{"t":"2022-09-18","q":92.7699966430664},{"t":"2022-09-25","q":91.33000183105469},{"t":"2022-10-02","q":92.02999877929688},{"t":"2022-10-09","q":90.69000244140625},{"t":"2022-10-16","q":91.87999725341797},{"t":"2022-10-23","q":93.75},{"t":"2022-10-30","q":92.87999725341797},{"t":"2022-11-06","q":94.9800033569336},{"t":"2022-11-13","q":94.83000183105469},{"t":"2022-11-20","q":95.95999908447266},{"t":"2022-11-27","q":96.18000030517578},{"t":"2022-12-04","q":94.4000015258789},{"t":"2022-12-11","q":91.25},{"t":"2022-12-18","q":91.01000213623047},{"t":"2022-12-25","q":90.61000061035156},{"t":"2023-01-01","q":92.95999908447266},{"t":"2023-01-08","q":94.0},{"t":"2023-01-15","q":93.61000061035156},{"t":"2023-01-22","q":95.8499984741211},{"t":"2023-01-29","q":97.5},{"t":"2023-02-05","q":96.7699966430664},{"t":"2023-02-12","q":96.41999816894531},{"t":"2023-02-19","q":94.93000030517578},{"t":"2023-02-26","q":96.33000183105469},{"t":"2023-03-05","q":93.86000061035156},{"t":"2023-03-12","q":92.6500015258789},{"t":"2023-03-19","q":92.75},{"t":"2023-03-26","q":95.33999633789062},{"t":"2023-04-02","q":94.87999725341797},{"t":"2023-04-09","q":95.48999786376953},{"t":"2023-04-16","q":95.44999694824219},{"t":"2023-04-23","q":95.33000183105469},{"t":"2023-04-30","q":95.25},{"t":"2023-05-07","q":96.20999908447266},{"t":"2023-05-14","q":97.8499984741211},{"t":"2023-05-21","q":98.37000274658203},{"t":"2023-05-28","q":99.8499984741211},{"t":"2023-06-04","q":100.23999786376953},{"t":"2023-06-11","q":101.4000015258789},{"t":"2023-06-18","q":99.25},{"t":"2023-06-25","q":100.9800033569336},{"t":"2023-07-02","q":99.6500015258789},{"t":"2023-07-09","q":100.23999786376953},{"t":"2023-07-16","q":101.54000091552734},{"t":"2023-07-23","q":103.5199966430664},{"t":"2023-07-30","q":101.69999694824219},{"t":"2023-08-06","q":100.83999633789062},{"t":"2023-08-13","q":99.08999633789062},{"t":"2023-08-20","q":100.44000244140625},{"t":"2023-08-27","q":103.13999938964844},{"t":"2023-09-03","q":102.72000122070312},{"t":"2023-09-10","q":103.62000274658203},{"t":"2023-09-17","q":101.4800033569336},{"t":"2023-09-24","q":101.0999984741211},{"t":"2023-10-01","q":100.08000183105469},{"t":"2023-10-08","q":101.73999786376953},{"t":"2023-10-15","q":98.44999694824219},{"t":"2023-10-22","q":96.83000183105469},{"t":"2023-10-29","q":100.68000030517578},{"t":"2023-11-05","q":100.86000061035156},{"t":"2023-11-12","q":102.27999877929688},{"t":"2023-11-19","q":102.94000244140625},{"t":"2023-11-26","q":104.12000274658203},{"t":"2023-12-03","q":105.36000061035156},{"t":"2023-12-10","q":106.77999877929688},{"t":"2023-12-17","q":106.68000030517578},{"t":"2023-12-24","q":107.08000183105469},{"t":"2023-12-31","q":106.41999816894531},{"t":"2024-01-07","q":107.54000091552734},{"t":"2024-01-14","q":107.63999938964844},{"t":"2024-01-21","q":110.12000274658203},{"t":"2024-01-28","q":111.33999633789062},{"t":"2024-02-04","q":112.58000183105469},{"t":"2024-02-11","q":113.69999694824219},{"t":"2024-02-18","q":114.54000091552734},{"t":"2024-02-25","q":115.04000091552734},{"t":"2024-03-03","q":115.12000274658203},{"t":"2024-03-10","q":114.80000305175781},{"t":"2024-03-17","q":117.62000274658203},{"t":"2024-03-24","q":118.27999877929688},{"t":"2024-03-31","q":116.87999725341797},{"t":"2024-04-07","q":117.72000122070312},{"t":"2024-04-14","q":114.27999877929688},{"t":"2024-04-21","q":116.44000244140625},{"t":"2024-04-28","q":116.62000274658203},{"t":"2024-05-05","q":118.63999938964844},{"t":"2024-05-12","q":119.55999755859375},{"t":"2024-05-19","q":119.4000015258789},{"t":"2024-05-26","q":117.5199966430664},{"t":"2024-06-02","q":120.45999908447266},{"t":"2024-06-09","q":121.68000030517578},{"t":"2024-06-16","q":122.69999694824219},{"t":"2024-06-23","q":123.18000030517578},{"t":"2024-06-30","q":123.41999816894531},{"t":"2024-07-07","q":124.83999633789062},{"t":"2024-07-14","q":122.0999984741211},{"t":"2024-07-21","q":121.33999633789062},{"t":"2024-07-28","q":117.5199966430664},{"t":"2024-08-04","q":118.04000091552734},{"t":"2024-08-11","q":121.73999786376953},{"t":"2024-08-18","q":122.0999984741211},{"t":"2024-08-25","q":123.0199966430664},{"t":"2024-09-01","q":118.83999633789062},{"t":"2024-09-08","q":122.69999694824219},{"t":"2024-09-15","q":123.27999877929688},{"t":"2024-09-22","q":125.55999755859375},{"t":"2024-09-29","q":126.5999984741211},{"t":"2024-10-06","q":128.1999969482422},{"t":"2024-10-13","q":129.66000366210938},{"t":"2024-10-20","q":129.02000427246094},{"t":"2024-10-27","q":127.23999786376953},{"t":"2024-11-03","q":131.97999572753906},{"t":"2024-11-10","q":131.36000061035156},{"t":"2024-11-17","q":134.82000732421875},{"t":"2024-11-24","q":134.55999755859375},{"t":"2024-12-01","q":136.0399932861328},{"t":"2024-12-08","q":135.77999877929688},{"t":"2024-12-15","q":134.05999755859375},{"t":"2024-12-22","q":134.36000061035156},{"t":"2024-12-29","q":135.24000549316406},{"t":"2025-01-05","q":133.72000122070312},{"t":"2025-01-12","q":137.02000427246094},{"t":"2025-01-19","q":137.13999938964844},{"t":"2025-01-26","q":138.86000061035156},{"t":"2025-02-02","q":138.66000366210938},{"t":"2025-02-09","q":138.6999969482422},{"t":"2025-02-16","q":138.97999572753906},{"t":"2025-02-23","q":135.82000732421875},{"t":"2025-03-02","q":128.39999389648438},{"t":"2025-03-09","q":127.08000183105469},{"t":"2025-03-16","q":128.3800048828125},{"t":"2025-03-23","q":126.9000015258789},{"t":"2025-03-30","q":115.80000305175781},{"t":"2025-04-06","q":113.91999816894531},{"t":"2025-04-13","q":115.81999969482422},{"t":"2025-04-20","q":119.80000305175781},{"t":"2025-04-27","q":124.13999938964844},{"t":"2025-05-04","q":124.94000244140625},{"t":"2025-05-11","q":130.6999969482422},{"t":"2025-05-18","q":127.13999938964844},{"t":"2025-05-25","q":128.47999572753906},{"t":"2025-06-01","q":130.17999267578125},{"t":"2025-06-08","q":128.5800018310547},{"t":"2025-06-15","q":128.0399932861328},{"t":"2025-06-22","q":130.10000610351562},{"t":"2025-06-29","q":130.27999877929688},{"t":"2025-07-06","q":131.27999877929688},{"t":"2025-07-13","q":132.5800018310547},{"t":"2025-07-20","q":133.39999389648438},{"t":"2025-07-27","q":132.0399932861328},{"t":"2025-08-03","q":134.1999969482422},{"t":"2025-08-10","q":135.47999572753906},{"t":"2025-08-17","q":136.39999389648438},{"t":"2025-08-24","q":135.47999572753906},{"t":"2025-08-31","q":135.55999755859375},{"t":"2025-09-07","q":138.33999633789062},{"t":"2025-09-14","q":139.0399932861328},{"t":"2025-09-21","q":139.05999755859375},{"t":"2025-09-28","q":141.66000366210938},{"t":"2025-10-05","q":140.1199951171875},{"t":"2025-10-06","q":142.17999267578125},{"t":"2025-10-07","q":141.89999389648438},{"t":"2025-10-08","q":143.16000366210938},{"t":"2025-10-09","q":143.16000366210938},{"t":"2025-10-10","q":140.1199951171875},{"t":"2025-10-12","q":140.10000610351562},{"t":"2025-10-13","q":141.44000244140625},{"t":"2025-10-14","q":140.83999633789062},{"t":"2025-10-15","q":141.67999267578125},{"t":"2025-10-16","q":141.74000549316406},{"t":"2025-10-17","q":140.10000610351562},{"t":"2025-10-19","q":143.0},{"t":"2025-10-20","q":142.66000366210938},{"t":"2025-10-21","q":143.1199951171875},{"t":"2025-10-22","q":142.3800048828125},{"t":"2025-10-23","q":143.0},{"t":"2025-10-26","q":145.5399932861328},{"t":"2025-10-27","q":145.0399932861328},{"t":"2025-10-28","q":145.22000122070312},{"t":"2025-10-29","q":145.60000610351562},{"t":"2025-10-30","q":145.66000366210938},{"t":"2025-10-31","q":145.5399932861328},{"t":"2025-11-02","q":141.5399932861328},{"t":"2025-11-03","q":145.77999877929688},{"t":"2025-11-04","q":145.25999450683594},{"t":"2025-11-05","q":145.4600067138672},{"t":"2025-11-06","q":143.36000061035156},{"t":"2025-11-07","q":141.5399932861328},{"t":"2025-11-09","q":143.67999267578125},{"t":"2025-11-10","q":144.5399932861328},{"t":"2025-11-11","q":145.02000427246094},{"t":"2025-11-12","q":145.74000549316406},{"t":"2025-11-13","q":143.82000732421875},{"t":"2025-11-14","q":143.67999267578125},{"t":"2025-11-16","q":140.8000030517578},{"t":"2025-11-17","q":143.02000427246094},{"t":"2025-11-18","q":141.17999267578125},{"t":"2025-11-19","q":141.3800048828125},{"t":"2025-11-20","q":142.22000122070312},{"t":"2025-11-21","q":140.8000030517578},{"t":"2025-11-23","q":144.83999633789062},{"t":"2025-11-24","q":142.4600067138672},{"t":"2025-11-25","q":142.8000030517578},{"t":"2025-11-26","q":144.4199981689453},{"t":"2025-11-27","q":144.25999450683594},{"t":"2025-11-28","q":144.83999633789062},{"t":"2025-11-30","q":145.16000366210938},{"t":"2025-12-01","q":144.3000030517578},{"t":"2025-12-02","q":144.25999450683594},{"t":"2025-12-03","q":144.17999267578125},{"t":"2025-12-04","q":144.5399932861328},{"t":"2025-12-05","q":145.16000366210938},{"t":"2025-12-07","q":143.17999267578125},{"t":"2025-12-08","q":144.89999389648438},{"t":"2025-12-09","q":144.97999572753906},{"t":"2025-12-10","q":144.72000122070312},{"t":"2025-12-11","q":144.0800018310547},{"t":"2025-12-12","q":143.17999267578125},{"t":"2025-12-14","q":144.17999267578125},{"t":"2025-12-15","q":143.4600067138672},{"t":"2025-12-16","q":142.44000244140625},{"t":"2025-12-17","q":141.8000030517578},{"t":"2025-12-18","q":143.52000427246094},{"t":"2025-12-19","q":144.17999267578125},{"t":"2025-12-21","q":144.6999969482422},{"t":"2025-12-22","q":144.39999389648438},{"t":"2025-12-23","q":144.6999969482422},{"t":"2025-12-28","q":145.13999938964844},{"t":"2025-12-29","q":144.97999572753906},{"t":"2025-12-30","q":145.4199981689453},{"t":"2026-01-02","q":145.13999938964844},{"t":"2026-01-04","q":148.89999389648438},{"t":"2026-01-05","q":147.0800018310547},{"t":"2026-01-06","q":147.6999969482422},{"t":"2026-01-07","q":148.0},{"t":"2026-01-08","q":147.72000122070312},{"t":"2026-01-09","q":148.89999389648438},{"t":"2026-01-11","q":149.89999389648438},{"t":"2026-01-12","q":149.0},{"t":"2026-01-13","q":149.25999450683594},{"t":"2026-01-14","q":148.39999389648438},{"t":"2026-01-15","q":150.24000549316406},{"t":"2026-01-16","q":149.89999389648438},{"t":"2026-01-18","q":147.72000122070312},{"t":"2026-01-19","q":148.0399932861328},{"t":"2026-01-20","q":146.66000366210938},{"t":"2026-01-21","q":147.0},{"t":"2026-01-22","q":147.97999572753906},{"t":"2026-01-23","q":147.72000122070312},{"t":"2026-01-25","q":147.22000122070312},{"t":"2026-01-26","q":147.24000549316406},{"t":"2026-01-27","q":147.16000366210938},{"t":"2026-01-28","q":147.3800048828125},{"t":"2026-01-29","q":146.13999938964844},{"t":"2026-01-30","q":147.22000122070312},{"t":"2026-02-01","q":147.82000732421875},{"t":"2026-02-02","q":148.5399932861328},{"t":"2026-02-03","q":148.10000610351562},{"t":"2026-02-04","q":147.75999450683594},{"t":"2026-02-05","q":146.5},{"t":"2026-02-06","q":147.82000732421875},{"t":"2026-02-08","q":147.6999969482422},{"t":"2026-02-09","q":148.5399932861328},{"t":"2026-02-10","q":148.89999389648438},{"t":"2026-02-11","q":149.0800018310547},{"t":"2026-02-12","q":147.83999633789062},{"t":"2026-02-13","q":147.6999969482422},{"t":"2026-02-15","q":149.8800048828125},{"t":"2026-02-16","q":147.5399932861328},{"t":"2026-02-17","q":147.82000732421875},{"t":"2026-02-18","q":149.5},{"t":"2026-02-19","q":149.16000366210938},{"t":"2026-02-20","q":149.8800048828125},{"t":"2026-02-22","q":149.82000732421875},{"t":"2026-02-23","q":148.82000732421875},{"t":"2026-02-24","q":149.72000122070312},{"t":"2026-02-25","q":150.86000061035156},{"t":"2026-02-26","q":150.4199981689453},{"t":"2026-02-27","q":149.82000732421875},{"t":"2026-03-01","q":148.33999633789062},{"t":"2026-03-02","q":150.02000427246094},{"t":"2026-03-03","q":147.67999267578125},{"t":"2026-03-04","q":149.3000030517578},{"t":"2026-03-05","q":148.33999633789062},{"t":"2026-03-08","q":146.77999877929688},{"t":"2026-03-09","q":146.39999389648438},{"t":"2026-03-10","q":148.5399932861328},{"t":"2026-03-11","q":148.0},{"t":"2026-03-12","q":146.9600067138672},{"t":"2026-03-13","q":146.77999877929688},{"t":"2026-03-15","q":142.63999938964844},{"t":"2026-03-16","q":147.3800048828125},{"t":"2026-03-17","q":147.8000030517578},{"t":"2026-03-18","q":146.8000030517578},{"t":"2026-03-19","q":144.27999877929688},{"t":"2026-03-20","q":142.63999938964844},{"t":"2026-03-22","q":140.97999572753906},{"t":"2026-03-23","q":143.33999633789062},{"t":"2026-03-24","q":143.24000549316406},{"t":"2026-03-25","q":144.67999267578125},{"t":"2026-03-26","q":142.9600067138672},{"t":"2026-03-27","q":140.97999572753906},{"t":"2026-03-29","q":144.74000549316406},{"t":"2026-03-30","q":141.89999389648438},{"t":"2026-03-31","q":141.82000732421875},{"t":"2026-04-01","q":144.89999389648438},{"t":"2026-04-02","q":144.74000549316406},{"t":"2026-04-05","q":148.55999755859375},{"t":"2026-04-07","q":143.9199981689453},{"t":"2026-04-08","q":148.0800018310547},{"t":"2026-04-09","q":148.16000366210938},{"t":"2026-04-10","q":148.55999755859375},{"t":"2026-04-12","q":153.66000366210938},{"t":"2026-04-13","q":148.47999572753906},{"t":"2026-04-14","q":150.27999877929688},{"t":"2026-04-15","q":150.77999877929688},{"t":"2026-04-16","q":151.6999969482422},{"t":"2026-04-17","q":153.66000366210938},{"t":"2026-04-19","q":153.60000610351562},{"t":"2026-04-20","q":152.8800048828125},{"t":"2026-04-21","q":152.55999755859375},{"t":"2026-04-22","q":153.3800048828125},{"t":"2026-04-23","q":153.77999877929688},{"t":"2026-04-24","q":153.60000610351562},{"t":"2026-04-26","q":153.9600067138672},{"t":"2026-04-27","q":153.5},{"t":"2026-04-28","q":152.8800048828125},{"t":"2026-04-29","q":153.1199951171875},{"t":"2026-04-30","q":153.9600067138672},{"t":"2026-05-03","q":158.13999938964844},{"t":"2026-05-04","q":154.55999755859375},{"t":"2026-05-05","q":155.97999572753906},{"t":"2026-05-06","q":158.05999755859375},{"t":"2026-05-07","q":157.97999572753906},{"t":"2026-05-08","q":158.13999938964844},{"t":"2026-05-10","q":159.44000244140625},{"t":"2026-05-11","q":158.6199951171875},{"t":"2026-05-12","q":156.9600067138672},{"t":"2026-05-13","q":159.13999938964844},{"t":"2026-05-14","q":161.02000427246094},{"t":"2026-05-15","q":159.44000244140625},{"t":"2026-05-17","q":161.6199951171875},{"t":"2026-05-18","q":158.44000244140625},{"t":"2026-05-19","q":158.1999969482422},{"t":"2026-05-20","q":159.75999450683594},{"t":"2026-05-21","q":159.9199981689453},{"t":"2026-05-22","q":161.6199951171875},{"t":"2026-05-24","q":163.16000366210938},{"t":"2026-05-25","q":162.77999877929688},{"t":"2026-05-26","q":162.5800018310547},{"t":"2026-05-27","q":162.1999969482422},{"t":"2026-05-28","q":162.82000732421875},{"t":"2026-05-29","q":163.16000366210938},{"t":"2026-05-31","q":162.36000061035156},{"t":"2026-06-01","q":163.9199981689453},{"t":"2026-06-02","q":164.8800048828125},{"t":"2026-06-03","q":164.13999938964844},{"t":"2026-06-04","q":163.8000030517578},{"t":"2026-06-05","q":162.36000061035156},{"t":"2026-06-07","q":162.4600067138672},{"t":"2026-06-08","q":161.55999755859375},{"t":"2026-06-09","q":159.5},{"t":"2026-06-10","q":159.24000549316406},{"t":"2026-06-11","q":159.55999755859375},{"t":"2026-06-12","q":162.4600067138672},{"t":"2026-06-14","q":165.44000244140625},{"t":"2026-06-15","q":164.60000610351562},{"t":"2026-06-16","q":164.16000366210938},{"t":"2026-06-17","q":164.63999938964844},{"t":"2026-06-18","q":165.4600067138672},{"t":"2026-06-19","q":165.44000244140625},{"t":"2026-06-21","q":163.6999969482422},{"t":"2026-06-22","q":166.0399932861328},{"t":"2026-06-23","q":163.9199981689453},{"t":"2026-06-24","q":164.8000030517578},{"t":"2026-06-25","q":164.1999969482422},{"t":"2026-06-26","q":163.6999969482422},{"t":"2026-06-28","q":165.8800048828125},{"t":"2026-06-29","q":163.44000244140625},{"t":"2026-06-30","q":165.22000122070312},{"t":"2026-07-01","q":165.94000244140625},{"t":"2026-07-02","q":164.97999572753906},{"t":"2026-07-03","q":165.8800048828125},{"t":"2026-07-05","q":166.13999938964844},{"t":"2026-07-06","q":166.60000610351562},{"t":"2026-07-07","q":164.82000732421875},{"t":"2026-07-08","q":163.77999877929688},{"t":"2026-07-09","q":165.55999755859375},{"t":"2026-07-10","q":166.13999938964844},{"t":"2026-07-12","q":163.5},{"t":"2026-07-13","q":165.77999877929688},{"t":"2026-07-14","q":165.66000366210938},{"t":"2026-07-15","q":165.8000030517578},{"t":"2026-07-16","q":165.4600067138672},{"t":"2026-07-17","q":163.5},{"t":"2026-07-19","q":164.27999877929688},{"t":"2026-07-20","q":164.17999267578125},{"t":"2026-07-21","q":165.13999938964844},{"t":"2026-07-22","q":165.39999389648438},{"t":"2026-07-23","q":163.36000061035156},{"t":"2026-07-24","q":164.27999877929688},{"t":"2026-07-26","q":162.9600067138672},{"t":"2026-07-27","q":163.36000061035156},{"t":"2026-07-28","q":163.77999877929688},{"t":"2026-07-29","q":162.39999389648438},{"t":"2026-07-30","q":162.02000427246094},{"t":"2026-07-31","q":162.9600067138672},{"t":"2026-08-02","q":168.3800048828125},{"t":"2026-08-03","q":165.10000610351562},{"t":"2026-08-04","q":167.5399932861328},{"t":"2026-08-05","q":168.0399932861328},{"t":"2026-08-06","q":167.83999633789062},{"t":"2026-08-07","q":168.3800048828125},{"t":"2026-08-09","q":168.8800048828125},{"t":"2026-08-10","q":168.47999572753906},{"t":"2026-08-11","q":168.47999572753906},{"t":"2026-08-12","q":168.8000030517578},{"t":"2026-08-13","q":169.6199951171875},{"t":"2026-08-14","q":168.8800048828125},{"t":"2026-08-16","q":166.3000030517578},{"t":"2026-08-17","q":169.05999755859375},{"t":"2026-08-18","q":166.89999389648438},{"t":"2026-08-19","q":166.5},{"t":"2026-08-20","q":165.66000366210938},{"t":"2026-08-21","q":166.3000030517578},{"t":"2026-08-23","q":168.5399932861328},{"t":"2026-08-24","q":165.6199951171875},{"t":"2026-08-25","q":166.3000030517578},{"t":"2026-08-26","q":166.5399932861328},{"t":"2026-08-27","q":167.13999938964844},{"t":"2026-08-28","q":168.5399932861328},{"t":"2026-08-30","q":167.8800048828125},{"t":"2026-08-31","q":166.66000366210938},{"t":"2026-09-01","q":166.6199951171875},{"t":"2026-09-02","q":166.82000732421875},{"t":"2026-09-03","q":168.05999755859375},{"t":"2026-09-04","q":167.8800048828125},{"t":"2026-09-06","q":166.86000061035156},{"t":"2026-09-07","q":167.77999877929688},{"t":"2026-09-08","q":167.5800018310547},{"t":"2026-09-09","q":166.22000122070312},{"t":"2026-09-10","q":165.25999450683594},{"t":"2026-09-11","q":166.86000061035156},{"t":"2026-09-13","q":167.13999938964844},{"t":"2026-09-14","q":166.22000122070312},{"t":"2026-09-15","q":165.36000061035156},{"t":"2026-09-16","q":166.3000030517578},{"t":"2026-09-17","q":167.66000366210938},{"t":"2026-09-18","q":167.13999938964844},{"t":"2026-09-20","q":169.74000549316406},{"t":"2026-09-21","q":169.47999572753906},{"t":"2026-09-22","q":170.5},{"t":"2026-09-23","q":170.0399932861328},{"t":"2026-09-24","q":168.9199981689453},{"t":"2026-09-25","q":169.74000549316406},{"t":"2026-09-27","q":171.13999938964844},{"t":"2026-09-28","q":169.1199951171875},{"t":"2026-09-29","q":169.39999389648438},{"t":"2026-09-30","q":169.77999877929688},{"t":"2026-10-01","q":169.3800048828125},{"t":"2026-10-02","q":171.13999938964844},{"t":"2026-10-05","q":172.32000732421875}]}</script></div>
+    <div class="card"><h2>📅 Agenda</h2><div class="agenda"><div class="ev-col"><h3>💼 Work</h3><ul class="events"><li><span class="time">09:30</span><div class="ev-title">WORK<div class="ev-loc">Schôdza v aplikácii Microsoft Teams; Zasadacka</div></div></li><li><span class="time">12:30</span><div class="ev-title">Veronika gynekolog</div></li></ul></div><div class="ev-col"><h3>🏠 Private</h3><ul class="events"><li><span class="time">12:45</span><div class="ev-title">Gynekologia</div></li><li><span class="time">16:00</span><div class="ev-title">Fit 🏋🏼‍♂️</div></li><li><span class="time">16:00</span><div class="ev-title">Andrej</div></li><li><span class="time">17:00</span><div class="ev-title">Lampy, drevotrieska</div></li></ul></div></div></div>
+    <div class="card"><h2>💼 Job offers <span class="sub">impactpool, joshswaterjobs, profesia</span></h2><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212231" target="_blank" rel="noopener">Individual Contractor - Geospatial Analysts – Satellite Imagery and GIS (Geneva office based) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Geneva</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212232" target="_blank" rel="noopener">Individual Contractor - Geospatial Analysts – Satellite Imagery and GIS (Remote) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Remote</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212230" target="_blank" rel="noopener">Individual Contractor - Geospatial Quality Assurance, Training and Analytical Support Specialists (Remote) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Remote</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212233" target="_blank" rel="noopener">Individual Contractor - Geospatial Quality Assurance, Training and Analytical Support Specialists (Geneva office based) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Geneva</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/391559/" target="_blank" rel="noopener">Associate / Associate Director – Flood Risk and Sustainable Water Management</a></div><div class="it-meta">Tetra Tech · London, UK 🇬🇧</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag">Full-Time</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/391427/" target="_blank" rel="noopener">Water Resource and Flood Risk Management Specialist (Philippines nationals)</a></div><div class="it-meta">Asian Development Bank (ADB) · Philippines 🇵🇭</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag">Consultancy</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/391779/" target="_blank" rel="noopener">Short Term Consultant – Senior Hydrologist</a></div><div class="it-meta">The World Bank · Jakarta, Indonesia 🇮🇩</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag">Consultancy</span><span class="tag deadline">deadline 9 October, 2026</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/bratislavska-vodarenska-spolocnost/O5363792" target="_blank" rel="noopener">Vedúci/Vedúca odboru vodohospodárskych koncepcií</a></div><div class="it-meta">Bratislavská vodárenská spoločnosť, a.s. · Prešovská 48, Bratislava</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">3 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/bratislavska-vodarenska-spolocnost/O5362740" target="_blank" rel="noopener">Geodet/geodetka</a></div><div class="it-meta">Bratislavská vodárenská spoločnosť, a.s. · Prešovská, Bratislava</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">1 700 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/indra-avitech/O5369162" target="_blank" rel="noopener">GIS Developer (m/ž) - Letectvo</a></div><div class="it-meta">Indra Avitech, s. r. o. · Bratislava, Slovensko (Pozícia umožňuje občasnú prácu z domu)</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">2 200 €–4 000 €</span></div></div></div>
+    <div class="card"><h2>🏠 Real estate <span class="sub">Bratislava III</span></h2><div class="item"><div class="it-title"><a href="https://www.topreality.sk/qreal-miesto-kde-sa-priroda-stretava-s-mestom-r9436601.html" target="_blank" rel="noopener">**QREAL**Miesto, kde sa príroda stretáva s mestom**</a></div><div class="it-meta">Bratislava-Rača · Pozemok pre rodinné domy · 5.10.2026</div><div><span class="price"></span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/qreal-velkorysy-pozemok-1502m2-ba-vinohrady-r9436597.html" target="_blank" rel="noopener">**QREAL**VEĽKORYSÝ POZEMOK 1502m2 BA-VINOHRADY**</a></div><div class="it-meta">Bratislava-Nové Mesto · Rekreačný pozemok · 5.10.2026</div><div><span class="price">95 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/predrezervovane-pieskova-raca-788-m2-pre-moderny-rodinny-dom-so-studiou-a-vsetkymi-is-r9430640.html" target="_blank" rel="noopener">Predrezervované. Pieskova, Rača | 788 m² pre moderný rodinný dom so štúdiou a všetkými IS</a></div><div class="it-meta">Bratislava-Rača · Pozemok pre rodinné domy · 5.10.2026</div><div><span class="price">498 900 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-pekny-oploteny-pozemok-v-osobnom-vlastnictve-o-vymere-419-m2-r9429225.html" target="_blank" rel="noopener">Na predaj pekný, oplotený pozemok v osobnom vlastníctve o výmere 419 m2</a></div><div class="it-meta">Bratislava-Rača · Rekreačný pozemok · 5.10.2026</div><div><span class="price">83 900 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/predaj-stavebnych-pozemkov-o-rozlohe-1-674-m2-nemecka-dolina-bratislava-vajnory-r9428303.html" target="_blank" rel="noopener">Predaj stavebných pozemkov o rozlohe 1 674 m² – Nemecká dolina, Bratislava – Vajnory</a></div><div class="it-meta">Bratislava-Vajnory · Pozemok pre obč. vybavenosť · 5.10.2026</div><div><span class="price">226 200 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-pozemok-zahradu-v-osobnom-vlastnictve-s-vymerou-387-m2-r9426554.html" target="_blank" rel="noopener">Na predaj pozemok – záhradu v osobnom vlastníctve s výmerou 387 m2</a></div><div class="it-meta">Bratislava-Rača · Rekreačný pozemok · 5.10.2026</div><div><span class="price">64 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/priestranna-zahrada-v-lokalite-zabi-majer-r9423997.html" target="_blank" rel="noopener">Priestranná záhrada v lokalite Žabí majer</a></div><div class="it-meta">Bratislava-Rača · Záhrada · 5.10.2026</div><div><span class="price">48 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-zahrada-v-osobnom-vlastnictve-s-vymerou-387-m2-r9422649.html" target="_blank" rel="noopener">Na predaj záhrada v osobnom vlastníctve s výmerou 387 m2</a></div><div class="it-meta">Bratislava-Rača · Záhrada · 5.10.2026</div><div><span class="price">52 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/vymen-suseda-vynimocny-pozemok-bratislava-iii-nove-mesto-vinohrady-koziarka-1502-00m2-r9420973.html" target="_blank" rel="noopener">VYMEŇ SUSEDA! - VÝNIMOČNÝ POZEMOK BRATISLAVA III – NOVÉ MESTO, VINOHRADY – KOZIARKA 1502.00m2.</a></div><div class="it-meta">Bratislava-Nové Mesto · Rekreačný pozemok · 5.10.2026</div><div><span class="price">95 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-vynimocny-stavebny-pozemok-s-vymerou-966-m2-ba-iii-top-r9416982.html" target="_blank" rel="noopener">Na predaj výnimočný stavebný pozemok s výmerou 966 m2, BA III TOP</a></div><div class="it-meta">Bratislava-Nové Mesto · Iný stavebný pozemok · 5.10.2026</div><div><span class="price">870 €</span></div></div></div>
+  </div>
+  <footer>Sources: impactpool.org · joshswaterjobs.com · profesia.sk · topreality.sk · noel.gv.at · shmu.sk · finance.yahoo.com · open-meteo.com</footer>
+</div>
+<script>
+(function() {
+  var KEY = 'mb-theme', root = document.documentElement;
+  function stored() {
+    try { var t = localStorage.getItem(KEY); return (t === 'light' || t === 'dark') ? t : 'auto'; }
+    catch (e) { return 'auto'; }
+  }
+  function isDark(t) {
+    if (t === 'dark') return true;
+    if (t === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function apply(t) {
+    if (t === 'auto') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', t);
+    var b = document.getElementById('themeToggle');
+    if (b) b.textContent = isDark(t) ? '\u2600\ufe0f' : '🌙';
+  }
+  function cycle() {
+    var order = ['auto', 'dark', 'light'], cur = stored();
+    var next = order[(order.indexOf(cur) + 1) % order.length];
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+    apply(next);
+  }
+  apply(stored());
+  var b = document.getElementById('themeToggle');
+  if (b) b.addEventListener('click', cycle);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() { apply(stored()); });
+  window.addEventListener('storage', function(e) { if (e.key === KEY) apply(stored()); });
+})();
+</script>
+<script>
+(function() {
+  var TWO_DAYS = 2 * 24 * 3600 * 1000;
+  var RANGES = {
+    '1D': TWO_DAYS,
+    '1M': 31 * 24 * 3600 * 1000,
+    '6M': 183 * 24 * 3600 * 1000,
+    '1Y': 366 * 24 * 3600 * 1000,
+    '3Y': 3 * 366 * 24 * 3600 * 1000,
+    '5Y': 5 * 366 * 24 * 3600 * 1000,
+    'MAX': Infinity
+  };
+  var W = 600, H = 190;
+  var PL = 46, PR = 12, PT = 14, PB = 24;
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function ts(p) { return Date.parse(p.t + 'T00:00:00'); }
+
+  function loadData() {
+    var el = document.getElementById('stockData');
+    if (!el) return null;
+    try { return JSON.parse(el.textContent); } catch (e) { return null; }
+  }
+
+  function sliceFor(key, pts) {
+    var ms = RANGES[key];
+    if (ms === Infinity) return pts;
+    var lastT = ts(pts[pts.length - 1]);
+    var cut = 0;
+    for (var i = pts.length - 1; i >= 0; i--) {
+      if (lastT - ts(pts[i]) <= ms) cut++; else break;
+    }
+    var out = pts.slice(pts.length - cut);
+    if (out.length < 2) out = pts.slice(pts.length - 2);
+    return out;
+  }
+
+  function niceStep(span, target) {
+    if (span <= 0) return 1;
+    var rough = span / target;
+    var pow = Math.pow(10, Math.floor(Math.log(rough) / Math.LN10));
+    var norm = rough / pow;
+    var f = norm < 1.5 ? 1 : (norm < 3 ? 2 : (norm < 7 ? 5 : 10));
+    return f * pow;
+  }
+
+function fmtTick(v, step) {
+  var dec = step >= 1 ? 0 : (step >= 0.1 ? 1 : 2);
+  return v.toFixed(dec);
+}
+
+  function fmtPrice(v) {
+    var s = v.toFixed(2);
+    if (s.indexOf('.') !== -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    return s;
+  }
+
+  function fmtDate(iso, withYear) {
+    var p = iso.split('-');
+    if (p.length < 3) return iso;
+    var d = +p[2], m = MONTHS[+p[1] - 1], y = p[0];
+    return d + ' ' + m + (withYear ? ' ' + y : '');
+  }
+
+  function draw(points, key) {
+    var svg = document.getElementById('stockChart');
+    var tip = document.getElementById('stockTip');
+    if (tip) tip.style.display = 'none';
+    if (!svg || !points || points.length < 2) {
+      if (svg) svg.innerHTML = '';
+      window.stockPts = null;
+      return;
+    }
+    var pts = sliceFor(key, points);
+    if (pts.length < 2) return;
+    window.stockPts = pts;
+
+    var qs = pts.map(function(p) { return p.q; });
+    var min = Math.min.apply(null, qs), max = Math.max.apply(null, qs);
+    if (max - min < 1e-9) {
+      max = min + (min === 0 ? 0.5 : Math.max(Math.abs(min) * 0.01, 0.05));
+      min = min - (min === 0 ? 0.5 : Math.abs(min) * 0.01);
+    }
+    var pad = (max - min) * 0.08;
+    min -= pad; max += pad;
+
+    var x = function(i) { return PL + (i / (pts.length - 1)) * (W - PL - PR); };
+    var y = function(q) { return PT + (1 - (q - min) / (max - min)) * (H - PT - PB); };
+    window.stockMapY = y;
+
+    var d = pts.map(function(p, i) { return (i ? 'L' : 'M') + x(i).toFixed(2) + ',' + y(p.q).toFixed(2); }).join('');
+    var area = d + 'L' + x(pts.length - 1).toFixed(2) + ',' + (H - PB).toFixed(2) +
+      'L' + x(0).toFixed(2) + ',' + (H - PB).toFixed(2) + 'Z';
+
+    var grid = '', yLabels = [], xLabels = [];
+    var step = niceStep(max - min, 5);
+    var tick = Math.ceil(min / step) * step;
+    for (; tick <= max; tick += step) {
+      var gy = y(tick);
+      grid += '<line class="axis" x1="' + PL + '" y1="' + gy.toFixed(1) +
+        '" x2="' + (W - PR) + '" y2="' + gy.toFixed(1) + '"/>';
+      yLabels.push({ text: fmtTick(tick, step), x: (PL - 6) / W * 100, y: gy / H * 100 });
+    }
+    grid += '<line class="axis" x1="' + PL + '" y1="' + (H - PB) +
+      '" x2="' + (W - PR) + '" y2="' + (H - PB) + '"/>';
+
+    var spanDays = (ts(pts[pts.length - 1]) - ts(pts[0])) / 86400000;
+    var nl = spanDays <= 5 ? 2 : 4;
+    for (var j = 0; j < nl; j++) {
+      var i = Math.round(j / (nl - 1) * (pts.length - 1));
+      xLabels.push({ text: fmtDate(pts[i].t, spanDays > 400),
+        x: x(i) / W * 100, y: (H - PB + 13) / H * 100 });
+    }
+
+    var dot = '<circle class="dot" cx="' + x(pts.length - 1).toFixed(2) +
+      '" cy="' + y(qs[qs.length - 1]).toFixed(2) + '" r="2.6"/>';
+
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.innerHTML = grid +
+      '<path class="area" d="' + area + '"/>' +
+      '<path class="line" d="' + d + '"/>' +
+      dot;
+    setAxis(yLabels, xLabels);
+  }
+
+  function setAxis(yLabels, xLabels) {
+    var axis = document.getElementById('stockAxis');
+    if (!axis) return;
+    var parts = [];
+    var unit = window.stockCurrency || '';
+    if (unit) parts.push({ text: unit, cls: 'aU', x: PL / W * 100, y: 3 / H * 100 });
+    for (var k = 0; k < yLabels.length; k++) {
+      parts.push({ text: yLabels[k].text, cls: 'aY', x: yLabels[k].x, y: yLabels[k].y });
+    }
+    for (var m = 0; m < xLabels.length; m++) {
+      parts.push({ text: xLabels[m].text, cls: 'aX', x: xLabels[m].x, y: xLabels[m].y });
+    }
+    var s = '';
+    for (var n = 0; n < parts.length; n++) {
+      var p = parts[n];
+      var align = p.cls === 'aX' ? 'translateX(-50%) ' : (p.cls === 'aY' ? 'translate(-100%,-50%) ' : '');
+      s += '<div class="' + p.cls + '" style="left:' + p.x.toFixed(2) +
+        '%;top:' + p.y.toFixed(2) + '%;transform:' + align + '">' + p.text + '</div>';
+    }
+    axis.innerHTML = s;
+  }
+
+  function hideTip() {
+    var tip = document.getElementById('stockTip');
+    if (tip) tip.style.display = 'none';
+    var svg = document.getElementById('stockChart');
+    if (svg) {
+      var g = svg.querySelector('#stockHover');
+      if (g) g.parentNode.removeChild(g);
+    }
+  }
+
+  function onMove(e) {
+    var svg = document.getElementById('stockChart');
+    var pts = window.stockPts;
+    if (!svg || !pts || pts.length < 2 || !window.stockMapY) return;
+    var rect = svg.getBoundingClientRect();
+    if (rect.width < 2) return;
+    var svgX = (e.clientX - rect.left) / rect.width * W;
+    var ratio = (svgX - PL) / (W - PL - PR);
+    var i = Math.round(ratio * (pts.length - 1));
+    if (i < 0) i = 0;
+    if (i > pts.length - 1) i = pts.length - 1;
+    var px = PL + (i / (pts.length - 1)) * (W - PL - PR);
+    var py = window.stockMapY(pts[i].q);
+
+    var g = svg.querySelector('#stockHover');
+    if (!g) {
+      g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('id', 'stockHover');
+      svg.appendChild(g);
+    }
+    g.innerHTML =
+      '<line class="stock-cross" x1="' + px.toFixed(2) + '" y1="' + PT +
+      '" x2="' + px.toFixed(2) + '" y2="' + (H - PB) + '"/>' +
+      '<circle class="dot" r="3" cx="' + px.toFixed(2) + '" cy="' + py.toFixed(2) + '"/>';
+
+    var tip = document.getElementById('stockTip');
+    if (!tip) return;
+    var unit = window.stockCurrency ? ' ' + window.stockCurrency : '';
+    tip.textContent = fmtDate(pts[i].t, true) + '  ·  ' + fmtPrice(pts[i].q) + unit;
+    var w = rect.width;
+    var left = px / W * w;
+    if (left < 46) left = 46;
+    if (left > w - 46) left = w - 46;
+    tip.style.left = left + 'px';
+    tip.style.top = (py / H * rect.height) + 'px';
+    tip.style.display = 'block';
+  }
+
+  function updateMove(pts) {
+    var el = document.getElementById('stockMove');
+    if (!el || !pts || pts.length < 2) return;
+    var first = pts[0].q, last = pts[pts.length - 1].q;
+    var pct = first ? (last - first) / first * 100 : 0;
+    var up = pct >= 0;
+    el.textContent = (up ? '\u25b2' : '\u25bc') + ' ' + Math.abs(pct).toFixed(2) + '%';
+    el.classList.toggle('up', up);
+    el.classList.toggle('down', !up);
+  }
+
+  function setRange(key) {
+    var btns = document.querySelectorAll('.stock-range');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', btns[i].getAttribute('data-range') === key);
+    }
+    draw(window.stockSeries, key);
+    updateMove(window.stockPts);
+  }
+
+  var data = loadData();
+  if (data && data.series && data.series.length) {
+    window.stockSeries = data.series;
+    window.stockCurrency = data.currency || '';
+    var svgEl = document.getElementById('stockChart');
+    if (svgEl) {
+      svgEl.addEventListener('pointermove', onMove);
+      svgEl.addEventListener('pointerleave', hideTip);
+    }
+    var buttons = document.querySelectorAll('.stock-range');
+    if (buttons.length) {
+      for (var b = 0; b < buttons.length; b++) {
+        (function(btn) {
+          btn.addEventListener('click', function() { setRange(btn.getAttribute('data-range')); });
+        })(buttons[b]);
+      }
+      setRange('6M');
+    } else {
+      draw(data.series, 'MAX');
+    }
+  }
+})();
+</script>
+</body>
+</html>
