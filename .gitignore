@@ -1,0 +1,6 @@
+# Never publish anything but the rendered page.
+*
+!.gitignore
+!index.html
+!archive/
+!archive/*.html
