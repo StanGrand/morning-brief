@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Brief – 2026-10-11</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#ffffff; --bg-grad1:#ffffff; --bg-grad2:#f5f5f5;
+  --card:#ffffff; --ink:#111111; --muted:#757575;
+  --accent:#d6220d; --accent-ink:#ffffff; --accent-soft:#fdecea;
+  --border:#e3e3e3; --shadow:none;
+  --ok:#0a8f3c; --ok-bg:#e9f7ee;
+  --rain-bg:#eaf2fd; --rain-ink:#12459c; --rain-border:#c3d9f5;
+  --warn-bg:#fdf4e3; --warn-ink:#8a5a00; --warn-border:#eccc8a;
+  --danger-bg:#fdeceb; --danger-ink:#b31016; --danger-border:#f0b7b4;
+  --sun:#f5a623; --chart:#d6220d;
+  --radius:3px; --hair:#111111; --tick:#f0f0f0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0d0d0d; --bg-grad1:#0d0d0d; --bg-grad2:#141414;
+    --card:#151515; --ink:#f4f4f4; --muted:#9b9b9b;
+    --accent:#ff4b33; --accent-ink:#0d0d0d; --accent-soft:#2b1512;
+    --border:#2b2b2b;
+    --ok:#5ed88a; --ok-bg:#11251a;
+    --rain-bg:#111d2e; --rain-ink:#8fc0ff; --rain-border:#2b4a78;
+    --warn-bg:#2b2410; --warn-ink:#ecc45a; --warn-border:#6b5518;
+    --danger-bg:#2e1416; --danger-ink:#ff8f93; --danger-border:#7a2b30;
+    --sun:#ffcf6e; --chart:#ff4b33;
+    --hair:#f4f4f4; --tick:#1c1c1c;
+  }
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d0d0d; --bg-grad1:#0d0d0d; --bg-grad2:#141414;
+  --card:#151515; --ink:#f4f4f4; --muted:#9b9b9b;
+  --accent:#ff4b33; --accent-ink:#0d0d0d; --accent-soft:#2b1512;
+  --border:#2b2b2b;
+  --ok:#5ed88a; --ok-bg:#11251a;
+  --rain-bg:#111d2e; --rain-ink:#8fc0ff; --rain-border:#2b4a78;
+  --warn-bg:#2b2410; --warn-ink:#ecc45a; --warn-border:#6b5518;
+  --danger-bg:#2e1416; --danger-ink:#ff8f93; --danger-border:#7a2b30;
+  --sun:#ffcf6e; --chart:#ff4b33;
+  --hair:#f4f4f4; --tick:#1c1c1c;
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:15px;line-height:1.4;
+  background:var(--bg);
+  background:linear-gradient(180deg,var(--bg-grad1),var(--bg-grad2));
+  -webkit-font-smoothing:antialiased}
+
+/* ---- shell ---- */
+.wrap{max-width:1320px;margin:0 auto;padding:0 18px 44px}
+.brandbar{height:5px;background:var(--accent);margin:0 -18px}
+
+/* ---- masthead ---- */
+header.top{display:flex;align-items:flex-end;gap:16px;
+  border-bottom:2px solid var(--hair);padding:16px 0 10px;margin-bottom:12px}
+header.top h1{margin:0;font-size:2.1rem;font-weight:800;letter-spacing:-.035em;
+  line-height:.95;text-transform:uppercase}
+.brand-emoji{font-size:1.05em;vertical-align:-.08em;margin-right:.14em}
+.meta{color:var(--muted);font-size:.72rem;letter-spacing:.09em;
+  text-transform:uppercase;padding-bottom:.2em;white-space:nowrap}
+.meta .sep{opacity:.4;margin:0 .4em}
+.theme-btn{margin-left:auto;border:1px solid var(--border);background:var(--card);
+  color:var(--muted);border-radius:var(--radius);width:28px;height:28px;
+  font-size:.85rem;cursor:pointer;line-height:1;flex:none;
+  display:flex;align-items:center;justify-content:center;padding:0}
+.theme-btn:hover{color:var(--accent);border-color:var(--accent)}
+
+/* ---- ticker strip ---- */
+.chips{display:flex;flex-wrap:wrap;gap:0;margin:0 0 14px;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:6px 0;background:var(--card)}
+.chip{border-right:1px solid var(--border);padding:0 11px;font-size:.76rem;
+  color:var(--muted);white-space:nowrap;display:inline-flex;gap:5px;align-items:center}
+.chip:last-child{border-right:0}
+.chip strong{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.chip.warn{border-right-color:var(--warn-border);color:var(--warn-ink)}
+.chip.warn strong{color:var(--warn-ink)}
+.chip.danger{border-right-color:var(--danger-border);color:var(--danger-ink)}
+.chip.danger strong{color:var(--danger-ink)}
+.chip.up strong{color:var(--ok)}
+.chip.down strong{color:var(--danger-ink)}
+
+/* ---- grid ---- */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;align-items:stretch}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:11px 13px 12px;min-width:0;
+  break-inside:avoid;page-break-inside:avoid;
+  display:flex;flex-direction:column;
+  container-type:inline-size}
+/* Spans are tuned so cards of similar height share a row: this was picked by
+   measuring rendered heights in a headless browser, not by eye. */
+.c-weather{grid-column:span 6}
+.c-stocks{grid-column:span 6}
+.c-hydro{grid-column:span 9}
+.c-agenda{grid-column:span 3}
+.c-jobs{grid-column:span 7}
+.c-reality{grid-column:span 5}
+.c-news{grid-column:span 12}
+
+.card h2{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  margin:0 0 9px;padding-bottom:7px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:7px;color:var(--ink);line-height:1}
+.card h2 .sub{color:var(--muted);font-weight:500;font-size:.66rem;letter-spacing:.1em;
+  margin-left:auto;text-transform:uppercase}
+.h2sub{color:var(--muted);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+  margin:-5px 0 8px;font-weight:500}
+
+ul.notes{list-style:none;margin:9px 0 0;padding:0;
+  border-top:1px solid var(--border)}
+ul.notes li{padding:5px 0 5px 11px;color:var(--muted);font-size:.8rem;
+  position:relative;line-height:1.35}
+ul.notes li:before{content:"";position:absolute;left:0;top:11px;
+  width:3px;height:3px;background:var(--accent);border-radius:50%}
+ul.notes li.warn{color:var(--warn-ink)}
+ul.notes li.danger{color:var(--danger-ink)}
+ul.notes li.warn:before{background:var(--warn-ink)}
+ul.notes li.danger:before{background:var(--danger-ink)}
+
+/* ---- weather ---- */
+.weather-main{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.weather-now{display:flex;align-items:center;gap:10px}
+.weather-emoji{font-size:2.3rem;line-height:.85}
+.temp-big{font-size:2.2rem;font-weight:800;letter-spacing:-.045em;line-height:.9}
+.temp-big small{font-size:.7rem;color:var(--muted);font-weight:500;display:block;
+  margin-top:3px;letter-spacing:0}
+.metro{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:1px;
+  margin-top:9px;background:var(--border);border:1px solid var(--border)}
+.metro .m{background:var(--card);padding:4px 7px;font-size:.72rem}
+.metro .m .k{color:var(--muted);font-size:.6rem;text-transform:uppercase;
+  letter-spacing:.1em;font-weight:600}
+.metro .m .v{font-weight:700;margin-top:1px;font-variant-numeric:tabular-nums}
+.forecast{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+  gap:1px;margin-top:9px;background:var(--border);border:1px solid var(--border)}
+.fday{background:var(--card);padding:7px 6px;text-align:center}
+.fday .dow{font-size:.62rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.12em;font-weight:700}
+.fday .emoji{font-size:1.4rem;line-height:1;margin:3px 0}
+.fday .cond{font-size:.68rem;color:var(--muted);line-height:1.2}
+.fday .hi{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.fday .lo{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.fday .precip{font-size:.64rem;color:var(--rain-ink);margin-top:2px;font-weight:600}
+.chart-wrap{margin-top:9px;border:1px solid var(--border);padding:5px 4px 2px;
+  background:var(--card)}
+.chart-wrap svg{display:block;width:100%;height:auto;max-height:200px}
+.chart-wrap .cap{font-size:.62rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.1em;text-align:center;margin-bottom:3px}
+
+/* ---- hydrology ---- */
+.hydro-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.hydro-box{border:1px solid var(--border);padding:9px 11px;background:var(--card)}
+.hydro-box>strong{font-size:.64rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:700}
+.hydro-box.warn{border-color:var(--warn-border);background:var(--warn-bg)}
+.hydro-box.danger{border-color:var(--danger-border);background:var(--danger-bg)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:.78rem;margin-top:6px}
+.kv .k{color:var(--muted);white-space:nowrap}
+.kv .v{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.rainlink{color:var(--danger-ink);font-weight:700;text-decoration:none}
+.rainlink:hover{text-decoration:underline}
+.big-num{font-size:2rem;font-weight:800;letter-spacing:-.04em;line-height:1;
+  color:var(--danger-ink);margin-top:5px;font-variant-numeric:tabular-nums}
+
+/* ---- agenda ---- */
+.agenda{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.ev-col h3{font-size:.64rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);margin:0 0 6px;font-weight:700;
+  border-bottom:1px solid var(--border);padding-bottom:4px}
+ul.events{list-style:none;margin:0;padding:0}
+ul.events li{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--tick);
+  font-size:.8rem;line-height:1.28}
+ul.events li:last-child{border-bottom:0}
+.time{font-variant-numeric:tabular-nums;font-weight:800;color:var(--accent);
+  white-space:nowrap;min-width:38px;font-size:.78rem}
+.ev-title{flex:1;font-weight:500;min-width:0}
+.ev-loc{color:var(--muted);font-size:.74rem;font-weight:400}
+
+/* ---- jobs & real estate ---- */
+/* Two lines per entry: title, then meta + tags sharing a line. */
+.item{display:flex;flex-wrap:wrap;align-items:center;gap:1px 8px;
+  padding:5px 0;border-bottom:1px solid var(--border);font-size:.84rem}
+.item:last-child{border-bottom:0}
+.item .it-title{flex:1 1 100%;font-weight:700;font-size:.85rem;line-height:1.25;
+  letter-spacing:-.01em}
+.item .it-title a{color:var(--ink)}
+.item .it-title a:hover{color:var(--accent);text-decoration:none}
+.item .it-meta{flex:0 1 auto;min-width:7em;color:var(--muted);font-size:.72rem;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tags{flex:0 0 auto;margin-left:auto;display:flex;flex-wrap:wrap;gap:3px;
+  justify-content:flex-end}
+.tag{display:inline-block;border:1px solid var(--border);background:var(--card);
+  border-radius:2px;padding:0 5px;font-size:.63rem;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.04em;font-weight:700;line-height:1.5;
+  white-space:nowrap}
+.tag.money,.tag.remote{border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
+.tag.deadline{border-color:var(--warn-border);background:var(--warn-bg);color:var(--warn-ink)}
+.tag.src{border-color:var(--border);background:var(--accent-soft);color:var(--accent)}
+.price{font-weight:800;color:var(--accent);white-space:nowrap;font-size:.82rem;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
+  color:var(--muted);font-size:.64rem;text-align:center;letter-spacing:.06em;
+  text-transform:uppercase}
+
+/* ---- stock watch ---- */
+.stock-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.stock-price{font-size:1.85rem;font-weight:800;letter-spacing:-.04em;line-height:1;
+  font-variant-numeric:tabular-nums}
+.stock-move{font-size:.84rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stock-move.up{color:var(--ok)}
+.stock-move.down{color:var(--danger-ink)}
+.stock-meta{color:var(--muted);font-size:.66rem;text-transform:uppercase;
+  letter-spacing:.08em;margin:5px 0 7px}
+.stock-chart{width:100%;height:auto;display:block}
+.stock-chart-wrap{position:relative;margin-top:4px}
+.stock-chart .area{fill:var(--accent);fill-opacity:.09}
+.stock-chart .line{fill:none;stroke:var(--accent);stroke-width:1.8;
+  stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.stock-chart .dot{fill:var(--accent)}
+.stock-chart .axis{stroke:var(--border);stroke-width:1;vector-effect:non-scaling-stroke}
+.stock-chart .stock-cross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;
+  pointer-events:none}
+.stock-axis{position:absolute;inset:0;pointer-events:none}
+.stock-axis div{position:absolute;font-size:.6rem;line-height:1;color:var(--muted);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.stock-axis .aU{font-weight:700;color:var(--ink)}
+.stock-tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);
+  border-radius:2px;padding:3px 7px;font-size:.72rem;font-variant-numeric:tabular-nums;
+  white-space:nowrap;transform:translate(-50%,-115%);display:none;z-index:5}
+.stock-ranges{display:flex;flex-wrap:wrap;gap:0;margin-top:8px;border-top:1px solid var(--border)}
+.stock-range{padding:4px 0;flex:1;text-align:center;border-right:1px solid var(--border);
+  font-size:.66rem;color:var(--muted);cursor:pointer;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase}
+.stock-range:last-child{border-right:0}
+.stock-range:hover{color:var(--accent);background:var(--accent-soft)}
+.stock-range.active{color:var(--accent);background:var(--accent-soft)}
+
+/* ---- news tabs ---- */
+/* One outlet visible at a time; the buttons switch panes and nothing moves
+   on its own, so the page stays still for the reader. */
+.news-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px}
+.news-tab{font:inherit;font-size:.66rem;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);background:var(--card);
+  border:1px solid var(--border);border-radius:2px;padding:3px 9px;
+  cursor:pointer;white-space:nowrap}
+.news-tab:hover{color:var(--accent);border-color:var(--accent)}
+.news-tab:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.news-tab[aria-selected="true"]{color:var(--accent-ink);
+  background:var(--accent);border-color:var(--accent)}
+/* Marks a tab whose articles are ordered by readership rather than by time. */
+.news-badge{display:inline-block;margin-left:5px;padding:0 4px;
+  font-size:.5rem;font-weight:700;letter-spacing:.1em;line-height:1.5;
+  border:1px solid currentColor;border-radius:2px;opacity:.75;
+  vertical-align:1px}
+.news-tab[aria-selected="true"] .news-badge{opacity:.9}
+.news-pane[hidden]{display:none}
+.news-col{min-width:0;border-left:2px solid var(--accent);padding-left:9px}
+.news-col.analysis{border-left-color:var(--muted)}
+.news-col>strong{display:flex;align-items:baseline;gap:6px;
+  font-size:.64rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:700;margin-bottom:2px}
+.nc-kind{font-size:.58rem;font-weight:600;letter-spacing:.06em;opacity:.8;
+  color:var(--muted)}
+.nc-ranked{color:var(--accent);opacity:1}
+.nc-item{padding:6px 0;border-top:1px solid var(--border)}
+.nc-item:first-of-type{border-top:0;padding-top:2px}
+.nc-head{display:flex;align-items:baseline;gap:8px}
+.nc-title{color:var(--ink);text-decoration:none;font-size:.82rem;font-weight:600;
+  line-height:1.3;min-width:0}
+.nc-title:hover{color:var(--accent);text-decoration:underline}
+.nc-age{margin-left:auto;flex:0 0 auto;font-size:.58rem;color:var(--muted);
+  letter-spacing:.06em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.nc-sum{color:var(--muted);font-size:.72rem;line-height:1.35;margin:2px 0 0}
+.news-empty{color:var(--muted);font-size:.78rem;padding:7px 0}
+.news-count{color:var(--muted);font-size:.6rem;text-transform:uppercase;
+  letter-spacing:.1em;margin-top:9px;padding-top:7px;border-top:1px solid var(--border)}
+
+/* ---- holidays ---- */
+.holiday{display:inline-block;border:1px solid var(--warn-border);background:var(--warn-bg);
+  color:var(--warn-ink);border-radius:2px;padding:2px 8px;font-size:.7rem;
+  margin:0 4px 6px 0;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.holiday.up{color:var(--muted);background:var(--card);border-color:var(--border);
+  font-weight:600}
+
+/* ---- stale + sparkline ---- */
+.stale-chip{color:var(--warn-ink)!important}
+.stale-chip strong{color:var(--warn-ink)!important}
+.spark-wrap{margin-top:8px;border-top:1px solid var(--border);padding-top:6px}
+.spark-wrap .spark-cap{font-size:.6rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.12em;font-weight:700}
+
+/* ---- responsive ---- */
+@media (max-width:1180px){
+  .c-weather,.c-agenda,.c-stocks,.c-jobs,.c-reality{grid-column:span 6}
+}
+@media (max-width:820px){
+  .grid{gap:12px}
+  .card{grid-column:span 12!important}
+  header.top{flex-wrap:wrap}
+  header.top h1{font-size:1.7rem}
+  .meta{white-space:normal}
+}
+/* On narrow screens give the meta line its own row instead of truncating it.
+   Keyed off the card's own width, so it works at every viewport. */
+@container (max-width:470px){
+  .item{gap:2px 6px}
+  .item .it-meta{flex:1 1 100%;min-width:0;white-space:normal;overflow:visible}
+  .tags{margin-left:0;justify-content:flex-start}
+}
+@media (prefers-reduced-motion:no-preference){
+  .card,.chip,.theme-btn{transition:border-color .12s ease,color .12s ease}
+}</style>
+</head>
+<body>
+<div class="brandbar"></div>
+<div class="wrap">
+  <header class="top">
+    <h1><span class="brand-emoji">📰</span>Daily Brief</h1>
+    <div class="meta">2026-10-11 · generated 2026-10-11 18:07 · openai/gpt-oss-120b</div>
+    <button type="button" id="themeToggle" class="theme-btn" aria-label="Toggle theme">☀️</button>
+  </header>
+  <div class="chips"><span class="chip"><strong>⛅ 15.1°C</strong></span><span class="chip">Partly cloudy</span><span class="chip danger"><strong>🌧️ 8</strong> heavy-rain station(s)</span><span class="chip">✅ No flood activity</span><span class="chip"><strong>💼 10</strong> job matches</span><span class="chip"><strong>🏠 10</strong> listing(s)</span><span class="chip"><strong>📅 1</strong> event(s)</span><span class="chip up"><strong>📈 VWCE.DE 172.86</strong> ▲ 0.56%</span></div>
+  <div class="grid">
+    <section class="card c-weather"><h2>🌤️ Weather<span class="sub">now + 5-day</span></h2><div class="weather-main"><div class="weather-now"><div class="weather-emoji">⛅</div><div><div class="temp-big">15.1°C<small>Partly cloudy</small></div></div></div></div><div class="metro"><div class="m"><div class="k">Humidity</div><div class="v">52%</div></div><div class="m"><div class="k">Wind</div><div class="v">9.8 km/h</div></div><div class="m"><div class="k">Rain</div><div class="v">33%</div></div><div class="m"><div class="k">Feels</div><div class="v">12.5°C</div></div><div class="m"><div class="k">Daylight</div><div class="v">07:04 – 18:10 · 11h</div></div></div><div class="chart-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 155" width="100%" height="auto" role="img" fill="currentColor" aria-label="5-day temperature forecast" font-family="system-ui,sans-serif" style="color:var(--ink)"><defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0654c"/><stop offset="55%" stop-color="#f5a623"/><stop offset="100%" stop-color="#4c9cf0"/></linearGradient></defs><line x1="10" y1="130" x2="460" y2="130" stroke="var(--border)" stroke-width="1" opacity=".8"/><text x="20.0" y="130.0" font-size="9" fill="var(--muted)" text-anchor="start" stroke="var(--bg)" stroke-width="3" paint-order="stroke" transform="translate(0,8)">4.984°</text><text x="63.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Sun</text><text x="63.0" y="35" font-size="15" text-anchor="middle">☁️</text><rect x="55.0" y="52.9" width="16" height="41.5" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="63.0" cy="52.9" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="63.0" cy="94.3" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="77.0" y="56.4" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">18.2°</text><text x="77.0" y="97.8" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">10.5°</text><text x="63.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">Dry</text><text x="149.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Mon</text><text x="149.0" y="35" font-size="15" text-anchor="middle">🌤️</text><rect x="141.0" y="64.7" width="16" height="46.8" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="149.0" cy="64.7" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="149.0" cy="111.5" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="163.0" y="68.2" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">16°</text><text x="163.0" y="115.0" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">7.3°</text><text x="149.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">Dry</text><text x="235.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Tue</text><text x="235.0" y="35" font-size="15" text-anchor="middle">☁️</text><rect x="227.0" y="64.2" width="16" height="44.1" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="235.0" cy="64.2" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="235.0" cy="108.3" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="249.0" y="67.7" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">16.1°</text><text x="249.0" y="111.8" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">7.9°</text><text x="235.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">Dry</text><text x="321.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Wed</text><text x="321.0" y="35" font-size="15" text-anchor="middle">🌦️</text><rect x="313.0" y="52.9" width="16" height="54.9" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="321.0" cy="52.9" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="321.0" cy="107.8" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="335.0" y="56.4" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">18.2°</text><text x="335.0" y="111.3" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">8°</text><text x="321.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">1 mm</text><text x="407.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Thu</text><text x="407.0" y="35" font-size="15" text-anchor="middle">☁️</text><rect x="399.0" y="53.9" width="16" height="59.2" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="407.0" cy="53.9" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="407.0" cy="113.1" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="421.0" y="57.4" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">18°</text><text x="421.0" y="116.6" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">7°</text><text x="407.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">Dry</text></svg></div></section>
+    <section class="card c-stocks"><h2>📈 VWCE.DE</h2><div class="h2sub">Vanguard FTSE All-World UCITS ETF USD Accumulation</div><div class="stock-head"><div class="stock-price">172.86 EUR</div><div class="stock-move up" id="stockMove">▲ 0.56%</div></div><div class="stock-meta">Vanguard FTSE All-World UCITS ETF USD Accumulation · last close 2026-10-09</div><div class="stock-chart-wrap"><svg class="stock-chart" id="stockChart" viewBox="0 0 600 190" preserveAspectRatio="none" aria-label="Share price chart"></svg><div class="stock-axis" id="stockAxis" aria-hidden="true"></div><div class="stock-tip" id="stockTip" role="tooltip"></div></div><div class="stock-ranges" id="stockRanges"><span class="stock-range" data-range="1D">1D</span><span class="stock-range" data-range="1M">1M</span><span class="stock-range" data-range="6M">6M</span><span class="stock-range" data-range="1Y">1Y</span><span class="stock-range" data-range="3Y">3Y</span><span class="stock-range" data-range="5Y">5Y</span><span class="stock-range" data-range="MAX">MAX</span></div><script type="application/json" id="stockData">{"symbol":"VWCE.DE","currency":"EUR","name":"Vanguard FTSE All-World UCITS ETF USD Accumulation","series":[{"t":"2019-07-28","q":69.63999938964844},{"t":"2019-08-04","q":68.52999877929688},{"t":"2019-08-11","q":68.69999694824219},{"t":"2019-08-18","q":68.37000274658203},{"t":"2019-08-25","q":70.23999786376953},{"t":"2019-09-01","q":71.5},{"t":"2019-09-08","q":72.41999816894531},{"t":"2019-09-15","q":72.7300033569336},{"t":"2019-09-22","q":72.44999694824219},{"t":"2019-09-29","q":71.08000183105469},{"t":"2019-10-06","q":72.29000091552734},{"t":"2019-10-13","q":71.7300033569336},{"t":"2019-10-20","q":72.9800033569336},{"t":"2019-10-27","q":73.30000305175781},{"t":"2019-11-03","q":74.8499984741211},{"t":"2019-11-10","q":75.06999969482422},{"t":"2019-11-17","q":74.8499984741211},{"t":"2019-11-24","q":75.61000061035156},{"t":"2019-12-01","q":75.70999908447266},{"t":"2019-12-08","q":75.86000061035156},{"t":"2019-12-15","q":77.58000183105469},{"t":"2019-12-22","q":77.5},{"t":"2019-12-29","q":77.3499984741211},{"t":"2020-01-05","q":78.37999725341797},{"t":"2020-01-12","q":79.54000091552734},{"t":"2020-01-19","q":79.54000091552734},{"t":"2020-01-26","q":76.79000091552734},{"t":"2020-02-02","q":79.94999694824219},{"t":"2020-02-09","q":81.5199966430664},{"t":"2020-02-16","q":80.5999984741211},{"t":"2020-02-23","q":70.44000244140625},{"t":"2020-03-01","q":68.98999786376953},{"t":"2020-03-08","q":59.709999084472656},{"t":"2020-03-15","q":58.119998931884766},{"t":"2020-03-22","q":60.33000183105469},{"t":"2020-03-29","q":60.310001373291016},{"t":"2020-04-05","q":65.80000305175781},{"t":"2020-04-12","q":66.9000015258789},{"t":"2020-04-19","q":66.47000122070312},{"t":"2020-04-26","q":68.37999725341797},{"t":"2020-05-03","q":69.0999984741211},{"t":"2020-05-10","q":67.26000213623047},{"t":"2020-05-17","q":69.08999633789062},{"t":"2020-05-24","q":69.83999633789062},{"t":"2020-05-31","q":73.83000183105469},{"t":"2020-06-07","q":70.6500015258789},{"t":"2020-06-14","q":72.94000244140625},{"t":"2020-06-21","q":70.94999694824219},{"t":"2020-06-28","q":72.7699966430664},{"t":"2020-07-05","q":73.38999938964844},{"t":"2020-07-12","q":73.72000122070312},{"t":"2020-07-19","q":72.52999877929688},{"t":"2020-07-26","q":71.37000274658203},{"t":"2020-08-02","q":73.5199966430664},{"t":"2020-08-09","q":74.16999816894531},{"t":"2020-08-16","q":74.4800033569336},{"t":"2020-08-23","q":75.80999755859375},{"t":"2020-08-30","q":74.06999969482422},{"t":"2020-09-06","q":73.94000244140625},{"t":"2020-09-13","q":73.95999908447266},{"t":"2020-09-20","q":73.18000030517578},{"t":"2020-09-27","q":74.56999969482422},{"t":"2020-10-04","q":76.30999755859375},{"t":"2020-10-11","q":77.05000305175781},{"t":"2020-10-18","q":75.66000366210938},{"t":"2020-10-25","q":73.18000030517578},{"t":"2020-11-01","q":76.9800033569336},{"t":"2020-11-08","q":78.91999816894531},{"t":"2020-11-15","q":79.73999786376953},{"t":"2020-11-22","q":80.70999908447266},{"t":"2020-11-29","q":80.68000030517578},{"t":"2020-12-06","q":80.0999984741211},{"t":"2020-12-13","q":80.76000213623047},{"t":"2020-12-20","q":80.8499984741211},{"t":"2020-12-27","q":81.41999816894531},{"t":"2021-01-03","q":83.66999816894531},{"t":"2021-01-10","q":84.01000213623047},{"t":"2021-01-17","q":84.62000274658203},{"t":"2021-01-24","q":82.2300033569336},{"t":"2021-01-31","q":86.36000061035156},{"t":"2021-02-07","q":87.16000366210938},{"t":"2021-02-14","q":87.19999694824219},{"t":"2021-02-21","q":84.62000274658203},{"t":"2021-02-28","q":84.30000305175781},{"t":"2021-03-07","q":87.4000015258789},{"t":"2021-03-14","q":87.80999755859375},{"t":"2021-03-21","q":88.31999969482422},{"t":"2021-03-28","q":90.0},{"t":"2021-04-04","q":90.58000183105469},{"t":"2021-04-11","q":91.45999908447266},{"t":"2021-04-18","q":90.75},{"t":"2021-04-25","q":90.79000091552734},{"t":"2021-05-02","q":91.27999877929688},{"t":"2021-05-09","q":89.80000305175781},{"t":"2021-05-16","q":89.95999908447266},{"t":"2021-05-23","q":91.16999816894531},{"t":"2021-05-30","q":91.77999877929688},{"t":"2021-06-06","q":92.62999725341797},{"t":"2021-06-13","q":92.83999633789062},{"t":"2021-06-20","q":94.22000122070312},{"t":"2021-06-27","q":95.22000122070312},{"t":"2021-07-04","q":95.29000091552734},{"t":"2021-07-11","q":95.26000213623047},{"t":"2021-07-18","q":96.41999816894531},{"t":"2021-07-25","q":95.36000061035156},{"t":"2021-08-01","q":96.91000366210938},{"t":"2021-08-08","q":97.37999725341797},{"t":"2021-08-15","q":96.58000183105469},{"t":"2021-08-22","q":97.70999908447266},{"t":"2021-08-29","q":98.20999908447266},{"t":"2021-09-05","q":97.72000122070312},{"t":"2021-09-12","q":97.16999816894531},{"t":"2021-09-19","q":97.23999786376953},{"t":"2021-09-26","q":95.75},{"t":"2021-10-03","q":97.19000244140625},{"t":"2021-10-10","q":98.86000061035156},{"t":"2021-10-17","q":99.54000091552734},{"t":"2021-10-24","q":100.69999694824219},{"t":"2021-10-31","q":102.5999984741211},{"t":"2021-11-07","q":103.41999816894531},{"t":"2021-11-14","q":104.4800033569336},{"t":"2021-11-21","q":101.0},{"t":"2021-11-28","q":100.18000030517578},{"t":"2021-12-05","q":102.91999816894531},{"t":"2021-12-12","q":102.36000061035156},{"t":"2021-12-19","q":103.81999969482422},{"t":"2021-12-26","q":104.72000122070312},{"t":"2022-01-02","q":102.77999877929688},{"t":"2022-01-09","q":101.87999725341797},{"t":"2022-01-16","q":99.81999969482422},{"t":"2022-01-23","q":98.20999908447266},{"t":"2022-01-30","q":98.20999908447266},{"t":"2022-02-06","q":99.5},{"t":"2022-02-13","q":97.52999877929688},{"t":"2022-02-20","q":97.5},{"t":"2022-02-27","q":96.88999938964844},{"t":"2022-03-06","q":95.87999725341797},{"t":"2022-03-13","q":99.55999755859375},{"t":"2022-03-20","q":101.27999877929688},{"t":"2022-03-27","q":101.45999908447266},{"t":"2022-04-03","q":102.0},{"t":"2022-04-10","q":101.27999877929688},{"t":"2022-04-17","q":99.13999938964844},{"t":"2022-04-24","q":99.41999816894531},{"t":"2022-05-01","q":96.06999969482422},{"t":"2022-05-08","q":95.76000213623047},{"t":"2022-05-15","q":92.80000305175781},{"t":"2022-05-22","q":96.30000305175781},{"t":"2022-05-29","q":95.86000061035156},{"t":"2022-06-05","q":93.11000061035156},{"t":"2022-06-12","q":88.51000213623047},{"t":"2022-06-19","q":91.83999633789062},{"t":"2022-06-26","q":90.97000122070312},{"t":"2022-07-03","q":95.19999694824219},{"t":"2022-07-10","q":94.12999725341797},{"t":"2022-07-17","q":95.93000030517578},{"t":"2022-07-24","q":98.69000244140625},{"t":"2022-07-31","q":99.36000061035156},{"t":"2022-08-07","q":101.30000305175781},{"t":"2022-08-14","q":102.12000274658203},{"t":"2022-08-21","q":100.5199966430664},{"t":"2022-08-28","q":97.77999877929688},{"t":"2022-09-04","q":98.55000305175781},{"t":"2022-09-11","q":94.48999786376953},{"t":"2022-09-18","q":92.7699966430664},{"t":"2022-09-25","q":91.33000183105469},{"t":"2022-10-02","q":92.02999877929688},{"t":"2022-10-09","q":90.69000244140625},{"t":"2022-10-16","q":91.87999725341797},{"t":"2022-10-23","q":93.75},{"t":"2022-10-30","q":92.87999725341797},{"t":"2022-11-06","q":94.9800033569336},{"t":"2022-11-13","q":94.83000183105469},{"t":"2022-11-20","q":95.95999908447266},{"t":"2022-11-27","q":96.18000030517578},{"t":"2022-12-04","q":94.4000015258789},{"t":"2022-12-11","q":91.25},{"t":"2022-12-18","q":91.01000213623047},{"t":"2022-12-25","q":90.61000061035156},{"t":"2023-01-01","q":92.95999908447266},{"t":"2023-01-08","q":94.0},{"t":"2023-01-15","q":93.61000061035156},{"t":"2023-01-22","q":95.8499984741211},{"t":"2023-01-29","q":97.5},{"t":"2023-02-05","q":96.7699966430664},{"t":"2023-02-12","q":96.41999816894531},{"t":"2023-02-19","q":94.93000030517578},{"t":"2023-02-26","q":96.33000183105469},{"t":"2023-03-05","q":93.86000061035156},{"t":"2023-03-12","q":92.6500015258789},{"t":"2023-03-19","q":92.75},{"t":"2023-03-26","q":95.33999633789062},{"t":"2023-04-02","q":94.87999725341797},{"t":"2023-04-09","q":95.48999786376953},{"t":"2023-04-16","q":95.44999694824219},{"t":"2023-04-23","q":95.33000183105469},{"t":"2023-04-30","q":95.25},{"t":"2023-05-07","q":96.20999908447266},{"t":"2023-05-14","q":97.8499984741211},{"t":"2023-05-21","q":98.37000274658203},{"t":"2023-05-28","q":99.8499984741211},{"t":"2023-06-04","q":100.23999786376953},{"t":"2023-06-11","q":101.4000015258789},{"t":"2023-06-18","q":99.25},{"t":"2023-06-25","q":100.9800033569336},{"t":"2023-07-02","q":99.6500015258789},{"t":"2023-07-09","q":100.23999786376953},{"t":"2023-07-16","q":101.54000091552734},{"t":"2023-07-23","q":103.5199966430664},{"t":"2023-07-30","q":101.69999694824219},{"t":"2023-08-06","q":100.83999633789062},{"t":"2023-08-13","q":99.08999633789062},{"t":"2023-08-20","q":100.44000244140625},{"t":"2023-08-27","q":103.13999938964844},{"t":"2023-09-03","q":102.72000122070312},{"t":"2023-09-10","q":103.62000274658203},{"t":"2023-09-17","q":101.4800033569336},{"t":"2023-09-24","q":101.0999984741211},{"t":"2023-10-01","q":100.08000183105469},{"t":"2023-10-08","q":101.73999786376953},{"t":"2023-10-15","q":98.44999694824219},{"t":"2023-10-22","q":96.83000183105469},{"t":"2023-10-29","q":100.68000030517578},{"t":"2023-11-05","q":100.86000061035156},{"t":"2023-11-12","q":102.27999877929688},{"t":"2023-11-19","q":102.94000244140625},{"t":"2023-11-26","q":104.12000274658203},{"t":"2023-12-03","q":105.36000061035156},{"t":"2023-12-10","q":106.77999877929688},{"t":"2023-12-17","q":106.68000030517578},{"t":"2023-12-24","q":107.08000183105469},{"t":"2023-12-31","q":106.41999816894531},{"t":"2024-01-07","q":107.54000091552734},{"t":"2024-01-14","q":107.63999938964844},{"t":"2024-01-21","q":110.12000274658203},{"t":"2024-01-28","q":111.33999633789062},{"t":"2024-02-04","q":112.58000183105469},{"t":"2024-02-11","q":113.69999694824219},{"t":"2024-02-18","q":114.54000091552734},{"t":"2024-02-25","q":115.04000091552734},{"t":"2024-03-03","q":115.12000274658203},{"t":"2024-03-10","q":114.80000305175781},{"t":"2024-03-17","q":117.62000274658203},{"t":"2024-03-24","q":118.27999877929688},{"t":"2024-03-31","q":116.87999725341797},{"t":"2024-04-07","q":117.72000122070312},{"t":"2024-04-14","q":114.27999877929688},{"t":"2024-04-21","q":116.44000244140625},{"t":"2024-04-28","q":116.62000274658203},{"t":"2024-05-05","q":118.63999938964844},{"t":"2024-05-12","q":119.55999755859375},{"t":"2024-05-19","q":119.4000015258789},{"t":"2024-05-26","q":117.5199966430664},{"t":"2024-06-02","q":120.45999908447266},{"t":"2024-06-09","q":121.68000030517578},{"t":"2024-06-16","q":122.69999694824219},{"t":"2024-06-23","q":123.18000030517578},{"t":"2024-06-30","q":123.41999816894531},{"t":"2024-07-07","q":124.83999633789062},{"t":"2024-07-14","q":122.0999984741211},{"t":"2024-07-21","q":121.33999633789062},{"t":"2024-07-28","q":117.5199966430664},{"t":"2024-08-04","q":118.04000091552734},{"t":"2024-08-11","q":121.73999786376953},{"t":"2024-08-18","q":122.0999984741211},{"t":"2024-08-25","q":123.0199966430664},{"t":"2024-09-01","q":118.83999633789062},{"t":"2024-09-08","q":122.69999694824219},{"t":"2024-09-15","q":123.27999877929688},{"t":"2024-09-22","q":125.55999755859375},{"t":"2024-09-29","q":126.5999984741211},{"t":"2024-10-06","q":128.1999969482422},{"t":"2024-10-13","q":129.66000366210938},{"t":"2024-10-20","q":129.02000427246094},{"t":"2024-10-27","q":127.23999786376953},{"t":"2024-11-03","q":131.97999572753906},{"t":"2024-11-10","q":131.36000061035156},{"t":"2024-11-17","q":134.82000732421875},{"t":"2024-11-24","q":134.55999755859375},{"t":"2024-12-01","q":136.0399932861328},{"t":"2024-12-08","q":135.77999877929688},{"t":"2024-12-15","q":134.05999755859375},{"t":"2024-12-22","q":134.36000061035156},{"t":"2024-12-29","q":135.24000549316406},{"t":"2025-01-05","q":133.72000122070312},{"t":"2025-01-12","q":137.02000427246094},{"t":"2025-01-19","q":137.13999938964844},{"t":"2025-01-26","q":138.86000061035156},{"t":"2025-02-02","q":138.66000366210938},{"t":"2025-02-09","q":138.6999969482422},{"t":"2025-02-16","q":138.97999572753906},{"t":"2025-02-23","q":135.82000732421875},{"t":"2025-03-02","q":128.39999389648438},{"t":"2025-03-09","q":127.08000183105469},{"t":"2025-03-16","q":128.3800048828125},{"t":"2025-03-23","q":126.9000015258789},{"t":"2025-03-30","q":115.80000305175781},{"t":"2025-04-06","q":113.91999816894531},{"t":"2025-04-13","q":115.81999969482422},{"t":"2025-04-20","q":119.80000305175781},{"t":"2025-04-27","q":124.13999938964844},{"t":"2025-05-04","q":124.94000244140625},{"t":"2025-05-11","q":130.6999969482422},{"t":"2025-05-18","q":127.13999938964844},{"t":"2025-05-25","q":128.47999572753906},{"t":"2025-06-01","q":130.17999267578125},{"t":"2025-06-08","q":128.5800018310547},{"t":"2025-06-15","q":128.0399932861328},{"t":"2025-06-22","q":130.10000610351562},{"t":"2025-06-29","q":130.27999877929688},{"t":"2025-07-06","q":131.27999877929688},{"t":"2025-07-13","q":132.5800018310547},{"t":"2025-07-20","q":133.39999389648438},{"t":"2025-07-27","q":132.0399932861328},{"t":"2025-08-03","q":134.1999969482422},{"t":"2025-08-10","q":135.47999572753906},{"t":"2025-08-17","q":136.39999389648438},{"t":"2025-08-24","q":135.47999572753906},{"t":"2025-08-31","q":135.55999755859375},{"t":"2025-09-07","q":138.33999633789062},{"t":"2025-09-14","q":139.0399932861328},{"t":"2025-09-21","q":139.05999755859375},{"t":"2025-09-28","q":141.66000366210938},{"t":"2025-10-05","q":140.1199951171875},{"t":"2025-10-09","q":143.16000366210938},{"t":"2025-10-10","q":140.1199951171875},{"t":"2025-10-12","q":140.10000610351562},{"t":"2025-10-13","q":141.44000244140625},{"t":"2025-10-14","q":140.83999633789062},{"t":"2025-10-15","q":141.67999267578125},{"t":"2025-10-16","q":141.74000549316406},{"t":"2025-10-17","q":140.10000610351562},{"t":"2025-10-19","q":143.0},{"t":"2025-10-20","q":142.66000366210938},{"t":"2025-10-21","q":143.1199951171875},{"t":"2025-10-22","q":142.3800048828125},{"t":"2025-10-23","q":143.0},{"t":"2025-10-26","q":145.5399932861328},{"t":"2025-10-27","q":145.0399932861328},{"t":"2025-10-28","q":145.22000122070312},{"t":"2025-10-29","q":145.60000610351562},{"t":"2025-10-30","q":145.66000366210938},{"t":"2025-10-31","q":145.5399932861328},{"t":"2025-11-02","q":141.5399932861328},{"t":"2025-11-03","q":145.77999877929688},{"t":"2025-11-04","q":145.25999450683594},{"t":"2025-11-05","q":145.4600067138672},{"t":"2025-11-06","q":143.36000061035156},{"t":"2025-11-07","q":141.5399932861328},{"t":"2025-11-09","q":143.67999267578125},{"t":"2025-11-10","q":144.5399932861328},{"t":"2025-11-11","q":145.02000427246094},{"t":"2025-11-12","q":145.74000549316406},{"t":"2025-11-13","q":143.82000732421875},{"t":"2025-11-14","q":143.67999267578125},{"t":"2025-11-16","q":140.8000030517578},{"t":"2025-11-17","q":143.02000427246094},{"t":"2025-11-18","q":141.17999267578125},{"t":"2025-11-19","q":141.3800048828125},{"t":"2025-11-20","q":142.22000122070312},{"t":"2025-11-21","q":140.8000030517578},{"t":"2025-11-23","q":144.83999633789062},{"t":"2025-11-24","q":142.4600067138672},{"t":"2025-11-25","q":142.8000030517578},{"t":"2025-11-26","q":144.4199981689453},{"t":"2025-11-27","q":144.25999450683594},{"t":"2025-11-28","q":144.83999633789062},{"t":"2025-11-30","q":145.16000366210938},{"t":"2025-12-01","q":144.3000030517578},{"t":"2025-12-02","q":144.25999450683594},{"t":"2025-12-03","q":144.17999267578125},{"t":"2025-12-04","q":144.5399932861328},{"t":"2025-12-05","q":145.16000366210938},{"t":"2025-12-07","q":143.17999267578125},{"t":"2025-12-08","q":144.89999389648438},{"t":"2025-12-09","q":144.97999572753906},{"t":"2025-12-10","q":144.72000122070312},{"t":"2025-12-11","q":144.0800018310547},{"t":"2025-12-12","q":143.17999267578125},{"t":"2025-12-14","q":144.17999267578125},{"t":"2025-12-15","q":143.4600067138672},{"t":"2025-12-16","q":142.44000244140625},{"t":"2025-12-17","q":141.8000030517578},{"t":"2025-12-18","q":143.52000427246094},{"t":"2025-12-19","q":144.17999267578125},{"t":"2025-12-21","q":144.6999969482422},{"t":"2025-12-22","q":144.39999389648438},{"t":"2025-12-23","q":144.6999969482422},{"t":"2025-12-28","q":145.13999938964844},{"t":"2025-12-29","q":144.97999572753906},{"t":"2025-12-30","q":145.4199981689453},{"t":"2026-01-02","q":145.13999938964844},{"t":"2026-01-04","q":148.89999389648438},{"t":"2026-01-05","q":147.0800018310547},{"t":"2026-01-06","q":147.6999969482422},{"t":"2026-01-07","q":148.0},{"t":"2026-01-08","q":147.72000122070312},{"t":"2026-01-09","q":148.89999389648438},{"t":"2026-01-11","q":149.89999389648438},{"t":"2026-01-12","q":149.0},{"t":"2026-01-13","q":149.25999450683594},{"t":"2026-01-14","q":148.39999389648438},{"t":"2026-01-15","q":150.24000549316406},{"t":"2026-01-16","q":149.89999389648438},{"t":"2026-01-18","q":147.72000122070312},{"t":"2026-01-19","q":148.0399932861328},{"t":"2026-01-20","q":146.66000366210938},{"t":"2026-01-21","q":147.0},{"t":"2026-01-22","q":147.97999572753906},{"t":"2026-01-23","q":147.72000122070312},{"t":"2026-01-25","q":147.22000122070312},{"t":"2026-01-26","q":147.24000549316406},{"t":"2026-01-27","q":147.16000366210938},{"t":"2026-01-28","q":147.3800048828125},{"t":"2026-01-29","q":146.13999938964844},{"t":"2026-01-30","q":147.22000122070312},{"t":"2026-02-01","q":147.82000732421875},{"t":"2026-02-02","q":148.5399932861328},{"t":"2026-02-03","q":148.10000610351562},{"t":"2026-02-04","q":147.75999450683594},{"t":"2026-02-05","q":146.5},{"t":"2026-02-06","q":147.82000732421875},{"t":"2026-02-08","q":147.6999969482422},{"t":"2026-02-09","q":148.5399932861328},{"t":"2026-02-10","q":148.89999389648438},{"t":"2026-02-11","q":149.0800018310547},{"t":"2026-02-12","q":147.83999633789062},{"t":"2026-02-13","q":147.6999969482422},{"t":"2026-02-15","q":149.8800048828125},{"t":"2026-02-16","q":147.5399932861328},{"t":"2026-02-17","q":147.82000732421875},{"t":"2026-02-18","q":149.5},{"t":"2026-02-19","q":149.16000366210938},{"t":"2026-02-20","q":149.8800048828125},{"t":"2026-02-22","q":149.82000732421875},{"t":"2026-02-23","q":148.82000732421875},{"t":"2026-02-24","q":149.72000122070312},{"t":"2026-02-25","q":150.86000061035156},{"t":"2026-02-26","q":150.4199981689453},{"t":"2026-02-27","q":149.82000732421875},{"t":"2026-03-01","q":148.33999633789062},{"t":"2026-03-02","q":150.02000427246094},{"t":"2026-03-03","q":147.67999267578125},{"t":"2026-03-04","q":149.3000030517578},{"t":"2026-03-05","q":148.33999633789062},{"t":"2026-03-08","q":146.77999877929688},{"t":"2026-03-09","q":146.39999389648438},{"t":"2026-03-10","q":148.5399932861328},{"t":"2026-03-11","q":148.0},{"t":"2026-03-12","q":146.9600067138672},{"t":"2026-03-13","q":146.77999877929688},{"t":"2026-03-15","q":142.63999938964844},{"t":"2026-03-16","q":147.3800048828125},{"t":"2026-03-17","q":147.8000030517578},{"t":"2026-03-18","q":146.8000030517578},{"t":"2026-03-19","q":144.27999877929688},{"t":"2026-03-20","q":142.63999938964844},{"t":"2026-03-22","q":140.97999572753906},{"t":"2026-03-23","q":143.33999633789062},{"t":"2026-03-24","q":143.24000549316406},{"t":"2026-03-25","q":144.67999267578125},{"t":"2026-03-26","q":142.9600067138672},{"t":"2026-03-27","q":140.97999572753906},{"t":"2026-03-29","q":144.74000549316406},{"t":"2026-03-30","q":141.89999389648438},{"t":"2026-03-31","q":141.82000732421875},{"t":"2026-04-01","q":144.89999389648438},{"t":"2026-04-02","q":144.74000549316406},{"t":"2026-04-05","q":148.55999755859375},{"t":"2026-04-07","q":143.9199981689453},{"t":"2026-04-08","q":148.0800018310547},{"t":"2026-04-09","q":148.16000366210938},{"t":"2026-04-10","q":148.55999755859375},{"t":"2026-04-12","q":153.66000366210938},{"t":"2026-04-13","q":148.47999572753906},{"t":"2026-04-14","q":150.27999877929688},{"t":"2026-04-15","q":150.77999877929688},{"t":"2026-04-16","q":151.6999969482422},{"t":"2026-04-17","q":153.66000366210938},{"t":"2026-04-19","q":153.60000610351562},{"t":"2026-04-20","q":152.8800048828125},{"t":"2026-04-21","q":152.55999755859375},{"t":"2026-04-22","q":153.3800048828125},{"t":"2026-04-23","q":153.77999877929688},{"t":"2026-04-24","q":153.60000610351562},{"t":"2026-04-26","q":153.9600067138672},{"t":"2026-04-27","q":153.5},{"t":"2026-04-28","q":152.8800048828125},{"t":"2026-04-29","q":153.1199951171875},{"t":"2026-04-30","q":153.9600067138672},{"t":"2026-05-03","q":158.13999938964844},{"t":"2026-05-04","q":154.55999755859375},{"t":"2026-05-05","q":155.97999572753906},{"t":"2026-05-06","q":158.05999755859375},{"t":"2026-05-07","q":157.97999572753906},{"t":"2026-05-08","q":158.13999938964844},{"t":"2026-05-10","q":159.44000244140625},{"t":"2026-05-11","q":158.6199951171875},{"t":"2026-05-12","q":156.9600067138672},{"t":"2026-05-13","q":159.13999938964844},{"t":"2026-05-14","q":161.02000427246094},{"t":"2026-05-15","q":159.44000244140625},{"t":"2026-05-17","q":161.6199951171875},{"t":"2026-05-18","q":158.44000244140625},{"t":"2026-05-19","q":158.1999969482422},{"t":"2026-05-20","q":159.75999450683594},{"t":"2026-05-21","q":159.9199981689453},{"t":"2026-05-22","q":161.6199951171875},{"t":"2026-05-24","q":163.16000366210938},{"t":"2026-05-25","q":162.77999877929688},{"t":"2026-05-26","q":162.5800018310547},{"t":"2026-05-27","q":162.1999969482422},{"t":"2026-05-28","q":162.82000732421875},{"t":"2026-05-29","q":163.16000366210938},{"t":"2026-05-31","q":162.36000061035156},{"t":"2026-06-01","q":163.9199981689453},{"t":"2026-06-02","q":164.8800048828125},{"t":"2026-06-03","q":164.13999938964844},{"t":"2026-06-04","q":163.8000030517578},{"t":"2026-06-05","q":162.36000061035156},{"t":"2026-06-07","q":162.4600067138672},{"t":"2026-06-08","q":161.55999755859375},{"t":"2026-06-09","q":159.5},{"t":"2026-06-10","q":159.24000549316406},{"t":"2026-06-11","q":159.55999755859375},{"t":"2026-06-12","q":162.4600067138672},{"t":"2026-06-14","q":165.44000244140625},{"t":"2026-06-15","q":164.60000610351562},{"t":"2026-06-16","q":164.16000366210938},{"t":"2026-06-17","q":164.63999938964844},{"t":"2026-06-18","q":165.4600067138672},{"t":"2026-06-19","q":165.44000244140625},{"t":"2026-06-21","q":163.6999969482422},{"t":"2026-06-22","q":166.0399932861328},{"t":"2026-06-23","q":163.9199981689453},{"t":"2026-06-24","q":164.8000030517578},{"t":"2026-06-25","q":164.1999969482422},{"t":"2026-06-26","q":163.6999969482422},{"t":"2026-06-28","q":165.8800048828125},{"t":"2026-06-29","q":163.44000244140625},{"t":"2026-06-30","q":165.22000122070312},{"t":"2026-07-01","q":165.94000244140625},{"t":"2026-07-02","q":164.97999572753906},{"t":"2026-07-03","q":165.8800048828125},{"t":"2026-07-05","q":166.13999938964844},{"t":"2026-07-06","q":166.60000610351562},{"t":"2026-07-07","q":164.82000732421875},{"t":"2026-07-08","q":163.77999877929688},{"t":"2026-07-09","q":165.55999755859375},{"t":"2026-07-10","q":166.13999938964844},{"t":"2026-07-12","q":163.5},{"t":"2026-07-13","q":165.77999877929688},{"t":"2026-07-14","q":165.66000366210938},{"t":"2026-07-15","q":165.8000030517578},{"t":"2026-07-16","q":165.4600067138672},{"t":"2026-07-17","q":163.5},{"t":"2026-07-19","q":164.27999877929688},{"t":"2026-07-20","q":164.17999267578125},{"t":"2026-07-21","q":165.13999938964844},{"t":"2026-07-22","q":165.39999389648438},{"t":"2026-07-23","q":163.36000061035156},{"t":"2026-07-24","q":164.27999877929688},{"t":"2026-07-26","q":162.9600067138672},{"t":"2026-07-27","q":163.36000061035156},{"t":"2026-07-28","q":163.77999877929688},{"t":"2026-07-29","q":162.39999389648438},{"t":"2026-07-30","q":162.02000427246094},{"t":"2026-07-31","q":162.9600067138672},{"t":"2026-08-02","q":168.3800048828125},{"t":"2026-08-03","q":165.10000610351562},{"t":"2026-08-04","q":167.5399932861328},{"t":"2026-08-05","q":168.0399932861328},{"t":"2026-08-06","q":167.83999633789062},{"t":"2026-08-07","q":168.3800048828125},{"t":"2026-08-09","q":168.8800048828125},{"t":"2026-08-10","q":168.47999572753906},{"t":"2026-08-11","q":168.47999572753906},{"t":"2026-08-12","q":168.8000030517578},{"t":"2026-08-13","q":169.6199951171875},{"t":"2026-08-14","q":168.8800048828125},{"t":"2026-08-16","q":166.3000030517578},{"t":"2026-08-17","q":169.05999755859375},{"t":"2026-08-18","q":166.89999389648438},{"t":"2026-08-19","q":166.5},{"t":"2026-08-20","q":165.66000366210938},{"t":"2026-08-21","q":166.3000030517578},{"t":"2026-08-23","q":168.5399932861328},{"t":"2026-08-24","q":165.6199951171875},{"t":"2026-08-25","q":166.3000030517578},{"t":"2026-08-26","q":166.5399932861328},{"t":"2026-08-27","q":167.13999938964844},{"t":"2026-08-28","q":168.5399932861328},{"t":"2026-08-30","q":167.8800048828125},{"t":"2026-08-31","q":166.66000366210938},{"t":"2026-09-01","q":166.6199951171875},{"t":"2026-09-02","q":166.82000732421875},{"t":"2026-09-03","q":168.05999755859375},{"t":"2026-09-04","q":167.8800048828125},{"t":"2026-09-06","q":166.86000061035156},{"t":"2026-09-07","q":167.77999877929688},{"t":"2026-09-08","q":167.5800018310547},{"t":"2026-09-09","q":166.22000122070312},{"t":"2026-09-10","q":165.25999450683594},{"t":"2026-09-11","q":166.86000061035156},{"t":"2026-09-13","q":167.13999938964844},{"t":"2026-09-14","q":166.22000122070312},{"t":"2026-09-15","q":165.36000061035156},{"t":"2026-09-16","q":166.3000030517578},{"t":"2026-09-17","q":167.66000366210938},{"t":"2026-09-18","q":167.13999938964844},{"t":"2026-09-20","q":169.74000549316406},{"t":"2026-09-21","q":169.47999572753906},{"t":"2026-09-22","q":170.5},{"t":"2026-09-23","q":170.0399932861328},{"t":"2026-09-24","q":168.9199981689453},{"t":"2026-09-25","q":169.74000549316406},{"t":"2026-09-27","q":171.13999938964844},{"t":"2026-09-28","q":169.1199951171875},{"t":"2026-09-29","q":169.39999389648438},{"t":"2026-09-30","q":169.77999877929688},{"t":"2026-10-01","q":169.3800048828125},{"t":"2026-10-02","q":171.13999938964844},{"t":"2026-10-04","q":172.86000061035156},{"t":"2026-10-05","q":172.89999389648438},{"t":"2026-10-06","q":173.55999755859375},{"t":"2026-10-07","q":172.9199981689453},{"t":"2026-10-08","q":171.89999389648438},{"t":"2026-10-09","q":172.86000061035156}]}</script></section>
+    <section class="card c-hydro"><h2>🌊 Hydrology<span class="sub">Danube + SHMÚ</span></h2><div class="hydro-grid"><div class="hydro-box"><strong>🌊 Thebnerstraßl</strong><div class="big-num" style="color:var(--accent)">635 <small style="font-size:.65em;font-weight:400;color:var(--muted)">m³/s</small></div><div class="kv"><div class="k">Level</div><div class="v">59 cm (16:45)</div><div class="k">Forecast peak</div><div class="v">658 m³/s (01:00)</div><div class="k">MQ</div><div class="v">2010 m³/s</div><div class="k">RNQ</div><div class="v">1040 m³/s</div></div><div class="spark-wrap"><div class="spark-cap">📈 72h trend</div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 46" width="100%" height="auto" role="img" font-family="system-ui,sans-serif" aria-label="Danube discharge trend over the last 72 hours"><line x1="5" y1="41" x2="295" y2="41" stroke="var(--border)" stroke-width="1"/><polyline points="5.0,38.1 11.0,41.0 17.1,41.0 23.1,38.1 29.2,38.1 35.2,38.1 41.2,41.0 47.3,41.0 53.3,35.9 59.4,38.1 65.4,35.9 71.5,25.6 77.5,20.4 83.5,20.4 89.6,23.3 95.6,28.4 101.7,30.7 107.7,20.4 113.8,10.1 119.8,5.0 125.8,7.3 131.9,10.1 137.9,10.1 144.0,13.0 150.0,15.3 156.0,23.3 162.1,20.4 168.1,23.3 174.2,23.3 180.2,23.3 186.2,23.3 192.3,20.4 198.3,23.3 204.4,28.4 210.4,30.7 216.5,33.6 222.5,30.7 228.5,25.6 234.6,18.1 240.6,13.0 246.7,13.0 252.7,15.3 258.8,18.1 264.8,18.1 270.8,20.4 276.9,25.6 282.9,30.7 289.0,25.6 295.0,15.3" fill="none" stroke="var(--chart)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="295.0" cy="15.3" r="3.5" fill="var(--accent)"/><text x="295" y="11" font-size="9" fill="var(--muted)" text-anchor="end">631 m³/s</text><text x="5" y="11" font-size="9" fill="var(--muted)" text-anchor="start">min 586</text></svg></div></div><div class="hydro-box"><strong>SHMÚ water</strong><div class="kv"><div class="k">Stations</div><div class="v">409</div><div class="k">Rising</div><div class="v">7</div><div class="k">Falling</div><div class="v">3</div></div></div><div class="hydro-box danger" style="grid-column:1/-1"><strong>🌧️ Heavy rain alerts</strong><div class="big-num">181 mm across 8 station(s)</div><ul class="notes"><li><a class="rainlink" href="https://www.shmu.sk/sk/?page=1&id=hydro_zra_all&stationId=APS243320&uhrny=24" target="_blank" rel="noopener">43320 - Starina</a> — 26.2 mm / 24h</li><li><a class="rainlink" href="https://www.shmu.sk/sk/?page=1&id=hydro_zra_all&stationId=APS243380&uhrny=24" target="_blank" rel="noopener">43380 - Zemplínske Hámre</a> — 23.0 mm / 24h</li><li><a class="rainlink" href="https://www.shmu.sk/sk/?page=1&id=hydro_zra_all&stationId=AWS211993&uhrny=24" target="_blank" rel="noopener">11993 - Kamenica nad Cirochou</a> — 23.0 mm / 24h</li><li><a class="rainlink" href="https://www.shmu.sk/sk/?page=1&id=hydro_zra_all&stationId=AHS9170&uhrny=24" target="_blank" rel="noopener">9170 - Snina - Cirocha</a> — 22.8 mm / 24h</li><li><a class="rainlink" href="https://www.shmu.sk/sk/?page=1&id=hydro_zra_all&stationId=AHS9180&uhrny=24" target="_blank" rel="noopener">9180 - Snina - Pčolinka</a> — 22.3 mm / 24h</li><li><a class="rainlink" href="https://www.shmu.sk/sk/?page=1&id=hydro_zra_all&stationId=APS245040&uhrny=24" target="_blank" rel="noopener">45040 - Kolbasov</a> — 21.5 mm / 24h</li><li><a class="rainlink" href="https://www.shmu.sk/sk/?page=1&id=hydro_zra_all&stationId=APS245060&uhrny=24" target="_blank" rel="noopener">45060 - Zboj</a> — 21.0 mm / 24h</li><li><a class="rainlink" href="https://www.shmu.sk/sk/?page=1&id=hydro_zra_all&stationId=APS243220&uhrny=24" target="_blank" rel="noopener">43220 - Papín</a> — 20.8 mm / 24h</li></ul></div></div><ul class="notes"><li class="warn" style="margin-left:0px">- No flood activity at any of the monitored stations.</li>
+<li class="warn" style="margin-left:0px">- Heavy rain alerts (24 h &gt;20 mm): Starina (26.2 mm), Zemplínske Hámre (23.0 mm), Kamenica nad Cirochou (23.0 mm), Snina – Cirocha (22.8 mm), Snina – Pčolinka (22.3 mm), Kolbasov (21.5 mm), Zboj (21.0 mm), Papín (20.8 mm).</li>
+<li style="margin-left:0px">- Danube at Thebnerstraßl: 635 m³/s, 59 cm (above long‑term mean MQ), 48 h forecast peak 658 m³/s expected Monday 01:00.</li></ul></section>
+    <section class="card c-agenda"><h2>📅 Agenda</h2><div class="agenda"><div class="ev-col"><h3>💼 Work</h3><ul class="events"><li>Nothing scheduled.</li></ul></div><div class="ev-col"><h3>🏠 Private</h3><ul class="events"><li><span class="time">10:00</span><div class="ev-title">Hviezdoslavov obed a kava</div></li></ul></div></div></section>
+    <section class="card c-news"><h2>📰 News<span class="sub">Slovak + international</span></h2><div class="news-tabs" role="tablist" aria-label="News outlets"><button type="button" class="news-tab" role="tab" id="ntab-sme" data-pane="sme" aria-selected="true" aria-controls="npane-sme">SME</button><button type="button" class="news-tab" role="tab" id="ntab-dennikn" data-pane="dennikn" aria-selected="false" aria-controls="npane-dennikn">Denník N</button><button type="button" class="news-tab" role="tab" id="ntab-postoj" data-pane="postoj" aria-selected="false" aria-controls="npane-postoj">Postoj<span class="news-badge" title="Ordered by what readers opened most, not by publication time: 5 of 5 articles ranked by Postoj itself">top</span></button><button type="button" class="news-tab" role="tab" id="ntab-kapital" data-pane="kapital" aria-selected="false" aria-controls="npane-kapital">Kapitál</button><button type="button" class="news-tab" role="tab" id="ntab-bbc" data-pane="bbc" aria-selected="false" aria-controls="npane-bbc">BBC</button><button type="button" class="news-tab" role="tab" id="ntab-guardian" data-pane="guardian" aria-selected="false" aria-controls="npane-guardian">Guardian</button><button type="button" class="news-tab" role="tab" id="ntab-nyt" data-pane="nyt" aria-selected="false" aria-controls="npane-nyt">NYT</button></div><div class="news-pane" id="npane-sme" role="tabpanel" aria-labelledby="ntab-sme" data-pane="sme"><div class="news-col"><strong>SME <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/index/c/sef-volkswagenu-ocakava-od-eu-plan-na-restrukturalizaciu-automobiliek?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Šéf Volkswagenu očakáva od EÚ plán na reštrukturalizáciu automobiliek</a><span class="nc-age">13m</span></div><p class="nc-sum">Volkswagen CEO expects the EU to unveil a car industry restructuring plan.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/index/c/rakusko-poskytne-viac-zdrojov-na-energeticke-uspory-v-domacnostiach?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Rakúsko poskytne viac zdrojov na energetické úspory v domácnostiach</a><span class="nc-age">25m</span></div><p class="nc-sum">Austria will provide more resources for household energy‑saving measures.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/komentare/c/karikatura-dna-hladina-stupa?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Karikatúra dňa: Hladina stúpa</a><span class="nc-age">42m</span></div><p class="nc-sum">A cartoon shows water levels rising.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/svet/c/novinarskymi-cenami-bayeux-calvados-ocenili-reportaze-z-pasma-gazy-i-ukrajiny?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Novinárskymi cenami Bayeux-Calvados ocenili reportáže z Pásma Gazy i Ukrajiny</a><span class="nc-age">42m</span></div><p class="nc-sum">Bayeux‑Calvados journalism awards honor reports from Gaza and Ukraine.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/komentare/c/teraz-je-idealny-cas-na-opravu-dlhovej-brzdy?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Teraz je ideálny čas na opravu dlhovej brzdy</a><span class="nc-age">51m</span></div><p class="nc-sum">Experts say now is the best time to fix the debt brake.</p></div></div></div><div class="news-pane" id="npane-dennikn" role="tabpanel" aria-labelledby="ntab-dennikn" data-pane="dennikn" hidden><div class="news-col"><strong>Denník N <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5616995/tyzdnovy-newsfilter-robert-fico-hovori-ze-ma-rad-svoju-pracu-neda-sa-nevsimnut-si-to/" target="_blank" rel="noopener noreferrer">Týždňový newsfilter: Robert Fico hovorí, že má rád svoju prácu. Nedá sa nevšimnúť si to</a><span class="nc-age">33m</span></div><p class="nc-sum">Weekly newsfilter notes Robert Fico says he enjoys his job, which is obvious.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5616900/letisko-v-rijade-zasiahli-husiovci-tretikrat-za-tyzden-trump-zvazuje-udery-saudskej-arabii-ubudaju-obranne-strely/" target="_blank" rel="noopener noreferrer">Letisko v Rijáde zasiahli húsíovci tretíkrát za týždeň. Trump zvažuje údery, Saudskej Arábii ubúdajú obranné strely</a><span class="nc-age">1h</span></div><p class="nc-sum">Riyadh airport hit by Houthi attacks third time this week; Trump weighs strikes.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5612587/nezavisla-komisia-ohodnotila-kandidatov-na-rektora-uk-tancer-obstal-lepsie-nez-stevcek/" target="_blank" rel="noopener noreferrer">Nezávislá komisia ohodnotila kandidátov na rektora UK. Tancer obstál lepšie než Števček</a><span class="nc-age">1h</span></div><p class="nc-sum">Commission rates Comenius University rector candidates; Tancer outperforms Števček.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5616977/shooty-tankovanie/" target="_blank" rel="noopener noreferrer">Shooty: Tankovanie</a><span class="nc-age">1h</span></div><p class="nc-sum">Shot: Refueling.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5616719/detektor-lzi-so-spolahlivostou-95-percent/" target="_blank" rel="noopener noreferrer">Detektor lži so spoľahlivosťou 95 percent?</a><span class="nc-age">1h</span></div><p class="nc-sum">A lie detector claims 95% reliability.</p></div></div></div><div class="news-pane" id="npane-postoj" role="tabpanel" aria-labelledby="ntab-postoj" data-pane="postoj" hidden><div class="news-col"><strong>Postoj <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 5 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201528/seniora-spacifikovali-tajni-policajti-tvrdi-matovic-sutaj-estok-avizuje-zmenu-zakona" target="_blank" rel="noopener noreferrer">Incident na mítingu Hnutia Slovensko / Seniora spacifikovali tajní policajti, tvrdí Matovič. Šutaj Eštok avizuje zmenu zákona</a><span class="nc-age">2h</span></div><p class="nc-sum">Secret police detail Slovak‑Senior meeting incident; Matovič says Šutaj Eštok proposes law change.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201514/vyhrala-opozicia-najvacsi-vitaz-je-stan-potom-krestanski-demokrati" target="_blank" rel="noopener noreferrer">Voľby v Česku 2026 / Vyhrala opozícia, najväčší víťaz je STAN, potom kresťanskí demokrati</a><span class="nc-age">8h</span></div><p class="nc-sum">Opposition wins Czech 2026 election; STAN is biggest winner, then Christian Democrats.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201498/konvergencie-atipy-na-koncertnu-sezonu-202627" target="_blank" rel="noopener noreferrer">Kam za operou a klasickou hudbou / Konvergencie a tipy na koncertnú sezónu 2026/27</a><span class="nc-age">9h</span></div><p class="nc-sum">Guide to opera and classical music venues with 2026/27 concert season tips.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201369/v-mnohych-slovenskych-rodinach-nie-su-ziadne-knihy-aj-preto-vedieme-v-rebrickoch-zakonspirovanosti" target="_blank" rel="noopener noreferrer">Andrej Rajský / V mnohých slovenských rodinách nie sú žiadne knihy, aj preto vedieme v rebríčkoch zakonšpirovanosti</a><span class="nc-age">22h</span></div><p class="nc-sum">Andrej Rajský says many Slovak families lack books, hurting literacy rankings.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://svetkrestanstva.postoj.sk/201481/nestaci-hovorit-ukaz-co-je-v-tebe" target="_blank" rel="noopener noreferrer">Slovo kňaza / Nestačí hovoriť. Ukáž, čo je v tebe!</a><span class="nc-age">11h</span></div><p class="nc-sum">Priest urges action over words, saying show what’s inside you.</p></div></div></div><div class="news-pane" id="npane-kapital" role="tabpanel" aria-labelledby="ntab-kapital" data-pane="kapital" hidden><div class="news-col analysis"><strong>Kapitál <span class="nc-kind">/ analysis</span> <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/francuzska-mladez-je-v-uliciach/" target="_blank" rel="noopener noreferrer">Francúzska mládež je v uliciach. Bojuje za lepšie školstvo a formuje svoju politickú identitu</a><span class="nc-age">2d</span></div><p class="nc-sum">French youth protest in streets for better education and political identity.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/zamrzne-nam-so-zmrazenym-najmom-aj-usmev/" target="_blank" rel="noopener noreferrer">Zamrzne nám so zmrazeným nájmom aj úsmev na tvárach?</a><span class="nc-age">3d</span></div><p class="nc-sum">Frozen rents may also freeze smiles on faces?</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/hanbit-sa-s-derridom/" target="_blank" rel="noopener noreferrer">Hanbiť sa s Derridom</a><span class="nc-age">4d</span></div><p class="nc-sum">Wrestling with Derrida.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/reportaz-z-kuby-zachrani-revoluciu-kapitalizmus/" target="_blank" rel="noopener noreferrer">Reportáž z Kuby: Zachráni revolúciu kapitalizmus?</a><span class="nc-age">5d</span></div><p class="nc-sum">Report from Cuba asks if capitalism can rescue the revolution.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/vaclav-havel-devadesatilety/" target="_blank" rel="noopener noreferrer">Václav Havel devadesátiletý: mezi národním mýtem a ochrannou známkou</a><span class="nc-age">6d</span></div><p class="nc-sum">90‑year‑old Václav Havel seen as national myth and trademark.</p></div></div></div><div class="news-pane" id="npane-bbc" role="tabpanel" aria-labelledby="ntab-bbc" data-pane="bbc" hidden><div class="news-col"><strong>BBC <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cr4g1pwxxlq1o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Riyadh airport attack another dangerous moment in already tense conflict</a><span class="nc-age">42m</span></div><p class="nc-sum">Riyadh airport attack adds another dangerous moment to tense conflict.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cwy7lxx60dg5o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Children among 139 dead after boat capsizes off Djibouti, UN says</a><span class="nc-age">42m</span></div><p class="nc-sum">UN says 139 people died when a boat capsized off Djibouti.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/ckp8gyd65z2go?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Poland stabbings driven by online glorification of violence, Tusk says</a><span class="nc-age">56m</span></div><p class="nc-sum">Poland stabbings linked to online glorification of violence, says Tusk.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cw0k0g57mk3zo?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Ukraine strikes Yandex data centre in third attack on Russian tech giant</a><span class="nc-age">1h</span></div><p class="nc-sum">Ukraine hits Yandex data centre in third attack on Russian tech firm.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/c6m2dnngvw8xo?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Pope Leo to have surgery after lump found on lung</a><span class="nc-age">2h</span></div><p class="nc-sum">Pope Leo will undergo surgery after a lung lump is found.</p></div></div></div><div class="news-pane" id="npane-guardian" role="tabpanel" aria-labelledby="ntab-guardian" data-pane="guardian" hidden><div class="news-col"><strong>Guardian <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 2 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/tv-and-radio/2026/oct/11/richard-e-grant-celebrity-traitors-mistakes" target="_blank" rel="noopener noreferrer">Richard E Grant admits Traitors mistakes: ‘I never thought they would take me seriously’</a><span class="nc-age">3h</span></div><p class="nc-sum">Richard E. Grant admits “Traitors” mistakes, never expected to be taken seriously.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/uk-news/2026/oct/11/tiger-will-not-be-euthanised-after-man-mauled-to-death-yorkshire-zoo" target="_blank" rel="noopener noreferrer">Wildlife park confirms tiger will not be euthanised after man mauled to death</a><span class="nc-age">2h</span></div><p class="nc-sum">Wildlife park says tiger will not be euthanised after man killed in mauling.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/world/2026/oct/11/poland-possible-plot-attack-prime-minister-donald-tusk" target="_blank" rel="noopener noreferrer">Donald Tusk says man accused of plotting to kill him detained</a><span class="nc-age">13m</span></div><p class="nc-sum">Donald Tusk says suspect in plot to kill him has been detained.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/us-news/live/2026/oct/11/donald-trump-ukraine-russia-energy-ceasefire-diesel-latest-updates" target="_blank" rel="noopener noreferrer">Zelenskyy signals support for Russia-Ukraine ‘energy ceasefire’ after surprise Trump announcement – live updates</a><span class="nc-age">17m</span></div><p class="nc-sum">Zelenskyy supports energy ceasefire between Russia and Ukraine after Trump’s surprise.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/world/2026/oct/11/zelenskyy-trump-ukraine-russia-energy-ceasefire" target="_blank" rel="noopener noreferrer">Trump announces partial ceasefire in Ukraine war as Zelenskyy says deal is ‘news to me’</a><span class="nc-age">18m</span></div><p class="nc-sum">Trump announces partial Ukraine ceasefire; Zelenskyy calls the deal “news to me”.</p></div></div></div><div class="news-pane" id="npane-nyt" role="tabpanel" aria-labelledby="ntab-nyt" data-pane="nyt" hidden><div class="news-col"><strong>NYT <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 2 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/11/world/asia/china-essay-higgins-surveillance.html" target="_blank" rel="noopener noreferrer">A Reporter Returns to China to Find it Richer, but Also Highly Paranoid.</a><span class="nc-age">7h</span></div><p class="nc-sum">Reporter returns to China, finds it richer yet highly paranoid.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/11/world/middleeast/saudi-arabia-options-houthis.html" target="_blank" rel="noopener noreferrer">Saudi Arabia Has Few Options as Houthis Aim at Heart of Its Ambitions</a><span class="nc-age">2h</span></div><p class="nc-sum">Saudi Arabia has few options as Houthis target its core ambitions.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/11/world/europe/trump-zelensky-diesel-energy-russia-.html" target="_blank" rel="noopener noreferrer">Ukraine Shrugs Off Trump Call to Ditch Zelensky for Energy Strikes</a><span class="nc-age">13m</span></div><p class="nc-sum">Ukraine dismisses Trump’s call to replace Zelensky with energy‑strike strategy.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/11/world/africa/migrant-boat-capsize-djibouti-dead-yemen.html" target="_blank" rel="noopener noreferrer">Over 100 Migrants Are Dead After Boat Capsizes Near Djibouti</a><span class="nc-age">1h</span></div><p class="nc-sum">Over 100 migrants die after a boat capsizes near Djibouti.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/10/world/europe/tiger-attack-wildlife-park-man-dead.html" target="_blank" rel="noopener noreferrer">Man Dies in Tiger Attack at Yorkshire Wildlife Park in England</a><span class="nc-age">2h</span></div><p class="nc-sum">Man dies in tiger attack at Yorkshire Wildlife Park in England.</p></div></div></div><div class="news-count">35 headlines across 7 outlets</div></section>
+    <section class="card c-jobs"><h2>💼 Job offers<span class="sub">impactpool, joshswaterjobs, profesia</span></h2><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212231" target="_blank" rel="noopener">Individual Contractor - Geospatial Analysts – Satellite Imagery and GIS (Geneva office based) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Geneva</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212232" target="_blank" rel="noopener">Individual Contractor - Geospatial Analysts – Satellite Imagery and GIS (Remote) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Remote</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212230" target="_blank" rel="noopener">Individual Contractor - Geospatial Quality Assurance, Training and Analytical Support Specialists (Remote) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Remote</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212233" target="_blank" rel="noopener">Individual Contractor - Geospatial Quality Assurance, Training and Analytical Support Specialists (Geneva office based) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Geneva</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/391920/" target="_blank" rel="noopener">Water Resources Project Specialist</a></div><div class="it-meta">Upper Thames River Conservation Authority · London, UK 🇬🇧</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag remote">remote</span><span class="tag">Full-Time</span><span class="tag money">: $39</span><span class="tag deadline">deadline October 7, 2026</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/391983/" target="_blank" rel="noopener">Water Monitoring and Surveys Field Operations Supervisor – Hydrologist Supervisor</a></div><div class="it-meta">Minnesota Department of Natural Resources · St Paul, MN, USA 🇺🇸</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag remote">remote</span><span class="tag">Full-Time</span><span class="tag deadline">deadline 14 October, 2026</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/392531/" target="_blank" rel="noopener">Water Resources Management Specialist</a></div><div class="it-meta">Jefferson County Land and Water Conservation Department · Jefferson, WI, USA 🇺🇸</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag">Full-Time</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/indra-avitech/O5369162" target="_blank" rel="noopener">GIS Developer (m/ž) - Letectvo</a></div><div class="it-meta">Indra Avitech, s. r. o. · Bratislava, Slovensko (Pozícia umožňuje občasnú prácu z domu)</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">2 200 €–4 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/bratislavska-vodarenska-spolocnost/O5371986" target="_blank" rel="noopener">Geodet/geodetka</a></div><div class="it-meta">Bratislavská vodárenská spoločnosť, a.s. · Prešovská, Bratislava</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">1 700 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/mestska-cast-bratislava-petrzalka/O5360438" target="_blank" rel="noopener">Odborný referent územného rozvoja a GIS (m/ž)</a></div><div class="it-meta">Mestská časť Bratislava-Petržalka · Petržalka</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">1 450 €–1 690 €</span></div></div></section>
+    <section class="card c-reality"><h2>🏠 Real estate<span class="sub">Bratislava III</span></h2><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-pozemok-pre-rodinny-dom-dvojdom-aj-bytovu-vystavbu-v-raci-r9442043.html" target="_blank" rel="noopener">NA PREDAJ POZEMOK PRE RODINNÝ DOM, DVOJDOM AJ BYTOVÚ VÝSTAVBU V RAČI</a></div><div class="it-meta">Bratislava-Rača · Pozemok pre rodinné domy · 11.10.2026</div><div class="tags"><span class="price">550 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/predam-drevenu-podpivnicenu-chatu-odstupim-najom-zahrady-r9437594.html" target="_blank" rel="noopener">Predam drevenu podpivnicenu chatu, odstupim najom zahrady</a></div><div class="it-meta">Bratislava-Vajnory · Chalupa, rekreačný domček · 11.10.2026</div><div class="tags"><span class="price">12 900 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/predaj-premiovy-stavebny-pozemok-na-kolibe-vtacnik-r9437247.html" target="_blank" rel="noopener">PREDAJ - Prémiový stavebný pozemok na Kolibe - Vtáčnik</a></div><div class="it-meta">Bratislava-Nové Mesto · Pozemok pre rodinné domy · 11.10.2026</div><div class="tags"><span class="price">525 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/ponukame-na-predaj-stavebny-pozemok-1004m2-v-lokalite-vajnory-r9436859.html" target="_blank" rel="noopener">Ponúkame na predaj stavebný pozemok 1004m² v lokalite Vajnory</a></div><div class="it-meta">Bratislava-Vajnory · Pozemok pre rodinné domy · 11.10.2026</div><div class="tags"><span class="price">430 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/ponukame-na-predaj-stavebny-pozemok-502m2-v-lokalite-vajnory-r9436857.html" target="_blank" rel="noopener">Ponúkame na predaj stavebný pozemok 502m² v lokalite Vajnory</a></div><div class="it-meta">Bratislava-Vajnory · Pozemok pre rodinné domy · 11.10.2026</div><div class="tags"><span class="price">430 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/predaj-5-izbovy-rodinny-dom-405-m2-pozemok-bratislava-nove-mesto-r9436483.html" target="_blank" rel="noopener">PREDAJ: 5 IZBOVÝ RODINNÝ DOM - 405 M2 POZEMOK - BRATISLAVA - NOVÉ MESTO</a></div><div class="it-meta">Bratislava-Nové Mesto · Rodinný dom · 11.10.2026 · 5-izb.</div><div class="tags"><span class="price">788 500 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/velka-slnecna-zahrada-650-m2-chatka-elektrina-a-vlastna-studna-zabi-majer-r9434112.html" target="_blank" rel="noopener">Veľká slnečná záhrada 650 m² – chatka, elektrina a vlastná studňa – Žabí Majer</a></div><div class="it-meta">Bratislava-Rača · Záhrada · 11.10.2026</div><div class="tags"><span class="price">42 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/herrys-na-predaj-4-izbova-novostavba-vo-vajnoroch-r9433981.html" target="_blank" rel="noopener">HERRYS - Na predaj 4-izbová novostavba vo Vajnoroch</a></div><div class="it-meta">Bratislava-Vajnory · Rodinný dom · 11.10.2026 · 4-izb.</div><div class="tags"><span class="price">380 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/gravitas-i-radovy-4-izb-rodinny-dom-v-starej-casti-race-na-alstrovej-r9411708.html" target="_blank" rel="noopener">GRAVITAS I Radový 4- izb. rodinný dom v starej časti Rače na Alstrovej</a></div><div class="it-meta">Bratislava-Rača · Rodinný dom · 11.10.2026 · 4-izb.</div><div class="tags"><span class="price">315 000 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/herrys-na-predaj-3-izbova-novostavba-rodinneho-domu-s-predzahradkou-vo-vajnoroch-r9405822.html" target="_blank" rel="noopener">HERRYS - Na predaj 3-izbová novostavba rodinného domu s predzáhradkou vo Vajnoroch</a></div><div class="it-meta">Bratislava-Vajnory · Rodinný dom · 11.10.2026 · 3-izb.</div><div class="tags"><span class="price">355 000 €</span></div></div></section>
+  </div>
+  <footer>Sources: impactpool.org · joshswaterjobs.com · profesia.sk · topreality.sk · noel.gv.at · shmu.sk · finance.yahoo.com · open-meteo.com · sme.sk · dennikn.sk · postoj.sk · kapital-noviny.sk · bbc.co.uk · theguardian.com · nytimes.com</footer>
+</div>
+<script>
+(function() {
+  var KEY = 'mb-theme', root = document.documentElement;
+  function explicit() {
+    try {
+      var t = localStorage.getItem(KEY);
+      return (t === 'light' || t === 'dark') ? t : null;
+    } catch (e) { return null; }
+  }
+  function systemDark() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  // Until the reader picks a mode, follow the OS. Once picked, stay put.
+  function current() { return explicit() || (systemDark() ? 'dark' : 'light'); }
+  function apply(t) {
+    root.setAttribute('data-theme', t);
+    var b = document.getElementById('themeToggle');
+    if (b) {
+      // Label the button with the mode it switches TO.
+      var to = t === 'dark' ? 'light' : 'dark';
+      var txt = t === 'dark' ? '\u2600\ufe0f' : '\uD83C\uDF19';
+      b.textContent = txt;
+      b.setAttribute('aria-label', 'Switch to ' + to + ' mode');
+      b.setAttribute('title', 'Switch to ' + to + ' mode');
+    }
+  }
+  // Two states only: every click is a visible change. The previous
+  // auto -> dark -> light cycle needed two clicks out of 'light', because the
+  // first click landed on 'auto', which looks the same on a light OS.
+  function toggle() {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+    apply(next);
+  }
+  apply(current());
+  var b = document.getElementById('themeToggle');
+  if (b) b.addEventListener('click', toggle);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+    if (!explicit()) apply(current());
+  });
+  window.addEventListener('storage', function(e) {
+    if (e.key === KEY) apply(current());
+  });
+})();
+</script>
+<script>
+(function() {
+  // Plain tab switching: no autoplay, no transforms. The first pane ships
+  // visible and the rest carry [hidden], so this only runs when the reader
+  // clicks something.
+  var root = document.querySelector('.c-news');
+  if (!root) return;
+  var tabs = Array.prototype.slice.call(root.querySelectorAll('.news-tab'));
+  var panes = Array.prototype.slice.call(root.querySelectorAll('.news-pane'));
+  if (!tabs.length) return;
+
+  function select(fid, focus) {
+    tabs.forEach(function(t) {
+      var on = t.getAttribute('data-pane') === fid;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on && focus) t.focus();
+    });
+    panes.forEach(function(p) {
+      p.hidden = p.getAttribute('data-pane') !== fid;
+    });
+  }
+
+  tabs.forEach(function(tab, i) {
+    tab.addEventListener('click', function() {
+      select(tab.getAttribute('data-pane'), false);
+    });
+    tab.addEventListener('keydown', function(e) {
+      var next = -1;
+      if (e.key === 'ArrowRight') next = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') next = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = tabs.length - 1;
+      if (next < 0) return;
+      e.preventDefault();
+      select(tabs[next].getAttribute('data-pane'), true);
+    });
+  });
+})();
+</script>
+<script>
+(function() {
+  var TWO_DAYS = 2 * 24 * 3600 * 1000;
+  var RANGES = {
+    '1D': TWO_DAYS,
+    '1M': 31 * 24 * 3600 * 1000,
+    '6M': 183 * 24 * 3600 * 1000,
+    '1Y': 366 * 24 * 3600 * 1000,
+    '3Y': 3 * 366 * 24 * 3600 * 1000,
+    '5Y': 5 * 366 * 24 * 3600 * 1000,
+    'MAX': Infinity
+  };
+  var W = 600, H = 190;
+  var PL = 46, PR = 12, PT = 14, PB = 24;
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function ts(p) { return Date.parse(p.t + 'T00:00:00'); }
+
+  function loadData() {
+    var el = document.getElementById('stockData');
+    if (!el) return null;
+    try { return JSON.parse(el.textContent); } catch (e) { return null; }
+  }
+
+  function sliceFor(key, pts) {
+    var ms = RANGES[key];
+    if (ms === Infinity) return pts;
+    var lastT = ts(pts[pts.length - 1]);
+    var cut = 0;
+    for (var i = pts.length - 1; i >= 0; i--) {
+      if (lastT - ts(pts[i]) <= ms) cut++; else break;
+    }
+    var out = pts.slice(pts.length - cut);
+    if (out.length < 2) out = pts.slice(pts.length - 2);
+    return out;
+  }
+
+  function niceStep(span, target) {
+    if (span <= 0) return 1;
+    var rough = span / target;
+    var pow = Math.pow(10, Math.floor(Math.log(rough) / Math.LN10));
+    var norm = rough / pow;
+    var f = norm < 1.5 ? 1 : (norm < 3 ? 2 : (norm < 7 ? 5 : 10));
+    return f * pow;
+  }
+
+function fmtTick(v, step) {
+  var dec = step >= 1 ? 0 : (step >= 0.1 ? 1 : 2);
+  return v.toFixed(dec);
+}
+
+  function fmtPrice(v) {
+    var s = v.toFixed(2);
+    if (s.indexOf('.') !== -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    return s;
+  }
+
+  function fmtDate(iso, withYear) {
+    var p = iso.split('-');
+    if (p.length < 3) return iso;
+    var d = +p[2], m = MONTHS[+p[1] - 1], y = p[0];
+    return d + ' ' + m + (withYear ? ' ' + y : '');
+  }
+
+  function draw(points, key) {
+    var svg = document.getElementById('stockChart');
+    var tip = document.getElementById('stockTip');
+    if (tip) tip.style.display = 'none';
+    if (!svg || !points || points.length < 2) {
+      if (svg) svg.innerHTML = '';
+      window.stockPts = null;
+      return;
+    }
+    var pts = sliceFor(key, points);
+    if (pts.length < 2) return;
+    window.stockPts = pts;
+
+    var qs = pts.map(function(p) { return p.q; });
+    var min = Math.min.apply(null, qs), max = Math.max.apply(null, qs);
+    if (max - min < 1e-9) {
+      max = min + (min === 0 ? 0.5 : Math.max(Math.abs(min) * 0.01, 0.05));
+      min = min - (min === 0 ? 0.5 : Math.abs(min) * 0.01);
+    }
+    var pad = (max - min) * 0.08;
+    min -= pad; max += pad;
+
+    var x = function(i) { return PL + (i / (pts.length - 1)) * (W - PL - PR); };
+    var y = function(q) { return PT + (1 - (q - min) / (max - min)) * (H - PT - PB); };
+    window.stockMapY = y;
+
+    var d = pts.map(function(p, i) { return (i ? 'L' : 'M') + x(i).toFixed(2) + ',' + y(p.q).toFixed(2); }).join('');
+    var area = d + 'L' + x(pts.length - 1).toFixed(2) + ',' + (H - PB).toFixed(2) +
+      'L' + x(0).toFixed(2) + ',' + (H - PB).toFixed(2) + 'Z';
+
+    var grid = '', yLabels = [], xLabels = [];
+    var step = niceStep(max - min, 5);
+    var tick = Math.ceil(min / step) * step;
+    for (; tick <= max; tick += step) {
+      var gy = y(tick);
+      grid += '<line class="axis" x1="' + PL + '" y1="' + gy.toFixed(1) +
+        '" x2="' + (W - PR) + '" y2="' + gy.toFixed(1) + '"/>';
+      yLabels.push({ text: fmtTick(tick, step), x: (PL - 6) / W * 100, y: gy / H * 100 });
+    }
+    grid += '<line class="axis" x1="' + PL + '" y1="' + (H - PB) +
+      '" x2="' + (W - PR) + '" y2="' + (H - PB) + '"/>';
+
+    var spanDays = (ts(pts[pts.length - 1]) - ts(pts[0])) / 86400000;
+    var nl = spanDays <= 5 ? 2 : 4;
+    for (var j = 0; j < nl; j++) {
+      var i = Math.round(j / (nl - 1) * (pts.length - 1));
+      xLabels.push({ text: fmtDate(pts[i].t, spanDays > 400),
+        x: x(i) / W * 100, y: (H - PB + 13) / H * 100 });
+    }
+
+    var dot = '<circle class="dot" cx="' + x(pts.length - 1).toFixed(2) +
+      '" cy="' + y(qs[qs.length - 1]).toFixed(2) + '" r="2.6"/>';
+
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.innerHTML = grid +
+      '<path class="area" d="' + area + '"/>' +
+      '<path class="line" d="' + d + '"/>' +
+      dot;
+    setAxis(yLabels, xLabels);
+  }
+
+  function setAxis(yLabels, xLabels) {
+    var axis = document.getElementById('stockAxis');
+    if (!axis) return;
+    var parts = [];
+    var unit = window.stockCurrency || '';
+    if (unit) parts.push({ text: unit, cls: 'aU', x: PL / W * 100, y: 3 / H * 100 });
+    for (var k = 0; k < yLabels.length; k++) {
+      parts.push({ text: yLabels[k].text, cls: 'aY', x: yLabels[k].x, y: yLabels[k].y });
+    }
+    for (var m = 0; m < xLabels.length; m++) {
+      parts.push({ text: xLabels[m].text, cls: 'aX', x: xLabels[m].x, y: xLabels[m].y });
+    }
+    var s = '';
+    for (var n = 0; n < parts.length; n++) {
+      var p = parts[n];
+      var align = p.cls === 'aX' ? 'translateX(-50%) ' : (p.cls === 'aY' ? 'translate(-100%,-50%) ' : '');
+      s += '<div class="' + p.cls + '" style="left:' + p.x.toFixed(2) +
+        '%;top:' + p.y.toFixed(2) + '%;transform:' + align + '">' + p.text + '</div>';
+    }
+    axis.innerHTML = s;
+  }
+
+  function hideTip() {
+    var tip = document.getElementById('stockTip');
+    if (tip) tip.style.display = 'none';
+    var svg = document.getElementById('stockChart');
+    if (svg) {
+      var g = svg.querySelector('#stockHover');
+      if (g) g.parentNode.removeChild(g);
+    }
+  }
+
+  function onMove(e) {
+    var svg = document.getElementById('stockChart');
+    var pts = window.stockPts;
+    if (!svg || !pts || pts.length < 2 || !window.stockMapY) return;
+    var rect = svg.getBoundingClientRect();
+    if (rect.width < 2) return;
+    var svgX = (e.clientX - rect.left) / rect.width * W;
+    var ratio = (svgX - PL) / (W - PL - PR);
+    var i = Math.round(ratio * (pts.length - 1));
+    if (i < 0) i = 0;
+    if (i > pts.length - 1) i = pts.length - 1;
+    var px = PL + (i / (pts.length - 1)) * (W - PL - PR);
+    var py = window.stockMapY(pts[i].q);
+
+    var g = svg.querySelector('#stockHover');
+    if (!g) {
+      g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('id', 'stockHover');
+      svg.appendChild(g);
+    }
+    g.innerHTML =
+      '<line class="stock-cross" x1="' + px.toFixed(2) + '" y1="' + PT +
+      '" x2="' + px.toFixed(2) + '" y2="' + (H - PB) + '"/>' +
+      '<circle class="dot" r="3" cx="' + px.toFixed(2) + '" cy="' + py.toFixed(2) + '"/>';
+
+    var tip = document.getElementById('stockTip');
+    if (!tip) return;
+    var unit = window.stockCurrency ? ' ' + window.stockCurrency : '';
+    tip.textContent = fmtDate(pts[i].t, true) + '  ·  ' + fmtPrice(pts[i].q) + unit;
+    var w = rect.width;
+    var left = px / W * w;
+    if (left < 46) left = 46;
+    if (left > w - 46) left = w - 46;
+    tip.style.left = left + 'px';
+    tip.style.top = (py / H * rect.height) + 'px';
+    tip.style.display = 'block';
+  }
+
+  function updateMove(pts) {
+    var el = document.getElementById('stockMove');
+    if (!el || !pts || pts.length < 2) return;
+    var first = pts[0].q, last = pts[pts.length - 1].q;
+    var pct = first ? (last - first) / first * 100 : 0;
+    var up = pct >= 0;
+    el.textContent = (up ? '\u25b2' : '\u25bc') + ' ' + Math.abs(pct).toFixed(2) + '%';
+    el.classList.toggle('up', up);
+    el.classList.toggle('down', !up);
+  }
+
+  function setRange(key) {
+    var btns = document.querySelectorAll('.stock-range');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', btns[i].getAttribute('data-range') === key);
+    }
+    draw(window.stockSeries, key);
+    updateMove(window.stockPts);
+  }
+
+  var data = loadData();
+  if (data && data.series && data.series.length) {
+    window.stockSeries = data.series;
+    window.stockCurrency = data.currency || '';
+    var svgEl = document.getElementById('stockChart');
+    if (svgEl) {
+      svgEl.addEventListener('pointermove', onMove);
+      svgEl.addEventListener('pointerleave', hideTip);
+    }
+    var buttons = document.querySelectorAll('.stock-range');
+    if (buttons.length) {
+      for (var b = 0; b < buttons.length; b++) {
+        (function(btn) {
+          btn.addEventListener('click', function() { setRange(btn.getAttribute('data-range')); });
+        })(buttons[b]);
+      }
+      setRange('1M');
+    } else {
+      draw(data.series, 'MAX');
+    }
+  }
+})();
+</script>
+</body>
+</html>
