@@ -18,83 +18,93 @@
 <style>
 :root{
   color-scheme:light;
-  --bg:#ffffff; --bg-grad1:#ffffff; --bg-grad2:#f5f5f5;
-  --card:#ffffff; --ink:#111111; --muted:#757575;
-  --accent:#d6220d; --accent-ink:#ffffff; --accent-soft:#fdecea;
-  --border:#e3e3e3; --shadow:none;
-  --ok:#0a8f3c; --ok-bg:#e9f7ee;
-  --rain-bg:#eaf2fd; --rain-ink:#12459c; --rain-border:#c3d9f5;
-  --warn-bg:#fdf4e3; --warn-ink:#8a5a00; --warn-border:#eccc8a;
-  --danger-bg:#fdeceb; --danger-ink:#b31016; --danger-border:#f0b7b4;
-  --sun:#f5a623; --chart:#d6220d;
-  --radius:3px; --hair:#111111; --tick:#f0f0f0;
+  /* Porcelain Violet: a cool porcelain ground, white cards and a violet
+     accent. The semantic tints below are not the browser-standard reds and
+     greens -- they are pulled towards the same cool base so a warning pill
+     does not read as a second brand colour. */
+  --bg:#f5f5fa;
+  --card:#ffffff; --ink:#14141a; --muted:#61616e; --label:#51515f;
+  --accent:#5b4bdc; --accent-ink:#ffffff; --accent-soft:#eeecfb;
+  --border:rgba(20,20,26,.075); --cell:#efeff7;
+  --shadow:0 1px 2px rgba(16,18,28,.04),0 10px 24px -16px rgba(16,18,28,.2);
+  --ok:#1f7a55; --ok-bg:#e9f4ef;
+  --rain-bg:#eaf0fd; --rain-ink:#1b4b8f; --rain-border:#c9d8f2;
+  --warn-bg:#f8f2df; --warn-ink:#7a5613; --warn-border:#e2d3a4;
+  --danger-bg:#fdecef; --danger-ink:#b02a3c; --danger-border:#efc2ca;
+  --sun:#e08a12; --chart:#5b4bdc;
+  --radius:14px; --radius-inner:10px; --radius-cell:8px;
+  --tick:#efeff7;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#0d0d0d; --bg-grad1:#0d0d0d; --bg-grad2:#141414;
-    --card:#151515; --ink:#f4f4f4; --muted:#9b9b9b;
-    --accent:#ff4b33; --accent-ink:#0d0d0d; --accent-soft:#2b1512;
-    --border:#2b2b2b;
-    --ok:#5ed88a; --ok-bg:#11251a;
-    --rain-bg:#111d2e; --rain-ink:#8fc0ff; --rain-border:#2b4a78;
-    --warn-bg:#2b2410; --warn-ink:#ecc45a; --warn-border:#6b5518;
-    --danger-bg:#2e1416; --danger-ink:#ff8f93; --danger-border:#7a2b30;
-    --sun:#ffcf6e; --chart:#ff4b33;
-    --hair:#f4f4f4; --tick:#1c1c1c;
+    --bg:#0a0a10;
+    --card:#131320; --ink:#ecebf5; --muted:#9a99ad; --label:#aeadc0;
+    --accent:#9a86ff; --accent-ink:#0a0718; --accent-soft:#201b3a;
+    --border:rgba(255,255,255,.09); --cell:#1a1a29;
+    /* Shadows disappear against a near-black ground, so cards lean on the
+       hairline border instead. */
+    --shadow:0 1px 2px rgba(0,0,0,.55),0 14px 30px -20px rgba(0,0,0,.9);
+    --ok:#5fcf9a; --ok-bg:#10241d;
+    --rain-bg:#111a2b; --rain-ink:#8cc4ff; --rain-border:#28405f;
+    --warn-bg:#221d10; --warn-ink:#e3bf72; --warn-border:#584a22;
+    --danger-bg:#2b1218; --danger-ink:#ff8fa3; --danger-border:#5c2630;
+    --sun:#f2c46a; --chart:#9a86ff;
+    --tick:#1a1a29;
   }
 }
 html[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#0d0d0d; --bg-grad1:#0d0d0d; --bg-grad2:#141414;
-  --card:#151515; --ink:#f4f4f4; --muted:#9b9b9b;
-  --accent:#ff4b33; --accent-ink:#0d0d0d; --accent-soft:#2b1512;
-  --border:#2b2b2b;
-  --ok:#5ed88a; --ok-bg:#11251a;
-  --rain-bg:#111d2e; --rain-ink:#8fc0ff; --rain-border:#2b4a78;
-  --warn-bg:#2b2410; --warn-ink:#ecc45a; --warn-border:#6b5518;
-  --danger-bg:#2e1416; --danger-ink:#ff8f93; --danger-border:#7a2b30;
-  --sun:#ffcf6e; --chart:#ff4b33;
-  --hair:#f4f4f4; --tick:#1c1c1c;
+  --bg:#0a0a10;
+  --card:#131320; --ink:#ecebf5; --muted:#9a99ad; --label:#aeadc0;
+  --accent:#9a86ff; --accent-ink:#0a0718; --accent-soft:#201b3a;
+  --border:rgba(255,255,255,.09); --cell:#1a1a29;
+  --shadow:0 1px 2px rgba(0,0,0,.55),0 14px 30px -20px rgba(0,0,0,.9);
+  --ok:#5fcf9a; --ok-bg:#10241d;
+  --rain-bg:#111a2b; --rain-ink:#8cc4ff; --rain-border:#28405f;
+  --warn-bg:#221d10; --warn-ink:#e3bf72; --warn-border:#584a22;
+  --danger-bg:#2b1218; --danger-ink:#ff8fa3; --danger-border:#5c2630;
+  --sun:#f2c46a; --chart:#9a86ff;
+  --tick:#1a1a29;
 }
 *{box-sizing:border-box}
 body{margin:0;color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   font-size:15px;line-height:1.4;
   background:var(--bg);
-  background:linear-gradient(180deg,var(--bg-grad1),var(--bg-grad2));
   -webkit-font-smoothing:antialiased}
 
 /* ---- shell ---- */
 .wrap{max-width:1320px;margin:0 auto;padding:0 18px 44px}
-.brandbar{height:5px;background:var(--accent);margin:0 -18px}
 
 /* ---- masthead ---- */
-header.top{display:flex;align-items:flex-end;gap:16px;
-  border-bottom:2px solid var(--hair);padding:16px 0 10px;margin-bottom:12px}
-header.top h1{margin:0;font-size:2.1rem;font-weight:800;letter-spacing:-.035em;
-  line-height:.95;text-transform:uppercase}
-.brand-emoji{font-size:1.05em;vertical-align:-.08em;margin-right:.14em}
-.meta{color:var(--muted);font-size:.72rem;letter-spacing:.09em;
-  text-transform:uppercase;padding-bottom:.2em;white-space:nowrap}
-.meta .sep{opacity:.4;margin:0 .4em}
+/* No rules and no all-caps block: the wordmark carries a single accent dot
+   and the page starts immediately underneath it. */
+header.top{display:flex;align-items:center;gap:14px;padding:22px 0 14px;margin-bottom:4px}
+header.top h1{margin:0;font-size:1.34rem;font-weight:650;letter-spacing:-.02em;
+  line-height:1.1;display:flex;align-items:center;gap:9px}
+.brand-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 4px var(--accent-soft);flex:none}
+.meta{color:var(--muted);font-size:.7rem;letter-spacing:.04em;
+  padding-bottom:.1em;white-space:nowrap}
+.meta .sep{opacity:.5;margin:0 .45em}
 .theme-btn{margin-left:auto;border:1px solid var(--border);background:var(--card);
-  color:var(--muted);border-radius:var(--radius);width:28px;height:28px;
-  font-size:.85rem;cursor:pointer;line-height:1;flex:none;
-  display:flex;align-items:center;justify-content:center;padding:0}
+  color:var(--muted);border-radius:50%;width:30px;height:30px;
+  font-size:.82rem;cursor:pointer;line-height:1;flex:none;
+  display:flex;align-items:center;justify-content:center;padding:0;
+  box-shadow:var(--shadow)}
 .theme-btn:hover{color:var(--accent);border-color:var(--accent)}
 
 /* ---- ticker strip ---- */
-.chips{display:flex;flex-wrap:wrap;gap:0;margin:0 0 14px;
-  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-  padding:6px 0;background:var(--card)}
-.chip{border-right:1px solid var(--border);padding:0 11px;font-size:.76rem;
-  color:var(--muted);white-space:nowrap;display:inline-flex;gap:5px;align-items:center}
-.chip:last-child{border-right:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.chip{border:1px solid var(--border);background:var(--card);border-radius:999px;
+  padding:4px 11px;font-size:.72rem;
+  color:var(--muted);white-space:nowrap;display:inline-flex;gap:5px;align-items:center;
+  box-shadow:var(--shadow)}
 .chip strong{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
-.chip.warn{border-right-color:var(--warn-border);color:var(--warn-ink)}
+.chip.warn{border-color:var(--warn-border);background:var(--warn-bg);color:var(--warn-ink)}
 .chip.warn strong{color:var(--warn-ink)}
-.chip.danger{border-right-color:var(--danger-border);color:var(--danger-ink)}
+.chip.danger{border-color:var(--danger-border);background:var(--danger-bg);color:var(--danger-ink)}
 .chip.danger strong{color:var(--danger-ink)}
 .chip.up strong{color:var(--ok)}
 .chip.down strong{color:var(--danger-ink)}
@@ -105,20 +115,23 @@ header.top h1{margin:0;font-size:2.1rem;font-weight:800;letter-spacing:-.035em;
    shorter cards). Two columns is deliberate -- with the tall Jobs/News/Reality
    cards a third column cannot be balanced and opens a large hole, measured in
    a headless browser. Collapses to one column on narrow screens. */
-.grid{column-count:2;column-gap:16px}
+.grid{column-count:2;column-gap:14px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:11px 13px 12px;min-width:0;
-  break-inside:avoid;page-break-inside:avoid;margin-bottom:16px;
+  padding:16px 18px 18px;min-width:0;
+  box-shadow:var(--shadow);
+  break-inside:avoid;page-break-inside:avoid;margin-bottom:14px;
   display:flex;flex-direction:column;
   container-type:inline-size}
 
-.card h2{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  margin:0 0 9px;padding-bottom:7px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:7px;color:var(--ink);line-height:1}
-.card h2 .sub{color:var(--muted);font-weight:500;font-size:.66rem;letter-spacing:.1em;
+/* A quiet uppercase label, not a ruled heading: the rule was doing the work
+   that the spacing now does. */
+.card h2{font-size:.62rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  margin:0 0 11px;padding:0;border:0;
+  display:flex;align-items:center;gap:7px;color:var(--label);line-height:1}
+.card h2 .sub{color:var(--muted);font-weight:500;font-size:.6rem;letter-spacing:.1em;
   margin-left:auto;text-transform:uppercase}
-.h2sub{color:var(--muted);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
-  margin:-5px 0 8px;font-weight:500}
+.h2sub{color:var(--muted);font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;
+  margin:-6px 0 10px;font-weight:500}
 
 ul.notes{list-style:none;margin:9px 0 0;padding:0;
   border-top:1px solid var(--border)}
@@ -138,33 +151,34 @@ ul.notes li.danger:before{background:var(--danger-ink)}
 .temp-big{font-size:2.2rem;font-weight:800;letter-spacing:-.045em;line-height:.9}
 .temp-big small{font-size:.7rem;color:var(--muted);font-weight:500;display:block;
   margin-top:3px;letter-spacing:0}
-.metro{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:1px;
-  margin-top:9px;background:var(--border);border:1px solid var(--border)}
-.metro .m{background:var(--card);padding:4px 7px;font-size:.72rem}
-.metro .m .k{color:var(--muted);font-size:.6rem;text-transform:uppercase;
+.metro{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:7px;
+  margin-top:11px}
+.metro .m{background:var(--cell);border-radius:var(--radius-cell);padding:7px 9px;font-size:.72rem}
+.metro .m .k{color:var(--muted);font-size:.58rem;text-transform:uppercase;
   letter-spacing:.1em;font-weight:600}
-.metro .m .v{font-weight:700;margin-top:1px;font-variant-numeric:tabular-nums}
+.metro .m .v{font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
 .forecast{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
-  gap:1px;margin-top:9px;background:var(--border);border:1px solid var(--border)}
-.fday{background:var(--card);padding:7px 6px;text-align:center}
-.fday .dow{font-size:.62rem;color:var(--muted);text-transform:uppercase;
+  gap:7px;margin-top:9px}
+.fday{background:var(--cell);border-radius:var(--radius-cell);padding:8px 6px;text-align:center}
+.fday .dow{font-size:.6rem;color:var(--muted);text-transform:uppercase;
   letter-spacing:.12em;font-weight:700}
-.fday .emoji{font-size:1.4rem;line-height:1;margin:3px 0}
-.fday .cond{font-size:.68rem;color:var(--muted);line-height:1.2}
+.fday .emoji{font-size:1.4rem;line-height:1;margin:4px 0}
+.fday .cond{font-size:.66rem;color:var(--muted);line-height:1.2}
 .fday .hi{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-top:2px}
 .fday .lo{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .fday .precip{font-size:.64rem;color:var(--rain-ink);margin-top:2px;font-weight:600}
-.chart-wrap{margin-top:9px;border:1px solid var(--border);padding:5px 4px 2px;
-  background:var(--card)}
+.chart-wrap{margin-top:10px;border:0;background:var(--cell);border-radius:var(--radius-inner);
+  padding:8px 6px 4px}
 .chart-wrap svg{display:block;width:100%;height:auto;max-height:200px}
-.chart-wrap .cap{font-size:.62rem;color:var(--muted);text-transform:uppercase;
-  letter-spacing:.1em;text-align:center;margin-bottom:3px}
+.chart-wrap .cap{font-size:.6rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.1em;text-align:center;margin-bottom:4px}
 
 /* ---- hydrology ---- */
 .hydro-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
-.hydro-box{border:1px solid var(--border);padding:9px 11px;background:var(--card)}
-.hydro-box>strong{font-size:.64rem;text-transform:uppercase;letter-spacing:.13em;
-  color:var(--muted);font-weight:700}
+.hydro-box{border:1px solid transparent;border-radius:var(--radius-inner);
+  padding:10px 12px;background:var(--cell)}
+.hydro-box>strong{font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:600}
 .hydro-box.warn{border-color:var(--warn-border);background:var(--warn-bg)}
 .hydro-box.danger{border-color:var(--danger-border);background:var(--danger-bg)}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:.78rem;margin-top:6px}
@@ -177,9 +191,9 @@ ul.notes li.danger:before{background:var(--danger-ink)}
 
 /* ---- agenda ---- */
 .agenda{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
-.ev-col h3{font-size:.64rem;text-transform:uppercase;letter-spacing:.13em;
-  color:var(--muted);margin:0 0 6px;font-weight:700;
-  border-bottom:1px solid var(--border);padding-bottom:4px}
+.ev-col h3{font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);margin:0 0 6px;font-weight:600;
+  padding:0;border:0}
 ul.events{list-style:none;margin:0;padding:0}
 ul.events li{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--tick);
   font-size:.8rem;line-height:1.28}
@@ -192,7 +206,7 @@ ul.events li:last-child{border-bottom:0}
 /* ---- jobs & real estate ---- */
 /* Two lines per entry: title, then meta + tags sharing a line. */
 .item{display:flex;flex-wrap:wrap;align-items:center;gap:1px 8px;
-  padding:5px 0;border-bottom:1px solid var(--border);font-size:.84rem}
+  padding:7px 0;border-bottom:1px solid var(--border);font-size:.84rem}
 .item:last-child{border-bottom:0}
 .item .it-title{flex:1 1 100%;font-weight:700;font-size:.85rem;line-height:1.25;
   letter-spacing:-.01em}
@@ -200,11 +214,11 @@ ul.events li:last-child{border-bottom:0}
 .item .it-title a:hover{color:var(--accent);text-decoration:none}
 .item .it-meta{flex:0 1 auto;min-width:7em;color:var(--muted);font-size:.72rem;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tags{flex:0 1 auto;min-width:0;margin-left:auto;display:flex;flex-wrap:wrap;gap:3px;
+.tags{flex:0 1 auto;min-width:0;margin-left:auto;display:flex;flex-wrap:wrap;gap:4px;
   justify-content:flex-end}
-.tag{display:inline-block;border:1px solid var(--border);background:var(--card);
-  border-radius:2px;padding:0 5px;font-size:.63rem;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.04em;font-weight:700;line-height:1.5;
+.tag{display:inline-block;border:1px solid var(--border);background:var(--cell);
+  border-radius:999px;padding:1px 8px;font-size:.62rem;color:var(--muted);
+  letter-spacing:.02em;font-weight:600;line-height:1.5;
   white-space:nowrap}
 .tag.money,.tag.remote{border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
 .tag.deadline{border-color:var(--warn-border);background:var(--warn-bg);color:var(--warn-ink)}
@@ -213,9 +227,8 @@ ul.events li:last-child{border-bottom:0}
   font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
-footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
-  color:var(--muted);font-size:.64rem;text-align:center;letter-spacing:.06em;
-  text-transform:uppercase}
+footer{margin-top:22px;padding-top:14px;border-top:1px solid var(--border);
+  color:var(--muted);font-size:.64rem;text-align:center;letter-spacing:.02em}
 
 /* ---- stock watch ---- */
 .stock-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
@@ -240,44 +253,44 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .stock-axis .aU{font-weight:700;color:var(--ink)}
 .stock-tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);
-  border-radius:2px;padding:3px 7px;font-size:.72rem;font-variant-numeric:tabular-nums;
+  border-radius:8px;padding:4px 8px;font-size:.72rem;font-variant-numeric:tabular-nums;
   white-space:nowrap;transform:translate(-50%,-115%);display:none;z-index:5}
-.stock-ranges{display:flex;flex-wrap:wrap;gap:0;margin-top:8px;border-top:1px solid var(--border)}
-.stock-range{padding:4px 0;flex:1;text-align:center;border-right:1px solid var(--border);
-  font-size:.66rem;color:var(--muted);cursor:pointer;font-weight:700;letter-spacing:.06em;
+.stock-ranges{display:flex;flex-wrap:wrap;gap:3px;margin-top:10px;padding:3px;
+  background:var(--cell);border-radius:999px}
+.stock-range{padding:5px 0;flex:1;text-align:center;border:0;border-radius:999px;
+  font-size:.62rem;color:var(--muted);cursor:pointer;font-weight:600;letter-spacing:.04em;
   text-transform:uppercase}
 .stock-range:last-child{border-right:0}
-.stock-range:hover{color:var(--accent);background:var(--accent-soft)}
-.stock-range.active{color:var(--accent);background:var(--accent-soft)}
+.stock-range:hover{color:var(--accent)}
+.stock-range.active{color:var(--accent-ink);background:var(--accent)}
 
 /* ---- news tabs ---- */
 /* One outlet visible at a time; the buttons switch panes and nothing moves
    on its own, so the page stays still for the reader. */
-.news-tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px}
-.news-tab{font:inherit;font-size:.66rem;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--muted);background:var(--card);
-  border:1px solid var(--border);border-radius:2px;padding:3px 9px;
+.news-tabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px}
+.news-tab{font:inherit;font-size:.72rem;font-weight:600;letter-spacing:.01em;
+  color:var(--muted);background:var(--card);
+  border:1px solid var(--border);border-radius:999px;padding:4px 11px;
   cursor:pointer;white-space:nowrap}
 .news-tab:hover{color:var(--accent);border-color:var(--accent)}
-.news-tab:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.news-tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .news-tab[aria-selected="true"]{color:var(--accent-ink);
   background:var(--accent);border-color:var(--accent)}
 /* Marks a tab whose articles are ordered by readership rather than by time. */
-.news-badge{display:inline-block;margin-left:5px;padding:0 4px;
-  font-size:.5rem;font-weight:700;letter-spacing:.1em;line-height:1.5;
-  border:1px solid currentColor;border-radius:2px;opacity:.75;
+.news-badge{display:inline-block;margin-left:5px;padding:0 5px;
+  font-size:.5rem;font-weight:700;letter-spacing:.08em;line-height:1.6;
+  border:1px solid currentColor;border-radius:999px;opacity:.75;
   vertical-align:1px}
 .news-tab[aria-selected="true"] .news-badge{opacity:.9}
 .news-pane[hidden]{display:none}
-.news-col{min-width:0;border-left:2px solid var(--accent);padding-left:9px}
-.news-col.analysis{border-left-color:var(--muted)}
+.news-col{min-width:0}
 .news-col>strong{display:flex;align-items:baseline;gap:6px;
-  font-size:.64rem;text-transform:uppercase;letter-spacing:.13em;
-  color:var(--muted);font-weight:700;margin-bottom:2px}
+  font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:600;margin-bottom:2px}
 .nc-kind{font-size:.58rem;font-weight:600;letter-spacing:.06em;opacity:.8;
   color:var(--muted)}
 .nc-ranked{color:var(--accent);opacity:1}
-.nc-item{padding:6px 0;border-top:1px solid var(--border)}
+.nc-item{padding:7px 0;border-top:1px solid var(--border)}
 .nc-item:first-of-type{border-top:0;padding-top:2px}
 .nc-head{display:flex;align-items:baseline;gap:8px}
 .nc-title{color:var(--ink);text-decoration:none;font-size:.82rem;font-weight:600;
@@ -285,17 +298,17 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
 .nc-title:hover{color:var(--accent);text-decoration:underline}
 .nc-age{margin-left:auto;flex:0 0 auto;font-size:.58rem;color:var(--muted);
   letter-spacing:.06em;font-variant-numeric:tabular-nums;white-space:nowrap}
-.nc-sum{color:var(--muted);font-size:.72rem;line-height:1.35;margin:2px 0 0}
+.nc-sum{color:var(--muted);font-size:.72rem;line-height:1.4;margin:3px 0 0}
 .news-empty{color:var(--muted);font-size:.78rem;padding:7px 0}
 .news-count{color:var(--muted);font-size:.6rem;text-transform:uppercase;
   letter-spacing:.1em;margin-top:9px;padding-top:7px;border-top:1px solid var(--border)}
 
 /* ---- holidays ---- */
 .holiday{display:inline-block;border:1px solid var(--warn-border);background:var(--warn-bg);
-  color:var(--warn-ink);border-radius:2px;padding:2px 8px;font-size:.7rem;
-  margin:0 4px 6px 0;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  color:var(--warn-ink);border-radius:999px;padding:3px 10px;font-size:.68rem;
+  margin:0 4px 6px 0;font-weight:600;letter-spacing:.02em}
 .holiday.up{color:var(--muted);background:var(--card);border-color:var(--border);
-  font-weight:600}
+  font-weight:500}
 
 /* ---- stale + sparkline ---- */
 .stale-chip{color:var(--warn-ink)!important}
@@ -306,19 +319,20 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
 
 /* ---- what changed since yesterday ---- */
 .delta{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin:0 0 14px;
-  border:1px solid var(--border);border-left:3px solid var(--accent);
-  background:var(--card);border-radius:var(--radius);padding:7px 12px;font-size:.76rem}
-.delta .delta-cap{font-size:.6rem;font-weight:700;letter-spacing:.14em;
+  border:1px solid var(--border);
+  background:var(--card);border-radius:var(--radius);padding:9px 14px;font-size:.76rem;
+  box-shadow:var(--shadow)}
+.delta .delta-cap{font-size:.58rem;font-weight:600;letter-spacing:.14em;
   text-transform:uppercase;color:var(--muted)}
 .delta .delta-item{color:var(--ink);white-space:nowrap}
 .delta .delta-item strong{color:var(--accent);font-variant-numeric:tabular-nums}
 
 /* ---- archive navigation ---- */
-.archive-nav{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin:22px 0 0}
-.archive-nav .archive-cap{font-size:.6rem;font-weight:700;letter-spacing:.14em;
+.archive-nav{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin:24px 0 0}
+.archive-nav .archive-cap{font-size:.58rem;font-weight:600;letter-spacing:.14em;
   text-transform:uppercase;color:var(--muted);margin-right:2px}
 .archive-nav a{font-size:.68rem;color:var(--muted);text-decoration:none;
-  border:1px solid var(--border);border-radius:2px;padding:1px 7px;
+  border:1px solid var(--border);border-radius:999px;padding:2px 9px;
   font-variant-numeric:tabular-nums}
 .archive-nav a:hover{color:var(--accent);border-color:var(--accent)}
 
@@ -326,7 +340,7 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
 @media (max-width:820px){
   .grid{column-count:1}
   header.top{flex-wrap:wrap}
-  header.top h1{font-size:1.7rem}
+  header.top h1{font-size:1.16rem}
   .meta{white-space:normal}
 }
 /* On narrow screens give the meta line its own row instead of truncating it.
@@ -342,22 +356,23 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
 }
 
 /* ---- needs attention banner ---- */
-.alert-banner{margin:0 0 14px;border:1px solid var(--border);border-left:3px solid var(--ok);
-  background:var(--card);border-radius:var(--radius);padding:8px 12px}
-.alert-banner.has-alerts{border-left-color:var(--danger-ink)}
-.alert-head{display:flex;align-items:center;gap:8px;font-size:.6rem;font-weight:700;
-  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.alert-banner{margin:0 0 14px;border:1px solid var(--border);
+  background:var(--card);border-radius:var(--radius);padding:13px 15px;
+  box-shadow:var(--shadow)}
+.alert-banner.has-alerts{border-color:var(--danger-border)}
+.alert-head{display:flex;align-items:center;gap:8px;font-size:.58rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .alert-allclear{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ok);
-  background:var(--ok-bg);color:var(--ok);border-radius:2px;padding:3px 10px;font-size:.66rem;
-  font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+  background:var(--ok-bg);color:var(--ok);border-radius:999px;padding:4px 11px;font-size:.64rem;
+  font-weight:600;text-transform:uppercase;letter-spacing:.06em}
 .alert-sub{font-size:.7rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
 .alert-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(234px,1fr))}
-.alert-card{border:1px solid var(--border);border-left-width:3px;border-radius:2px;
-  padding:6px 10px 7px;background:var(--card);display:flex;flex-direction:column;gap:1px}
-.alert-card.danger{border-left-color:var(--danger-ink);background:var(--danger-bg)}
-.alert-card.warn{border-left-color:var(--warn-ink);background:var(--warn-bg)}
-.alert-card.info{border-left-color:var(--accent);background:var(--accent-soft)}
-.alert-card .ak{font-size:.54rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+.alert-card{border:1px solid var(--border);border-radius:var(--radius-inner);
+  padding:9px 11px;background:var(--cell);display:flex;flex-direction:column;gap:2px}
+.alert-card.danger{border-color:var(--danger-border);background:var(--danger-bg)}
+.alert-card.warn{border-color:var(--warn-border);background:var(--warn-bg)}
+.alert-card.info{border-color:var(--border);background:var(--accent-soft)}
+.alert-card .ak{font-size:.54rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
   color:var(--muted);opacity:.85}
 .alert-card .at{font-weight:800;font-size:.82rem;line-height:1.25}
 .alert-card.danger .at{color:var(--danger-ink)}
@@ -369,34 +384,35 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
 
 /* ---- delta badges embedded in the card headings ---- */
 .delta-badge{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--border);
-  border-radius:2px;padding:0 6px;font-size:.6rem;font-weight:700;letter-spacing:.04em;
+  border-radius:999px;padding:1px 7px;font-size:.58rem;font-weight:600;letter-spacing:.03em;
   text-transform:uppercase;color:var(--muted);white-space:nowrap;
   font-variant-numeric:tabular-nums;line-height:1.6}
 .delta-badge.up{color:var(--ok);border-color:var(--ok);background:var(--ok-bg)}
 .delta-badge.down{color:var(--danger-ink);border-color:var(--danger-border);
   background:var(--danger-bg)}
 .delta-badge.new{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
-.card h2 .delta-badge{margin-left:6px;text-transform:uppercase;letter-spacing:.08em}
+.card h2 .delta-badge{margin-left:6px;letter-spacing:.06em}
 
 /* ---- today's 3-minute digest ---- */
-.digest{margin:0 0 12px;border:1px solid var(--border);border-left:3px solid var(--accent);
-  background:var(--card);border-radius:var(--radius);padding:8px 12px}
-.digest .digest-cap{font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:5px;display:block}
-.digest ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
-.digest li{display:flex;gap:9px;font-size:.82rem;line-height:1.35}
-.digest li .dk{flex:0 0 auto;font-size:.58rem;font-weight:700;letter-spacing:.1em;
+.digest{margin:0 0 12px;border:1px solid var(--border);
+  background:var(--cell);border-radius:var(--radius-inner);padding:10px 13px}
+.digest .digest-cap{font-size:.58rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:6px;display:block}
+.digest ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.digest li{display:flex;gap:10px;font-size:.8rem;line-height:1.4}
+.digest li .dk{flex:0 0 auto;font-size:.56rem;font-weight:600;letter-spacing:.1em;
   text-transform:uppercase;color:var(--accent);min-width:72px;padding-top:2px}
 .digest li .dt{min-width:0;color:var(--ink)}
 
 /* ---- environment & health ---- */
 .env-grid{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));
   align-items:start}
-.env-box{border:1px solid var(--border);padding:8px 10px;background:var(--card)}
-.env-box>strong{font-size:.62rem;text-transform:uppercase;letter-spacing:.13em;
-  color:var(--muted);font-weight:700}
-.aqi-head,.pollen-head{font-size:.62rem;text-transform:uppercase;letter-spacing:.13em;
-  color:var(--muted);font-weight:700}
+.env-box{border:1px solid transparent;border-radius:var(--radius-inner);
+  padding:10px 12px;background:var(--cell)}
+.env-box>strong{font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:600}
+.aqi-head,.pollen-head{font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:600}
 .aqi-num{font-size:1.9rem;font-weight:800;letter-spacing:-.04em;line-height:1;margin-top:4px;
   font-variant-numeric:tabular-nums}
 .aqi-good{color:var(--ok)}
@@ -411,33 +427,33 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
 .pollen-list .pn{flex:0 0 auto;min-width:6.5em;color:var(--muted)}
 .pollen-list .pg{color:var(--muted);font-size:.66rem;font-variant-numeric:tabular-nums}
 .pollen-dots{display:inline-flex;gap:2px;margin-left:auto}
-.pollen-dots i{width:6px;height:6px;border-radius:50%;background:var(--border);display:inline-block}
+.pollen-dots i{width:7px;height:7px;border-radius:50%;background:var(--border);display:inline-block}
 .pollen-dots i.on{background:var(--accent)}
 
 /* intraday rain / UV timeline (inside the weather card) */
-.timeline{margin-top:9px;border-top:1px solid var(--border);padding-top:7px}
-.timeline .tl-cap{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;
-  font-weight:700;margin-bottom:5px}
+.timeline{margin-top:11px;border-top:1px solid var(--border);padding-top:8px}
+.timeline .tl-cap{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;
+  font-weight:600;margin-bottom:6px}
 .tl-bars{display:flex;align-items:flex-end;gap:2px;height:40px}
 .tl-bar{flex:1;min-height:2px;background:var(--rain-bg);border:1px solid var(--rain-border);
-  border-radius:1px}
-.tl-x{display:flex;gap:2px;margin-top:2px}
+  border-radius:3px}
+.tl-x{display:flex;gap:2px;margin-top:3px}
 .tl-x span{flex:1;text-align:center;font-size:.54rem;color:var(--muted);
   font-variant-numeric:tabular-nums}
-.tl-foot{display:flex;justify-content:space-between;gap:10px;font-size:.6rem;color:var(--muted);
-  margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+.tl-foot{display:flex;justify-content:space-between;gap:10px;font-size:.58rem;color:var(--muted);
+  margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
 .tl-foot b{color:var(--ink)}
 
 /* health / wearable card */
-.health-grid{display:grid;gap:1px;background:var(--border);border:1px solid var(--border);
+.health-grid{display:grid;gap:7px;
   grid-template-columns:repeat(auto-fit,minmax(78px,1fr))}
-.health-cell{background:var(--card);padding:5px 8px}
-.health-cell .k{color:var(--muted);font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;
+.health-cell{background:var(--cell);border-radius:var(--radius-cell);padding:7px 9px}
+.health-cell .k{color:var(--muted);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;
   font-weight:600}
-.health-cell .v{font-weight:700;margin-top:1px;font-variant-numeric:tabular-nums}
-.health-src{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;
-  margin-top:7px}
-.card .stock-link{display:inline-block;margin-top:6px;font-size:.66rem;font-weight:700;
+.health-cell .v{font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.health-src{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;
+  margin-top:8px}
+.card .stock-link{display:inline-block;margin-top:8px;font-size:.64rem;font-weight:600;
   letter-spacing:.04em;text-transform:uppercase}
 
 /* ---- tracker highlights ---- */
@@ -446,16 +462,15 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
 .loc-list li{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:.78rem;
   border-bottom:1px solid var(--tick)}
 .loc-list li:last-child{border-bottom:0}
-.tag.pm2{border-color:var(--border);background:var(--card);color:var(--muted)}
+.tag.pm2{border-color:var(--border);background:var(--cell);color:var(--muted)}
 .tag.score{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 .tag.top{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
 </style>
 </head>
 <body>
-<div class="brandbar"></div>
 <div class="wrap">
   <header class="top">
-    <h1><span class="brand-emoji">📰</span>Daily Brief</h1>
+    <h1><span class="brand-dot" aria-hidden="true"></span>Daily Brief</h1>
     <div class="meta">2026-10-21 · generated 2026-10-21 08:34 · openai/gpt-oss-120b</div>
     <button type="button" id="themeToggle" class="theme-btn" aria-label="Toggle theme">☀️</button>
   </header>
@@ -470,7 +485,7 @@ footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--border);
 <li class="warn" style="margin-left:0px">- No heavy‑rain alerts reported.</li>
 <li style="margin-left:0px">- Danube at Thebnerstraßl: discharge 677 m³/s, level 68 cm (below MQ and RNQ2020). Forecast peak 891 m³/s on Friday at 06:00.</li></ul></section>
     <section class="card c-agenda"><h2>📅 Agenda</h2><div class="agenda"><div class="ev-col"><h3>💼 Work</h3><ul class="events"><li><span class="time">12:00</span><div class="ev-title">Nová Dubnica - Hriva SVP opatrenia<div class="ev-loc">Zasadacka</div></div></li></ul></div><div class="ev-col"><h3>🏠 Private</h3><ul class="events"><li><span class="time">20:30</span><div class="ev-title">Futbal ⚽<div class="ev-loc">Bežecká dráha, ihrisko,, Tbiliská 7705/4, 831 06 Bratislava-Rača, Slovakia</div></div></li></ul></div></div></section>
-    <section class="card c-news"><h2>📰 News<span class="sub">Slovak + international</span><span class="delta-badge new">+31 new news</span></h2><div class="digest"><span class="digest-cap">⏱ Today's 3-minute digest</span><ul><li><span class="dk">Slovak</span><span class="dt">The government is drafting a new plan from the Fic commission to combat the ongoing drought crisis.</span></li><li><span class="dk">World</span><span class="dt">U.S. actions are delaying Patriot missile deliveries to Ukraine, raising concerns among European allies.</span></li><li><span class="dk">Biz / Tech</span><span class="dt">Elon Musk is weighing a merger that would combine Tesla’s electric‑car business with SpaceX’s aerospace operations.</span></li></ul></div><div class="news-tabs" role="tablist" aria-label="News outlets"><button type="button" class="news-tab" role="tab" id="ntab-sme" data-pane="sme" aria-selected="true" aria-controls="npane-sme">SME</button><button type="button" class="news-tab" role="tab" id="ntab-dennikn" data-pane="dennikn" aria-selected="false" aria-controls="npane-dennikn">Denník N</button><button type="button" class="news-tab" role="tab" id="ntab-postoj" data-pane="postoj" aria-selected="false" aria-controls="npane-postoj">Postoj<span class="news-badge" title="Ordered by what readers opened most, not by publication time: 5 of 5 articles ranked by Postoj itself">top</span></button><button type="button" class="news-tab" role="tab" id="ntab-kapital" data-pane="kapital" aria-selected="false" aria-controls="npane-kapital">Kapitál</button><button type="button" class="news-tab" role="tab" id="ntab-bbc" data-pane="bbc" aria-selected="false" aria-controls="npane-bbc">BBC</button><button type="button" class="news-tab" role="tab" id="ntab-guardian" data-pane="guardian" aria-selected="false" aria-controls="npane-guardian">Guardian</button><button type="button" class="news-tab" role="tab" id="ntab-nyt" data-pane="nyt" aria-selected="false" aria-controls="npane-nyt">NYT<span class="news-badge" title="Ordered by what readers opened most, not by publication time: 3 of 5 articles ranked by NYT itself">top</span></button></div><div class="news-pane" id="npane-sme" role="tabpanel" aria-labelledby="ntab-sme" data-pane="sme"><div class="news-col"><strong>SME <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/domov/c/v-niektorych-oblastiach-platia-vystrahy-pred-vetrom-na-horach-a-hmlou?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">V niektorých oblastiach platia výstrahy pred vetrom na horách a hmlou</a><span class="nc-age">24m</span></div><p class="nc-sum">Wind and fog warnings issued for some mountain areas.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/svet/c/americki-agenti-vysetruju-spravy-o-hodeni-zapalneho-zariadenia-na-budovu-ice?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Americkí agenti vyšetrujú správy o hodení zápalného zariadenia na budovu ICE</a><span class="nc-age">58m</span></div><p class="nc-sum">US agents probe report of fire‑bomb thrown at ICE building.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/svet/c/rama-pripisuje-nepokoje-v-albansku-hybridnej-vojne?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Rama pripisuje nepokoje v Albánsku hybridnej vojne</a><span class="nc-age">1h</span></div><p class="nc-sum">Rama says Albanian unrest is caused by a hybrid war.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/podcasty/c/zoom-nejedzte-sami-budete-sa-mat-zle?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Zoom: Nejedzte sami, budete sa mať zle</a><span class="nc-age">1h</span></div><p class="nc-sum">Zoom advises not to eat alone or you may feel ill.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/komentare/c/vojna-usa-proti-iranu-dramaticky-zhorsuje-hlad-vo-svete?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Vojna USA proti Iránu dramaticky zhoršuje hlad vo svete</a><span class="nc-age">1h</span></div><p class="nc-sum">US war on Iran dramatically worsens global hunger.</p></div></div></div><div class="news-pane" id="npane-dennikn" role="tabpanel" aria-labelledby="ntab-dennikn" data-pane="dennikn" hidden><div class="news-col"><strong>Denník N <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://e.dennikn.sk/5636219/hlada-sa-plan-ficovej-komisie-proti-suchu/" target="_blank" rel="noopener noreferrer">Hľadá sa plán Ficovej komisie proti suchu</a><span class="nc-age">5m</span></div><p class="nc-sum">Search underway for a plan by Fic’s drought‑relief commission.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5635910/tibor-gaspar-a-sestra-odstaveneho-policajta-durku-superia-v-nitrianskej-zupe/" target="_blank" rel="noopener noreferrer">Tibor Gašpar a sestra odstaveného policajta Ďurku súperia v Nitrianskej župe</a><span class="nc-age">29m</span></div><p class="nc-sum">Former officer Ďurko’s brother and Tibor Gašpar contest Nitra district seat.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5635779/zlatica-kusnirova-o-seriali-nasi-ludia-v-prvom-momente-som-si-myslela-ze-to-je-kocner/" target="_blank" rel="noopener noreferrer">Zlatica Kušnírová o seriáli Naši ľudia: V prvom momente som si myslela, že to je Kočner</a><span class="nc-age">35m</span></div><p class="nc-sum">Zlatica Kušnírová first thought “Naši ľudia” was about Kočner.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5637358/rano-s-nhl-slafkovsky-hral-ako-posadnuty-chvalil-ho-expert-dal-uz-niekedy-krajsi-gol/" target="_blank" rel="noopener noreferrer">Ráno s NHL: Slafkovský hral ako posadnutý, chválil ho expert. Dal už niekedy krajší gól?</a><span class="nc-age">1h</span></div><p class="nc-sum">NHL morning: Slafkovský played obsessively, praised, scored a beautiful goal.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5625567/partnerka-potrebuje-neustale-pocut-ze-ju-lubim-ako-jej-citlivo-vysvetlit-ze-ma-to-uz-otravuje/" target="_blank" rel="noopener noreferrer">Partnerka potrebuje neustále počuť, že ju ľúbim. Ako jej citlivo vysvetliť, že ma to už otravuje?</a><span class="nc-age">1h</span></div><p class="nc-sum">How to gently tell a partner you’re tired of constant love affirmations.</p></div></div></div><div class="news-pane" id="npane-postoj" role="tabpanel" aria-labelledby="ntab-postoj" data-pane="postoj" hidden><div class="news-col"><strong>Postoj <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 5 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201983/usa-robia-ukrajine-obstrukcie-s-dodanim-patriotov-ktore-zaplatili-europania" target="_blank" rel="noopener noreferrer">Vyhrocovanie sporov / USA robia Ukrajine obštrukcie s dodaním Patriotov, za ktoré zaplatili Európania</a><span class="nc-age">15h</span></div><p class="nc-sum">US blocks Patriot aid to Ukraine, Europeans pay for the obstruction.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201954/par-dni-pred-volbami-je-bibi-ochotny-obetovat-aj-zivotaschopnost-svojho-statu" target="_blank" rel="noopener noreferrer">Osudová voľba Izraela / Pár dní pred voľbami je Bibi ochotný obetovať aj životaschopnosť svojho štátu</a><span class="nc-age">21h</span></div><p class="nc-sum">Days before elections, Bibi says he’ll sacrifice Israel’s viability if needed.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201923/nie-mili-slovaci-cely-vyspely-svet-nie-je-odsudeny-na-dlhovu-krizu" target="_blank" rel="noopener noreferrer">Smerom k bankrotu? / Nie, milí Slováci, celý vyspelý svet nie je odsúdený na dlhovú krízu</a><span class="nc-age">1d</span></div><p class="nc-sum">Claim that the whole developed world faces a debt crisis is false.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201971/keby-bol-frantisek-miklosko-lobistom-ps-v-klube-kdh-nespraval-by-sa-inak" target="_blank" rel="noopener noreferrer">Politické fórum / Keby bol František Mikloško lobistom PS v klube KDH, nesprával by sa inak</a><span class="nc-age">19h</span></div><p class="nc-sum">If Mikloško were a PS lobbyist in KDH, his behavior would differ.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201949/europoslankyna-katarina-roth-nevedalova-zo-smeru-otvorene-podporila-milana-mazureka-za-presovskeho-zupana" target="_blank" rel="noopener noreferrer">Smer a Prešovský kraj / Roth Neveďalová otvorene podporila Mazureka. Vaľová priznala dohodu s Republikou</a><span class="nc-age">1d</span></div><p class="nc-sum">Roth Neveďalová backs Mazurek; Vaľová admits deal with the Republic.</p></div></div></div><div class="news-pane" id="npane-kapital" role="tabpanel" aria-labelledby="ntab-kapital" data-pane="kapital" hidden><div class="news-col analysis"><strong>Kapitál <span class="nc-kind">/ analysis</span> <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/caro-claire-burke-nedavno/" target="_blank" rel="noopener noreferrer">Žena je vždy na vine</a><span class="nc-age">23h</span></div><p class="nc-sum">Statement that women are always to blame.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/navi-pillay-nobelova-cena-za-mier/" target="_blank" rel="noopener noreferrer">Nobelova cena za mier pre Navi: povzbudenie v pochmúrnych časoch</a><span class="nc-age">2d</span></div><p class="nc-sum">Nobel Peace Prize given to Navi, offering hope in dark times.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/chudoba-ako-druhe-zamestnanie/" target="_blank" rel="noopener noreferrer">Chudoba ako druhé zamestnanie. O živote v permanentnej časovej tiesni</a><span class="nc-age">4d</span></div><p class="nc-sum">Poverty described as a second job, living under constant time pressure.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/jan-bierhanzl-rozhovor/" target="_blank" rel="noopener noreferrer">Jan Bierhanzl: Ľavica a kresťanstvo sa môžu navzájom inšpirovať</a><span class="nc-age">6d</span></div><p class="nc-sum">Jan Bierhanzl says leftists and Christianity can inspire each other.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/podozrivo-dobry-roman/" target="_blank" rel="noopener noreferrer">Podozrivo dobrý román</a><span class="nc-age">7d</span></div><p class="nc-sum">A novel that appears suspiciously good.</p></div></div></div><div class="news-pane" id="npane-bbc" role="tabpanel" aria-labelledby="ntab-bbc" data-pane="bbc" hidden><div class="news-col"><strong>BBC <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cmlyl09xjke4o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Elon Musk considering Tesla-SpaceX merger</a><span class="nc-age">49m</span></div><p class="nc-sum">Elon Musk is considering merging Tesla with SpaceX.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/ckdd8m1z1z3yo?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Pakistan arrests man hunted by US over $126m postage fraud case</a><span class="nc-age">51m</span></div><p class="nc-sum">Pakistan arrests man wanted by US for $126 million postage fraud.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cr93z1e87e0do?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Why does Elon Musk want to merge Tesla and SpaceX?</a><span class="nc-age">2h</span></div><p class="nc-sum">Explanation of why Musk wants to merge Tesla and SpaceX.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cq5ynkx3xy11o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">US envoy to meet Putin in Russia as Zelensky says intelligence sharing &#x27;works now&#x27;</a><span class="nc-age">2h</span></div><p class="nc-sum">US envoy to meet Putin in Russia; Zelensky says intelligence sharing now works.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/videos/cq398rg0lnd1o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">BBC inside Australian court as man charged with attacking MP stays silent in first hearing</a><span class="nc-age">2h</span></div><p class="nc-sum">BBC reports man charged with attacking MP stays silent at first hearing.</p></div></div></div><div class="news-pane" id="npane-guardian" role="tabpanel" aria-labelledby="ntab-guardian" data-pane="guardian" hidden><div class="news-col"><strong>Guardian <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/australia-news/live/2026/oct/21/helen-haines-independent-mp-alleged-attack-wangaratta-vigils-court-ntwnfb" target="_blank" rel="noopener noreferrer">Helen Haines live coverage: Helen Haines’s second leg amputated but she is stable and ‘a fighter’, husband says</a><span class="nc-age">8m</span></div><p class="nc-sum">Helen Haines’ second leg amputated; she is stable and called a fighter.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/australia-news/2026/oct/21/no-bail-brendan-nugent-helen-haines-police-chief-warning-ntwnfb" target="_blank" rel="noopener noreferrer">No bail for alleged Helen Haines attacker as police chief warns of Australia’s ‘febrile’ political environment</a><span class="nc-age">10m</span></div><p class="nc-sum">No bail for alleged attacker of Helen Haines; police warn of febrile politics.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/environment/2026/oct/21/jackdaw-gasfield-in-north-sea-approved" target="_blank" rel="noopener noreferrer">UK approves Jackdaw gasfield in North Sea</a><span class="nc-age">23m</span></div><p class="nc-sum">UK approves Jackdaw gasfield project in the North Sea.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/society/2026/oct/21/jess-phillips-hopes-supreme-court-sees-sense-and-overturns-domestic-abuse-ruling" target="_blank" rel="noopener noreferrer">Jess Phillips hopes supreme court ‘sees sense’ and overturns domestic abuse ruling</a><span class="nc-age">38m</span></div><p class="nc-sum">Jess Phillips hopes Supreme Court will overturn domestic‑abuse ruling.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/australia-news/2026/oct/21/beau-lamarre-condon-murder-trial-taylor-swift-song-ntwnfb" target="_blank" rel="noopener noreferrer">Beau Lamarre-Condon allegedly played Taylor Swift’s No Body, No Crime during body disposal, court told</a><span class="nc-age">1h</span></div><p class="nc-sum">Beau Lamarre‑Condon allegedly played “No Body, No Crime” while disposing a body.</p></div></div></div><div class="news-pane" id="npane-nyt" role="tabpanel" aria-labelledby="ntab-nyt" data-pane="nyt" hidden><div class="news-col"><strong>NYT <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 3 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/20/world/europe/france-student-protests-slogan.html" target="_blank" rel="noopener noreferrer">Student Protesters in France Have a Strange New Slogan. What Does It Mean?</a><span class="nc-age">9h</span></div><p class="nc-sum">French student protesters use a strange new slogan; its meaning explained.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/20/world/europe/ukraine-war-zelensky-trump.html" target="_blank" rel="noopener noreferrer">Why Zelensky Took the Gloves Off This Time With Trump</a><span class="nc-age">9h</span></div><p class="nc-sum">Zelensky removed his gloves in a confrontation with Trump.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/20/world/putin-trump-ukraine-war.html" target="_blank" rel="noopener noreferrer">Is Putin’s Waiting Game Working?</a><span class="nc-age">1h</span></div><p class="nc-sum">Question whether Putin’s waiting strategy is working.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/20/world/asia/marco-rubio-india-us-trade-deal.html" target="_blank" rel="noopener noreferrer">Rubio Travels to India to Strengthen Economic Ties Amid Strained U.S. Relations</a><span class="nc-age">10m</span></div><p class="nc-sum">Rubio travels to India to strengthen economic ties amid US strain.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/21/world/asia/modi-india-protests-cockroach-party.html" target="_blank" rel="noopener noreferrer">Modi Seeks to Calm Allies by Shackling Gen Z Protests</a><span class="nc-age">2h</span></div><p class="nc-sum">Modi seeks to calm allies by suppressing Gen Z protests.</p></div></div></div><div class="news-count">35 headlines across 7 outlets</div></section>
+    <section class="card c-news"><h2>📰 News<span class="sub">Slovak + international</span><span class="delta-badge new">+31 new news</span></h2><div class="digest"><span class="digest-cap">⏱ Today's 3-minute digest</span><ul><li><span class="dk">Slovak</span><span class="dt">The government is drafting a new plan from the Fic commission to combat the ongoing drought crisis.</span></li><li><span class="dk">World</span><span class="dt">U.S. actions are delaying Patriot missile deliveries to Ukraine, raising concerns among European allies.</span></li><li><span class="dk">Biz / Tech</span><span class="dt">Elon Musk is weighing a merger that would combine Tesla’s electric‑car business with SpaceX’s aerospace operations.</span></li></ul></div><div class="news-tabs" role="tablist" aria-label="News outlets"><button type="button" class="news-tab" role="tab" id="ntab-sme" data-pane="sme" aria-selected="true" aria-controls="npane-sme">SME</button><button type="button" class="news-tab" role="tab" id="ntab-dennikn" data-pane="dennikn" aria-selected="false" aria-controls="npane-dennikn">Denník N</button><button type="button" class="news-tab" role="tab" id="ntab-postoj" data-pane="postoj" aria-selected="false" aria-controls="npane-postoj">Postoj<span class="news-badge" title="Ordered by what readers opened most, not by publication time: 5 of 5 articles ranked by Postoj itself">top</span></button><button type="button" class="news-tab" role="tab" id="ntab-kapital" data-pane="kapital" aria-selected="false" aria-controls="npane-kapital">Kapitál</button><button type="button" class="news-tab" role="tab" id="ntab-bbc" data-pane="bbc" aria-selected="false" aria-controls="npane-bbc">BBC</button><button type="button" class="news-tab" role="tab" id="ntab-guardian" data-pane="guardian" aria-selected="false" aria-controls="npane-guardian">Guardian</button><button type="button" class="news-tab" role="tab" id="ntab-nyt" data-pane="nyt" aria-selected="false" aria-controls="npane-nyt">NYT<span class="news-badge" title="Ordered by what readers opened most, not by publication time: 3 of 5 articles ranked by NYT itself">top</span></button></div><div class="news-pane" id="npane-sme" role="tabpanel" aria-labelledby="ntab-sme" data-pane="sme"><div class="news-col"><strong>SME <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/domov/c/v-niektorych-oblastiach-platia-vystrahy-pred-vetrom-na-horach-a-hmlou?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">V niektorých oblastiach platia výstrahy pred vetrom na horách a hmlou</a><span class="nc-age">7h</span></div><p class="nc-sum">Wind and fog warnings issued for some mountain areas.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/svet/c/americki-agenti-vysetruju-spravy-o-hodeni-zapalneho-zariadenia-na-budovu-ice?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Americkí agenti vyšetrujú správy o hodení zápalného zariadenia na budovu ICE</a><span class="nc-age">8h</span></div><p class="nc-sum">US agents probe report of fire‑bomb thrown at ICE building.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/svet/c/rama-pripisuje-nepokoje-v-albansku-hybridnej-vojne?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Rama pripisuje nepokoje v Albánsku hybridnej vojne</a><span class="nc-age">8h</span></div><p class="nc-sum">Rama says Albanian unrest is caused by a hybrid war.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/podcasty/c/zoom-nejedzte-sami-budete-sa-mat-zle?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Zoom: Nejedzte sami, budete sa mať zle</a><span class="nc-age">8h</span></div><p class="nc-sum">Zoom advises not to eat alone or you may feel ill.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/komentare/c/vojna-usa-proti-iranu-dramaticky-zhorsuje-hlad-vo-svete?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Vojna USA proti Iránu dramaticky zhoršuje hlad vo svete</a><span class="nc-age">9h</span></div><p class="nc-sum">US war on Iran dramatically worsens global hunger.</p></div></div></div><div class="news-pane" id="npane-dennikn" role="tabpanel" aria-labelledby="ntab-dennikn" data-pane="dennikn" hidden><div class="news-col"><strong>Denník N <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://e.dennikn.sk/5636219/hlada-sa-plan-ficovej-komisie-proti-suchu/" target="_blank" rel="noopener noreferrer">Hľadá sa plán Ficovej komisie proti suchu</a><span class="nc-age">7h</span></div><p class="nc-sum">Search underway for a plan by Fic’s drought‑relief commission.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5635910/tibor-gaspar-a-sestra-odstaveneho-policajta-durku-superia-v-nitrianskej-zupe/" target="_blank" rel="noopener noreferrer">Tibor Gašpar a sestra odstaveného policajta Ďurku súperia v Nitrianskej župe</a><span class="nc-age">7h</span></div><p class="nc-sum">Former officer Ďurko’s brother and Tibor Gašpar contest Nitra district seat.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5635779/zlatica-kusnirova-o-seriali-nasi-ludia-v-prvom-momente-som-si-myslela-ze-to-je-kocner/" target="_blank" rel="noopener noreferrer">Zlatica Kušnírová o seriáli Naši ľudia: V prvom momente som si myslela, že to je Kočner</a><span class="nc-age">7h</span></div><p class="nc-sum">Zlatica Kušnírová first thought “Naši ľudia” was about Kočner.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5637358/rano-s-nhl-slafkovsky-hral-ako-posadnuty-chvalil-ho-expert-dal-uz-niekedy-krajsi-gol/" target="_blank" rel="noopener noreferrer">Ráno s NHL: Slafkovský hral ako posadnutý, chválil ho expert. Dal už niekedy krajší gól?</a><span class="nc-age">8h</span></div><p class="nc-sum">NHL morning: Slafkovský played obsessively, praised, scored a beautiful goal.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5625567/partnerka-potrebuje-neustale-pocut-ze-ju-lubim-ako-jej-citlivo-vysvetlit-ze-ma-to-uz-otravuje/" target="_blank" rel="noopener noreferrer">Partnerka potrebuje neustále počuť, že ju ľúbim. Ako jej citlivo vysvetliť, že ma to už otravuje?</a><span class="nc-age">8h</span></div><p class="nc-sum">How to gently tell a partner you’re tired of constant love affirmations.</p></div></div></div><div class="news-pane" id="npane-postoj" role="tabpanel" aria-labelledby="ntab-postoj" data-pane="postoj" hidden><div class="news-col"><strong>Postoj <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 5 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201983/usa-robia-ukrajine-obstrukcie-s-dodanim-patriotov-ktore-zaplatili-europania" target="_blank" rel="noopener noreferrer">Vyhrocovanie sporov / USA robia Ukrajine obštrukcie s dodaním Patriotov, za ktoré zaplatili Európania</a><span class="nc-age">23h</span></div><p class="nc-sum">US blocks Patriot aid to Ukraine, Europeans pay for the obstruction.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201954/par-dni-pred-volbami-je-bibi-ochotny-obetovat-aj-zivotaschopnost-svojho-statu" target="_blank" rel="noopener noreferrer">Osudová voľba Izraela / Pár dní pred voľbami je Bibi ochotný obetovať aj životaschopnosť svojho štátu</a><span class="nc-age">1d</span></div><p class="nc-sum">Days before elections, Bibi says he’ll sacrifice Israel’s viability if needed.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201923/nie-mili-slovaci-cely-vyspely-svet-nie-je-odsudeny-na-dlhovu-krizu" target="_blank" rel="noopener noreferrer">Smerom k bankrotu? / Nie, milí Slováci, celý vyspelý svet nie je odsúdený na dlhovú krízu</a><span class="nc-age">1d</span></div><p class="nc-sum">Claim that the whole developed world faces a debt crisis is false.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201971/keby-bol-frantisek-miklosko-lobistom-ps-v-klube-kdh-nespraval-by-sa-inak" target="_blank" rel="noopener noreferrer">Politické fórum / Keby bol František Mikloško lobistom PS v klube KDH, nesprával by sa inak</a><span class="nc-age">1d</span></div><p class="nc-sum">If Mikloško were a PS lobbyist in KDH, his behavior would differ.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/201949/europoslankyna-katarina-roth-nevedalova-zo-smeru-otvorene-podporila-milana-mazureka-za-presovskeho-zupana" target="_blank" rel="noopener noreferrer">Smer a Prešovský kraj / Roth Neveďalová otvorene podporila Mazureka. Vaľová priznala dohodu s Republikou</a><span class="nc-age">1d</span></div><p class="nc-sum">Roth Neveďalová backs Mazurek; Vaľová admits deal with the Republic.</p></div></div></div><div class="news-pane" id="npane-kapital" role="tabpanel" aria-labelledby="ntab-kapital" data-pane="kapital" hidden><div class="news-col analysis"><strong>Kapitál <span class="nc-kind">/ analysis</span> <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/caro-claire-burke-nedavno/" target="_blank" rel="noopener noreferrer">Žena je vždy na vine</a><span class="nc-age">1d</span></div><p class="nc-sum">Statement that women are always to blame.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/navi-pillay-nobelova-cena-za-mier/" target="_blank" rel="noopener noreferrer">Nobelova cena za mier pre Navi: povzbudenie v pochmúrnych časoch</a><span class="nc-age">2d</span></div><p class="nc-sum">Nobel Peace Prize given to Navi, offering hope in dark times.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/chudoba-ako-druhe-zamestnanie/" target="_blank" rel="noopener noreferrer">Chudoba ako druhé zamestnanie. O živote v permanentnej časovej tiesni</a><span class="nc-age">5d</span></div><p class="nc-sum">Poverty described as a second job, living under constant time pressure.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/jan-bierhanzl-rozhovor/" target="_blank" rel="noopener noreferrer">Jan Bierhanzl: Ľavica a kresťanstvo sa môžu navzájom inšpirovať</a><span class="nc-age">6d</span></div><p class="nc-sum">Jan Bierhanzl says leftists and Christianity can inspire each other.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/podozrivo-dobry-roman/" target="_blank" rel="noopener noreferrer">Podozrivo dobrý román</a><span class="nc-age">7d</span></div><p class="nc-sum">A novel that appears suspiciously good.</p></div></div></div><div class="news-pane" id="npane-bbc" role="tabpanel" aria-labelledby="ntab-bbc" data-pane="bbc" hidden><div class="news-col"><strong>BBC <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cmlyl09xjke4o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Elon Musk considering Tesla-SpaceX merger</a><span class="nc-age">8h</span></div><p class="nc-sum">Elon Musk is considering merging Tesla with SpaceX.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/ckdd8m1z1z3yo?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Pakistan arrests man hunted by US over $126m postage fraud case</a><span class="nc-age">8h</span></div><p class="nc-sum">Pakistan arrests man wanted by US for $126 million postage fraud.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cr93z1e87e0do?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Why does Elon Musk want to merge Tesla and SpaceX?</a><span class="nc-age">9h</span></div><p class="nc-sum">Explanation of why Musk wants to merge Tesla and SpaceX.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cq5ynkx3xy11o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">US envoy to meet Putin in Russia as Zelensky says intelligence sharing &#x27;works now&#x27;</a><span class="nc-age">9h</span></div><p class="nc-sum">US envoy to meet Putin in Russia; Zelensky says intelligence sharing now works.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/videos/cq398rg0lnd1o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">BBC inside Australian court as man charged with attacking MP stays silent in first hearing</a><span class="nc-age">10h</span></div><p class="nc-sum">BBC reports man charged with attacking MP stays silent at first hearing.</p></div></div></div><div class="news-pane" id="npane-guardian" role="tabpanel" aria-labelledby="ntab-guardian" data-pane="guardian" hidden><div class="news-col"><strong>Guardian <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/australia-news/live/2026/oct/21/helen-haines-independent-mp-alleged-attack-wangaratta-vigils-court-ntwnfb" target="_blank" rel="noopener noreferrer">Helen Haines live coverage: Helen Haines’s second leg amputated but she is stable and ‘a fighter’, husband says</a><span class="nc-age">7h</span></div><p class="nc-sum">Helen Haines’ second leg amputated; she is stable and called a fighter.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/australia-news/2026/oct/21/no-bail-brendan-nugent-helen-haines-police-chief-warning-ntwnfb" target="_blank" rel="noopener noreferrer">No bail for alleged Helen Haines attacker as police chief warns of Australia’s ‘febrile’ political environment</a><span class="nc-age">7h</span></div><p class="nc-sum">No bail for alleged attacker of Helen Haines; police warn of febrile politics.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/environment/2026/oct/21/jackdaw-gasfield-in-north-sea-approved" target="_blank" rel="noopener noreferrer">UK approves Jackdaw gasfield in North Sea</a><span class="nc-age">7h</span></div><p class="nc-sum">UK approves Jackdaw gasfield project in the North Sea.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/society/2026/oct/21/jess-phillips-hopes-supreme-court-sees-sense-and-overturns-domestic-abuse-ruling" target="_blank" rel="noopener noreferrer">Jess Phillips hopes supreme court ‘sees sense’ and overturns domestic abuse ruling</a><span class="nc-age">7h</span></div><p class="nc-sum">Jess Phillips hopes Supreme Court will overturn domestic‑abuse ruling.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/australia-news/2026/oct/21/beau-lamarre-condon-murder-trial-taylor-swift-song-ntwnfb" target="_blank" rel="noopener noreferrer">Beau Lamarre-Condon allegedly played Taylor Swift’s No Body, No Crime during body disposal, court told</a><span class="nc-age">8h</span></div><p class="nc-sum">Beau Lamarre‑Condon allegedly played “No Body, No Crime” while disposing a body.</p></div></div></div><div class="news-pane" id="npane-nyt" role="tabpanel" aria-labelledby="ntab-nyt" data-pane="nyt" hidden><div class="news-col"><strong>NYT <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 3 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/20/world/europe/france-student-protests-slogan.html" target="_blank" rel="noopener noreferrer">Student Protesters in France Have a Strange New Slogan. What Does It Mean?</a><span class="nc-age">16h</span></div><p class="nc-sum">French student protesters use a strange new slogan; its meaning explained.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/20/world/europe/ukraine-war-zelensky-trump.html" target="_blank" rel="noopener noreferrer">Why Zelensky Took the Gloves Off This Time With Trump</a><span class="nc-age">17h</span></div><p class="nc-sum">Zelensky removed his gloves in a confrontation with Trump.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/20/world/putin-trump-ukraine-war.html" target="_blank" rel="noopener noreferrer">Is Putin’s Waiting Game Working?</a><span class="nc-age">9h</span></div><p class="nc-sum">Question whether Putin’s waiting strategy is working.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/20/world/asia/marco-rubio-india-us-trade-deal.html" target="_blank" rel="noopener noreferrer">Rubio Travels to India to Strengthen Economic Ties Amid Strained U.S. Relations</a><span class="nc-age">7h</span></div><p class="nc-sum">Rubio travels to India to strengthen economic ties amid US strain.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/21/world/asia/modi-india-protests-cockroach-party.html" target="_blank" rel="noopener noreferrer">Modi Seeks to Calm Allies by Shackling Gen Z Protests</a><span class="nc-age">9h</span></div><p class="nc-sum">Modi seeks to calm allies by suppressing Gen Z protests.</p></div></div></div><div class="news-count">35 headlines across 7 outlets</div></section>
     <section class="card c-jobs"><h2>💼 Job offers<span class="sub">impactpool, joshswaterjobs, profesia</span><span class="delta-badge new">+1 new job</span></h2><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212231" target="_blank" rel="noopener">Individual Contractor - Geospatial Analysts – Satellite Imagery and GIS (Geneva office based) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Geneva</div><div class="tags"><span class="tag top">★ top match</span><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span><span class="tag score">2 skill hits</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212232" target="_blank" rel="noopener">Individual Contractor - Geospatial Analysts – Satellite Imagery and GIS (Remote) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Remote</div><div class="tags"><span class="tag top">★ top match</span><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span><span class="tag score">2 skill hits</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212230" target="_blank" rel="noopener">Individual Contractor - Geospatial Quality Assurance, Training and Analytical Support Specialists (Remote) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Remote</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span><span class="tag score">1 skill hit</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212233" target="_blank" rel="noopener">Individual Contractor - Geospatial Quality Assurance, Training and Analytical Support Specialists (Geneva office based) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Geneva</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span><span class="tag score">1 skill hit</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/393987/" target="_blank" rel="noopener">Water Resources Partnerships Manager</a></div><div class="it-meta">Thames River Trust · London, UK 🇬🇧</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag remote">remote</span><span class="tag">Full-Time</span><span class="tag score">1 skill hit</span><span class="tag deadline">deadline 29 October, 2026</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/394014/" target="_blank" rel="noopener">Water Resources Engineering Associate (Specialist)</a></div><div class="it-meta">California Department of Water Resources (CDWR) · Castaic, CA, USA 🇺🇸</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag remote">remote</span><span class="tag">Full-Time</span><span class="tag score">1 skill hit</span><span class="tag deadline">deadline 29 October, 2026</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/394372/" target="_blank" rel="noopener">Hydrologist (Water Resource Coordinator) (U.S. nationals)</a></div><div class="it-meta">U.S. Bureau of Indian Affairs · United States 🇺🇸</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag">Full-Time</span><span class="tag score">2 skill hits</span><span class="tag deadline">deadline 2 November, 2026</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/narodna-dialnicna-spolocnost/O5283696" target="_blank" rel="noopener">Špecialista prevádzky – vodohospodár (m/ž) (zástup za MD/RD)</a></div><div class="it-meta">Národná diaľničná spoločnosť, a.s. · Westend Gate, Dúbravská cesta, Karlova Ves</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">1 800 €</span><span class="tag score">1 skill hit</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/bratislavska-vodarenska-spolocnost/O5371986" target="_blank" rel="noopener">Geodet/geodetka</a></div><div class="it-meta">Bratislavská vodárenská spoločnosť, a.s. · Prešovská, Bratislava</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">1 700 €</span><span class="tag score">1 skill hit</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/rvs-group-slovensko/O5375024" target="_blank" rel="noopener">Koordinátor/ka legislatívnych povinností pre obce v oblasti prevádzky vodovodov a kanalizácií</a></div><div class="it-meta">RVS GROUP SLOVENSKO a.s. · Zochova 5, Bratislava, Slovensko (Pozícia umožňuje občasnú prácu z domu)</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">1 800 €</span><span class="tag score">1 skill hit</span></div></div></section>
     <section class="card c-reality"><h2>🏠 Real estate<span class="sub">Bratislava III</span><span class="delta-badge new">+9 new prop</span></h2><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-krasne-upravenu-sukromnu-zahradu-v-bratislave-iii-top-r9439587.html" target="_blank" rel="noopener">Na predaj krásne upravenú súkromnú záhradu v Bratislave III TOP</a></div><div class="it-meta">Bratislava-Rača · Rekreačný pozemok · 21.10.2026 · 290 m²</div><div class="tags"><span class="price">70 000 €</span><span class="tag pm2">241 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-pekny-oploteny-pozemok-v-osobnom-vlastnictve-o-vymere-419-m2-r9429225.html" target="_blank" rel="noopener">Na predaj pekný, oplotený pozemok v osobnom vlastníctve o výmere 419 m2</a></div><div class="it-meta">Bratislava-Rača · Rekreačný pozemok · 21.10.2026 · 419 m²</div><div class="tags"><span class="price">83 900 €</span><span class="tag pm2">200 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-pozemok-zahradu-v-osobnom-vlastnictve-s-vymerou-387-m2-r9426554.html" target="_blank" rel="noopener">Na predaj pozemok – záhradu v osobnom vlastníctve s výmerou 387 m2</a></div><div class="it-meta">Bratislava-Rača · Rekreačný pozemok · 21.10.2026 · 387 m²</div><div class="tags"><span class="price">64 000 €</span><span class="tag pm2">165 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-zahrada-v-osobnom-vlastnictve-s-vymerou-387-m2-r9422649.html" target="_blank" rel="noopener">Na predaj záhrada v osobnom vlastníctve s výmerou 387 m2</a></div><div class="it-meta">Bratislava-Rača · Záhrada · 21.10.2026 · 387 m²</div><div class="tags"><span class="price">52 000 €</span><span class="tag pm2">134 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-vynimocny-stavebny-pozemok-s-vymerou-966-m2-ba-iii-top-r9416982.html" target="_blank" rel="noopener">Na predaj výnimočný stavebný pozemok s výmerou 966 m2, BA III TOP</a></div><div class="it-meta">Bratislava-Nové Mesto · Iný stavebný pozemok · 21.10.2026 · 966 m²</div><div class="tags"><span class="price">870 €</span><span class="tag pm2">1 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-6-izbovy-rodinny-dom-bratislava-iii-r9416850.html" target="_blank" rel="noopener">Na predaj 6-izbový rodinný dom - Bratislava III</a></div><div class="it-meta">Bratislava-Nové Mesto · Rodinný dom · 21.10.2026 · 6-izb. · 150 m²</div><div class="tags"><span class="price">470 000 €</span><span class="tag pm2">3 133 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-slnecny-4-izbovy-domcek-v-krasnej-a-pokojnej-lokalite-r9414639.html" target="_blank" rel="noopener">Na predaj slnečný 4-izbový domček v krásnej a pokojnej lokalite</a></div><div class="it-meta">Bratislava-Rača · Rodinný dom · 21.10.2026 · 4-izb. · 71 m²</div><div class="tags"><span class="price">189 000 €</span><span class="tag pm2">2 662 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-zaujimavy-investicny-pozemok-v-atraktivnej-mestskej-casti-bratislava-vajnory-top-r9405849.html" target="_blank" rel="noopener">Na predaj zaujímavý investičný pozemok v atraktívnej mestskej časti Bratislava – Vajnory, TOP</a></div><div class="it-meta">Bratislava-Vajnory · Iný stavebný pozemok · 21.10.2026 · 573 m²</div><div class="tags"><span class="price">200 €</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-atraktivny-pozemok-s-murovanou-trojpodlaznou-chatou-bratislava-raca-top-r9402866.html" target="_blank" rel="noopener">Na predaj atraktívny pozemok s murovanou trojpodlažnou chatou, Bratislava - Rača TOP</a></div><div class="it-meta">Bratislava-Rača · Rekreačný pozemok · 21.10.2026 · 512 m²</div><div class="tags"><span class="price">199 000 €</span><span class="tag pm2">389 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/na-predaj-zahradna-chata-vo-vajnoroch-r9398958.html" target="_blank" rel="noopener">Na predaj záhradná chata vo Vajnoroch</a></div><div class="it-meta">Bratislava-Vajnory · Chata, drevenica, zrub · 21.10.2026 · 374 m²</div><div class="tags"><span class="price">43 000 €</span><span class="tag pm2">115 €/m²</span></div></div></section>
   </div>
