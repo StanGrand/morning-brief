@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Brief – 2026-10-25</title>
+<meta name="description" content="Weather, river levels, news, job matches and property listings for 2026-10-25.">
+<link rel="canonical" href="https://stangrand.github.io/morning-brief/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Daily Brief">
+<meta property="og:title" content="Daily Brief – 2026-10-25">
+<meta property="og:description" content="Weather, river levels, news, job matches and property listings for 2026-10-25.">
+<meta property="og:url" content="https://stangrand.github.io/morning-brief/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Daily Brief – 2026-10-25">
+<meta name="twitter:description" content="Weather, river levels, news, job matches and property listings for 2026-10-25.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='88'%3E%F0%9F%93%B0%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme:light;
+  /* Graphite (neutral control): pure neutral greys with the brand red.
+     Semantics retuned to stay readable and not fight the neutral ground. */
+  --bg:#fafafa;
+  --card:#ffffff; --ink:#0d0d0d; --muted:#6a6a6a; --label:#585858;
+  --accent:#d6220d; --accent-ink:#ffffff; --accent-soft:#fdecea;
+  --border:rgba(0,0,0,.075); --cell:#f4f4f4;
+  /* selected day column in the weather chart: one step above --cell */
+  --fx-hl:#ffffff;
+  --shadow:0 1px 2px rgba(16,18,22,.04),0 10px 24px -16px rgba(16,18,22,.18);
+  --ok:#1a7f4b; --ok-bg:#e8f5ee;
+  --rain-bg:#dbe9fb; --rain-ink:#12459c; --rain-border:#a7c8ee;
+  --warn-bg:#fff6e5; --warn-ink:#8a5a00; --warn-border:#eccc8a;
+  --danger-bg:#fdecea; --danger-ink:#b3261e; --danger-border:#f0b7b4;
+  --sun:#f5a623; --chart:#d6220d;
+  --radius:14px; --radius-inner:10px; --radius-cell:8px;
+  --tick:#f4f4f4;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0b0b0b;
+    --card:#151515; --ink:#f5f5f5; --muted:#9b9b9b; --label:#b0b0b0;
+    --accent:#ff4b33; --accent-ink:#0d0d0d; --accent-soft:#2b1512;
+    --border:rgba(255,255,255,.08); --cell:#1c1c1c;
+    --fx-hl:#242424;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 14px 30px -20px rgba(0,0,0,.9);
+    --ok:#5ed88a; --ok-bg:#11251a;
+    --rain-bg:#1b3a63; --rain-ink:#8fc0ff; --rain-border:#3a6ca6;
+    --warn-bg:#241d0d; --warn-ink:#f0c76a; --warn-border:#6b5518;
+    --danger-bg:#2e1416; --danger-ink:#ff8f93; --danger-border:#7a2b30;
+    --sun:#ffcf6e; --chart:#ff4b33;
+    --tick:#1c1c1c;
+  }
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0b0b0b;
+  --card:#151515; --ink:#f5f5f5; --muted:#9b9b9b; --label:#b0b0b0;
+  --accent:#ff4b33; --accent-ink:#0d0d0d; --accent-soft:#2b1512;
+  --border:rgba(255,255,255,.08); --cell:#1c1c1c;
+  --fx-hl:#242424;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 14px 30px -20px rgba(0,0,0,.9);
+  --ok:#5ed88a; --ok-bg:#11251a;
+  --rain-bg:#1b3a63; --rain-ink:#8fc0ff; --rain-border:#3a6ca6;
+  --warn-bg:#241d0d; --warn-ink:#f0c76a; --warn-border:#6b5518;
+  --danger-bg:#2e1416; --danger-ink:#ff8f93; --danger-border:#7a2b30;
+  --sun:#ffcf6e; --chart:#ff4b33;
+  --tick:#1c1c1c;
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:15px;line-height:1.4;
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased}
+
+/* ---- shell ---- */
+.wrap{max-width:1320px;margin:0 auto;padding:0 18px 44px}
+
+/* ---- masthead ---- */
+/* No rules and no all-caps block: the wordmark carries a single accent dot
+   and the page starts immediately underneath it. */
+header.top{display:flex;align-items:center;gap:14px;padding:22px 0 14px;margin-bottom:4px}
+header.top h1{margin:0;font-size:1.34rem;font-weight:650;letter-spacing:-.02em;
+  line-height:1.1;display:flex;align-items:center;gap:9px}
+.brand-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 4px var(--accent-soft);flex:none}
+.meta{color:var(--muted);font-size:.7rem;letter-spacing:.04em;
+  padding-bottom:.1em;white-space:nowrap}
+.meta .sep{opacity:.5;margin:0 .45em}
+.theme-btn{margin-left:auto;border:1px solid var(--border);background:var(--card);
+  color:var(--muted);border-radius:50%;width:30px;height:30px;
+  font-size:.82rem;cursor:pointer;line-height:1;flex:none;
+  display:flex;align-items:center;justify-content:center;padding:0;
+  box-shadow:var(--shadow)}
+.theme-btn:hover{color:var(--accent);border-color:var(--accent)}
+
+/* ---- ticker strip ---- */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.chip{border:1px solid var(--border);background:var(--card);border-radius:999px;
+  padding:4px 11px;font-size:.72rem;
+  color:var(--muted);white-space:nowrap;display:inline-flex;gap:5px;align-items:center;
+  box-shadow:var(--shadow)}
+.chip strong{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.chip.warn{border-color:var(--warn-border);background:var(--warn-bg);color:var(--warn-ink)}
+.chip.warn strong{color:var(--warn-ink)}
+.chip.danger{border-color:var(--danger-border);background:var(--danger-bg);color:var(--danger-ink)}
+.chip.danger strong{color:var(--danger-ink)}
+.chip.up strong{color:var(--ok)}
+.chip.down strong{color:var(--danger-ink)}
+
+/* ---- grid ---- */
+/* Tight masonry: cards flow down two balanced columns, so none is padded up to
+   a row-mate's height (a fixed 12-col grid left large blank areas inside the
+   shorter cards). Two columns is deliberate -- with the tall Jobs/News/Reality
+   cards a third column cannot be balanced and opens a large hole, measured in
+   a headless browser. Collapses to one column on narrow screens. */
+.grid{column-count:2;column-gap:14px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px 18px 18px;min-width:0;
+  box-shadow:var(--shadow);
+  break-inside:avoid;page-break-inside:avoid;margin-bottom:14px;
+  display:flex;flex-direction:column;
+  container-type:inline-size}
+
+/* A quiet uppercase label, not a ruled heading: the rule was doing the work
+   that the spacing now does. */
+.card h2{font-size:.62rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  margin:0 0 11px;padding:0;border:0;
+  display:flex;align-items:center;gap:7px;color:var(--label);line-height:1}
+.card h2 .sub{color:var(--muted);font-weight:500;font-size:.6rem;letter-spacing:.1em;
+  margin-left:auto;text-transform:uppercase}
+.h2sub{color:var(--muted);font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;
+  margin:-6px 0 10px;font-weight:500}
+
+ul.notes{list-style:none;margin:9px 0 0;padding:0;
+  border-top:1px solid var(--border)}
+ul.notes li{padding:5px 0 5px 11px;color:var(--muted);font-size:.8rem;
+  position:relative;line-height:1.35}
+ul.notes li:before{content:"";position:absolute;left:0;top:11px;
+  width:3px;height:3px;background:var(--accent);border-radius:50%}
+ul.notes li.warn{color:var(--warn-ink)}
+ul.notes li.danger{color:var(--danger-ink)}
+ul.notes li.warn:before{background:var(--warn-ink)}
+ul.notes li.danger:before{background:var(--danger-ink)}
+
+/* ---- weather ---- */
+.weather-main{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.weather-now{display:flex;align-items:center;gap:10px}
+.weather-emoji{font-size:2.3rem;line-height:.85}
+.temp-big{font-size:2.2rem;font-weight:800;letter-spacing:-.045em;line-height:.9}
+.temp-big small{font-size:.7rem;color:var(--muted);font-weight:500;display:block;
+  margin-top:3px;letter-spacing:0}
+.metro{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:7px;
+  margin-top:11px}
+.metro .m{background:var(--cell);border-radius:var(--radius-cell);padding:7px 9px;font-size:.72rem}
+.metro .m .k{color:var(--muted);font-size:.58rem;text-transform:uppercase;
+  letter-spacing:.1em;font-weight:600}
+.metro .m .v{font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.forecast{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+  gap:7px;margin-top:9px}
+.fday{background:var(--cell);border-radius:var(--radius-cell);padding:8px 6px;text-align:center}
+.fday .dow{font-size:.6rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.12em;font-weight:700}
+.fday .emoji{font-size:1.4rem;line-height:1;margin:4px 0}
+.fday .cond{font-size:.66rem;color:var(--muted);line-height:1.2}
+.fday .hi{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-top:2px}
+.fday .lo{font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.fday .precip{font-size:.64rem;color:var(--rain-ink);margin-top:2px;font-weight:600}
+.chart-wrap{margin-top:10px;border:0;background:var(--cell);border-radius:var(--radius-inner);
+  padding:8px 6px 4px}
+.chart-wrap svg{display:block;width:100%;height:auto;max-height:200px}
+.chart-wrap .cap{font-size:.6rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.1em;text-align:center;margin-bottom:4px}
+/* the 5-day chart doubles as the day selector: each column is a tab whose
+   pane is the hourly timeline underneath it */
+.chart-wrap .fx-day{cursor:pointer}
+.chart-wrap .fx-hl{fill:var(--fx-hl);opacity:0;transition:opacity .12s ease}
+.chart-wrap .fx-day:hover .fx-hl{opacity:.5}
+.chart-wrap .fx-day[aria-selected="true"] .fx-hl{opacity:1}
+.chart-wrap .fx-day:focus{outline:none}
+.chart-wrap .fx-day:focus-visible .fx-hl{opacity:1;stroke:var(--accent);stroke-width:2}
+.chart-wrap .fx-day[aria-selected="true"] .fx-dow{fill:var(--accent);opacity:1}
+
+/* ---- hydrology ---- */
+.hydro-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.hydro-box{border:1px solid transparent;border-radius:var(--radius-inner);
+  padding:10px 12px;background:var(--cell)}
+.hydro-box>strong{font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:600}
+.hydro-box.warn{border-color:var(--warn-border);background:var(--warn-bg)}
+.hydro-box.danger{border-color:var(--danger-border);background:var(--danger-bg)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:.78rem;margin-top:6px}
+.kv .k{color:var(--muted);white-space:nowrap}
+.kv .v{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.rainlink{color:var(--danger-ink);font-weight:700;text-decoration:none}
+.rainlink:hover{text-decoration:underline}
+.big-num{font-size:2rem;font-weight:800;letter-spacing:-.04em;line-height:1;
+  color:var(--danger-ink);margin-top:5px;font-variant-numeric:tabular-nums}
+
+/* ---- agenda ---- */
+.agenda{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.ev-col h3{font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);margin:0 0 6px;font-weight:600;
+  padding:0;border:0}
+ul.events{list-style:none;margin:0;padding:0}
+ul.events li{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--tick);
+  font-size:.8rem;line-height:1.28}
+ul.events li:last-child{border-bottom:0}
+.time{font-variant-numeric:tabular-nums;font-weight:800;color:var(--accent);
+  white-space:nowrap;min-width:38px;font-size:.78rem}
+.ev-title{flex:1;font-weight:500;min-width:0}
+.ev-loc{color:var(--muted);font-size:.74rem;font-weight:400}
+
+/* ---- jobs & real estate ---- */
+/* Two lines per entry: title, then meta + tags sharing a line. */
+.item{display:flex;flex-wrap:wrap;align-items:center;gap:1px 8px;
+  padding:7px 0;border-bottom:1px solid var(--border);font-size:.84rem}
+.item:last-child{border-bottom:0}
+.item .it-title{flex:1 1 100%;font-weight:700;font-size:.85rem;line-height:1.25;
+  letter-spacing:-.01em}
+.item .it-title a{color:var(--ink)}
+.item .it-title a:hover{color:var(--accent);text-decoration:none}
+.item .it-meta{flex:0 1 auto;min-width:7em;color:var(--muted);font-size:.72rem;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tags{flex:0 1 auto;min-width:0;margin-left:auto;display:flex;flex-wrap:wrap;gap:4px;
+  justify-content:flex-end}
+.tag{display:inline-block;border:1px solid var(--border);background:var(--cell);
+  border-radius:999px;padding:1px 8px;font-size:.62rem;color:var(--muted);
+  letter-spacing:.02em;font-weight:600;line-height:1.5;
+  white-space:nowrap}
+.tag.money,.tag.remote{border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
+.tag.deadline{border-color:var(--warn-border);background:var(--warn-bg);color:var(--warn-ink)}
+.tag.src{border-color:var(--border);background:var(--accent-soft);color:var(--accent)}
+.price{font-weight:800;color:var(--accent);white-space:nowrap;font-size:.82rem;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+footer{margin-top:22px;padding-top:14px;border-top:1px solid var(--border);
+  color:var(--muted);font-size:.64rem;text-align:center;letter-spacing:.02em}
+
+/* ---- stock watch ---- */
+.stock-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.stock-price{font-size:1.85rem;font-weight:800;letter-spacing:-.04em;line-height:1;
+  font-variant-numeric:tabular-nums}
+.stock-move{font-size:.84rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stock-move.up{color:var(--ok)}
+.stock-move.down{color:var(--danger-ink)}
+.stock-meta{color:var(--muted);font-size:.66rem;text-transform:uppercase;
+  letter-spacing:.08em;margin:5px 0 7px}
+.stock-chart{width:100%;height:auto;display:block}
+.stock-chart-wrap{position:relative;margin-top:4px}
+.stock-chart .area{fill:var(--accent);fill-opacity:.09}
+.stock-chart .line{fill:none;stroke:var(--accent);stroke-width:1.8;
+  stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.stock-chart .dot{fill:var(--accent)}
+.stock-chart .axis{stroke:var(--border);stroke-width:1;vector-effect:non-scaling-stroke}
+.stock-chart .stock-cross{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;
+  pointer-events:none}
+.stock-axis{position:absolute;inset:0;pointer-events:none}
+.stock-axis div{position:absolute;font-size:.6rem;line-height:1;color:var(--muted);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.stock-axis .aU{font-weight:700;color:var(--ink)}
+.stock-tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);
+  border-radius:8px;padding:4px 8px;font-size:.72rem;font-variant-numeric:tabular-nums;
+  white-space:nowrap;transform:translate(-50%,-115%);display:none;z-index:5}
+.stock-ranges{display:flex;flex-wrap:wrap;gap:3px;margin-top:10px;padding:3px;
+  background:var(--cell);border-radius:999px}
+.stock-range{padding:5px 0;flex:1;text-align:center;border:0;border-radius:999px;
+  font-size:.62rem;color:var(--muted);cursor:pointer;font-weight:600;letter-spacing:.04em;
+  text-transform:uppercase}
+.stock-range:last-child{border-right:0}
+.stock-range:hover{color:var(--accent)}
+.stock-range.active{color:var(--accent-ink);background:var(--accent)}
+
+/* ---- news tabs ---- */
+/* One outlet visible at a time; the buttons switch panes and nothing moves
+   on its own, so the page stays still for the reader. */
+.news-tabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:11px}
+.news-tab{font:inherit;font-size:.72rem;font-weight:600;letter-spacing:.01em;
+  color:var(--muted);background:var(--card);
+  border:1px solid var(--border);border-radius:999px;padding:4px 11px;
+  cursor:pointer;white-space:nowrap}
+.news-tab:hover{color:var(--accent);border-color:var(--accent)}
+.news-tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.news-tab[aria-selected="true"]{color:var(--accent-ink);
+  background:var(--accent);border-color:var(--accent)}
+/* Marks a tab whose articles are ordered by readership rather than by time. */
+.news-badge{display:inline-block;margin-left:5px;padding:0 5px;
+  font-size:.5rem;font-weight:700;letter-spacing:.08em;line-height:1.6;
+  border:1px solid currentColor;border-radius:999px;opacity:.75;
+  vertical-align:1px}
+.news-tab[aria-selected="true"] .news-badge{opacity:.9}
+.news-pane[hidden]{display:none}
+.news-col{min-width:0}
+.news-col>strong{display:flex;align-items:baseline;gap:6px;
+  font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:600;margin-bottom:2px}
+.nc-kind{font-size:.58rem;font-weight:600;letter-spacing:.06em;opacity:.8;
+  color:var(--muted)}
+.nc-ranked{color:var(--accent);opacity:1}
+.nc-item{padding:7px 0;border-top:1px solid var(--border)}
+.nc-item:first-of-type{border-top:0;padding-top:2px}
+.nc-head{display:flex;align-items:baseline;gap:8px}
+.nc-title{color:var(--ink);text-decoration:none;font-size:.82rem;font-weight:600;
+  line-height:1.3;min-width:0}
+.nc-title:hover{color:var(--accent);text-decoration:underline}
+.nc-age{margin-left:auto;flex:0 0 auto;font-size:.58rem;color:var(--muted);
+  letter-spacing:.06em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.nc-sum{color:var(--muted);font-size:.72rem;line-height:1.4;margin:3px 0 0}
+.news-empty{color:var(--muted);font-size:.78rem;padding:7px 0}
+.news-count{color:var(--muted);font-size:.6rem;text-transform:uppercase;
+  letter-spacing:.1em;margin-top:9px;padding-top:7px;border-top:1px solid var(--border)}
+
+/* ---- holidays ---- */
+.holiday{display:inline-block;border:1px solid var(--warn-border);background:var(--warn-bg);
+  color:var(--warn-ink);border-radius:999px;padding:3px 10px;font-size:.68rem;
+  margin:0 4px 6px 0;font-weight:600;letter-spacing:.02em}
+.holiday.up{color:var(--muted);background:var(--card);border-color:var(--border);
+  font-weight:500}
+
+/* ---- stale + sparkline ---- */
+.stale-chip{color:var(--warn-ink)!important}
+.stale-chip strong{color:var(--warn-ink)!important}
+/* stale banner (prominent, above alerts) */
+.stale-banner{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 10px;border:1px solid var(--warn-border);background:var(--warn-bg);color:var(--warn-ink);border-radius:var(--radius);padding:8px 12px;font-size:.76rem}
+.stale-banner .sb-icon{font-size:.9rem}
+.stale-banner .sb-sub{color:var(--warn-ink);opacity:.8;font-size:.7rem}
+/* meta age */
+.meta .meta-full{color:var(--muted);font-size:.68rem}
+/* at a glance */
+.glance{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 10px}
+.glance .g-item{display:flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--card);border-radius:999px;padding:5px 10px;font-size:.72rem}
+.glance .g-k{color:var(--muted);font-size:.58rem;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.glance .g-v{font-weight:600;font-variant-numeric:tabular-nums}
+.spark-wrap{margin-top:8px;border-top:1px solid var(--border);padding-top:6px}
+.spark-wrap .spark-cap{font-size:.6rem;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.12em;font-weight:700}
+
+/* ---- what changed since yesterday ---- */
+.delta{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin:0 0 14px;
+  border:1px solid var(--border);
+  background:var(--card);border-radius:var(--radius);padding:9px 14px;font-size:.76rem;
+  box-shadow:var(--shadow)}
+.delta .delta-cap{font-size:.58rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.delta .delta-item{color:var(--ink);white-space:nowrap}
+.delta .delta-item strong{color:var(--accent);font-variant-numeric:tabular-nums}
+
+/* ---- archive navigation ---- */
+.archive-nav{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin:24px 0 0}
+.archive-nav .archive-cap{font-size:.58rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-right:2px}
+.archive-nav a{font-size:.68rem;color:var(--muted);text-decoration:none;
+  border:1px solid var(--border);border-radius:999px;padding:2px 9px;
+  font-variant-numeric:tabular-nums}
+.archive-nav a:hover{color:var(--accent);border-color:var(--accent)}
+
+/* ---- responsive ---- */
+@media (max-width:820px){
+  .grid{column-count:1}
+  header.top{flex-wrap:wrap}
+  header.top h1{font-size:1.16rem}
+  .meta{white-space:normal}
+}
+/* Print: keep the brief readable, collapse interactivity, avoid breaks in cards. */
+@media print{
+  :root{color-scheme:light}
+  html{background:#fff}
+  body{background:#fff;color:#111}
+  .wrap{max-width:100%;padding:16px}
+  .theme-btn{display:none !important}
+  .chips{flex-wrap:wrap}
+  .chip{background:#f6f6f6;color:#111;border-color:#ddd}
+  .chip.danger,.chip.warn,.chip.up,.chip.down{background:#f6f6f6;color:#111}
+  .alert-banner{background:#fff;border-color:#ddd;box-shadow:none}
+  .alert-card{break-inside:avoid}
+  .pinned{display:none}
+  .grid{column-count:1}
+  .card{break-inside:avoid;box-shadow:none;border-color:#ddd;background:#fff}
+  .card h2{color:#111}
+  .card h2 .sub,.meta,.delta .delta-cap,.archive-cap{color:#555}
+  .news-tabs{display:none}
+  .news-pane{display:block !important}
+  .news-pane[hidden]{display:block !important}
+  .fx-day{cursor:default}
+  .fx-day .fx-hl{display:none}
+  .timeline.fx-pane{display:block}
+  .timeline.fx-pane[hidden]{display:block}
+  .chart-wrap svg{height:auto}
+  .c-stocks svg{display:none}
+  footer, .archive-nav{color:#555}
+  a{color:#111}
+}
+/* On narrow screens give the meta line its own row instead of truncating it.
+   Keyed off the card's own width, so it works at every viewport. */
+@container (max-width:470px){
+  .item{gap:2px 6px}
+  .item .it-meta{flex:1 1 100%;min-width:0;white-space:normal;overflow:visible}
+  .tags{flex:1 1 100%;margin-left:0;justify-content:flex-start}
+  .tag{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+}
+@media (prefers-reduced-motion:no-preference){
+  .card,.chip,.theme-btn{transition:border-color .12s ease,color .12s ease}
+}
+
+/* ---- needs attention banner ---- */
+.alert-banner{margin:0 0 14px;border:1px solid var(--border);
+  background:var(--card);border-radius:var(--radius);padding:13px 15px;
+  box-shadow:var(--shadow)}
+.alert-banner.has-alerts{border-color:var(--danger-border)}
+.alert-head{display:flex;align-items:center;gap:8px;font-size:.58rem;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.alert-allclear{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ok);
+  background:var(--ok-bg);color:var(--ok);border-radius:999px;padding:4px 11px;font-size:.64rem;
+  font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.alert-sub{font-size:.7rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
+.alert-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(234px,1fr))}
+.alert-card{border:1px solid var(--border);border-radius:var(--radius-inner);
+  padding:9px 11px;background:var(--cell);display:flex;flex-direction:column;gap:2px}
+.alert-card.danger{border-color:var(--danger-border);background:var(--danger-bg)}
+.alert-card.warn{border-color:var(--warn-border);background:var(--warn-bg)}
+.alert-card.info{border-color:var(--border);background:var(--accent-soft)}
+.alert-card .ak{font-size:.54rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);opacity:.85}
+.alert-card .at{font-weight:800;font-size:.82rem;line-height:1.25}
+.alert-card.danger .at{color:var(--danger-ink)}
+.alert-card.warn .at{color:var(--warn-ink)}
+.alert-card.info .at{color:var(--accent)}
+.alert-card .at a{color:inherit}
+.alert-card .ad{font-size:.72rem;color:var(--muted);line-height:1.3}
+.alert-more{font-size:.64rem;color:var(--muted);margin-top:6px}
+
+/* ---- pinned links (personal spreadsheets, above the cards) ---- */
+.pinned{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin:0 0 14px}
+.pinned .pin-cap{font-size:.58rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-right:2px;user-select:none}
+.pin-link{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;
+  border:1px solid var(--border);border-radius:999px;background:var(--cell);
+  color:var(--label);font-size:.72rem;font-weight:600;line-height:1.3;
+  text-decoration:none;white-space:nowrap;
+  transition:border-color .12s ease,color .12s ease,background .12s ease}
+.pin-ico{flex:none}
+.pin-emoji{flex:none;font-size:.78rem;line-height:1}
+.pin-link .pin-arrow{font-size:.66rem;opacity:.55}
+.pin-link:hover{border-color:var(--accent);color:var(--accent)}
+.pin-link:hover .pin-arrow{opacity:1}
+.pin-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---- delta badges embedded in the card headings ---- */
+.delta-badge{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--border);
+  border-radius:999px;padding:1px 7px;font-size:.58rem;font-weight:600;letter-spacing:.03em;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap;
+  font-variant-numeric:tabular-nums;line-height:1.6}
+.delta-badge.up{color:var(--ok);border-color:var(--ok);background:var(--ok-bg)}
+.delta-badge.down{color:var(--danger-ink);border-color:var(--danger-border);
+  background:var(--danger-bg)}
+.delta-badge.new{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.card h2 .delta-badge{margin-left:6px;letter-spacing:.06em}
+
+/* ---- today's 3-minute digest ---- */
+.digest{margin:0 0 12px;border:1px solid var(--border);
+  background:var(--cell);border-radius:var(--radius-inner);padding:10px 13px}
+.digest .digest-cap{font-size:.58rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:6px;display:block}
+.digest ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.digest li{display:flex;gap:10px;font-size:.8rem;line-height:1.4}
+.digest li .dk{flex:0 0 auto;font-size:.56rem;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--accent);min-width:72px;padding-top:2px}
+.digest li .dt{min-width:0;color:var(--ink)}
+
+/* ---- environment & health ---- */
+.env-grid{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:start}
+.env-box{border:1px solid transparent;border-radius:var(--radius-inner);
+  padding:10px 12px;background:var(--cell)}
+.env-box>strong{font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:600}
+.aqi-head,.pollen-head{font-size:.6rem;text-transform:uppercase;letter-spacing:.13em;
+  color:var(--muted);font-weight:600}
+.aqi-num{font-size:1.9rem;font-weight:800;letter-spacing:-.04em;line-height:1;margin-top:4px;
+  font-variant-numeric:tabular-nums}
+.aqi-good{color:var(--ok)}
+.aqi-mid{color:var(--warn-ink)}
+.aqi-bad{color:var(--danger-ink)}
+.aqi-sub{font-size:.68rem;color:var(--muted);margin-top:3px}
+.pol-row{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:6px}
+.pol{font-size:.66rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.env-empty{color:var(--muted);font-size:.8rem;margin:0}
+.pollen-list{list-style:none;margin:6px 0 0;padding:0;font-size:.74rem}
+.pollen-list li{display:flex;align-items:center;gap:7px;padding:2px 0}
+.pollen-list .pn{flex:0 0 auto;min-width:6.5em;color:var(--muted)}
+.pollen-list .pg{color:var(--muted);font-size:.66rem;font-variant-numeric:tabular-nums}
+.pollen-dots{display:inline-flex;gap:2px;margin-left:auto}
+.pollen-dots i{width:7px;height:7px;border-radius:50%;background:var(--border);display:inline-block}
+.pollen-dots i.on{background:var(--accent)}
+
+/* intraday rain / UV timeline (inside the weather card) */
+.timeline{margin-top:11px;border-top:1px solid var(--border);padding-top:8px}
+.timeline .tl-cap{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;
+  font-weight:600;margin-bottom:6px}
+.tl-bars{display:flex;align-items:flex-end;gap:2px;height:40px}
+.tl-bar{flex:1;min-height:2px;background:var(--rain-bg);border:1px solid var(--rain-border);
+  border-radius:3px}
+.tl-bar.dry{background:var(--border);border-color:transparent}
+.tl-x{display:flex;gap:2px;margin-top:3px}
+.tl-x span{flex:1;text-align:center;font-size:.54rem;color:var(--muted);
+  font-variant-numeric:tabular-nums}
+.tl-foot{display:flex;justify-content:space-between;gap:10px;font-size:.58rem;color:var(--muted);
+  margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+.tl-foot b{color:var(--ink)}
+/* one timeline pane per forecast day; only the selected one is shown */
+.timeline.fx-pane[hidden]{display:none}
+.tl-day{font-size:.62rem;color:var(--muted);margin-top:5px;line-height:1.5}
+.tl-day b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+
+/* health / wearable card */
+.health-grid{display:grid;gap:7px;
+  grid-template-columns:repeat(auto-fit,minmax(78px,1fr))}
+.health-cell{background:var(--cell);border-radius:var(--radius-cell);padding:7px 9px}
+.health-cell .k{color:var(--muted);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;
+  font-weight:600}
+.health-cell .v{font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.health-src{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;
+  margin-top:8px}
+.card .stock-link{display:inline-block;margin-top:8px;font-size:.64rem;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase}
+
+/* ---- tracker highlights ---- */
+.tracker-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.loc-list{list-style:none;margin:0;padding:0}
+.loc-list li{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:.78rem;
+  border-bottom:1px solid var(--tick)}
+.loc-list li:last-child{border-bottom:0}
+.tag.pm2{border-color:var(--border);background:var(--cell);color:var(--muted)}
+.tag.score{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.tag.top{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1><span class="brand-dot" aria-hidden="true"></span>Daily Brief</h1>
+    <div class="meta" title="2026-10-25 05:30">3 min ago <span class="meta-full">(2026-10-25 05:30)</span></div>
+    <button type="button" id="themeToggle" class="theme-btn" aria-label="Toggle theme">☀️</button>
+  </header>
+  <div class="chips"><span class="chip"><strong>☁️ 5.6°C</strong></span><span class="chip">Overcast</span><span class="chip">🌅 06:25 · 🌇 16:44</span><span class="chip">✅ No flood activity</span><span class="chip"><strong>💼 10</strong> job matches</span><span class="chip"><strong>🏠 10</strong> listing(s)</span><span class="chip up"><strong>📈 VWCE.DE 169.3</strong> ▲ 0.01%</span></div>
+  <nav class="glance" aria-label="At a glance"><span class="g-item"><span class="g-k">VWCE.DE</span><span class="g-v">169.3 ▲ 0.01%</span></span><span class="g-item"><span class="g-k">News</span><span class="g-v">35</span></span><span class="g-item"><span class="g-k">AQI</span><span class="g-v">27 Fair</span></span></nav>
+  
+  <div class="alert-banner has-alerts"><span class="alert-head">⚠ Needs attention · 2</span><div class="alert-grid"><div class="alert-card warn"><span class="ak">weather</span><div class="at">High rain probability</div><div class="ad">100% chance today (threshold 70%)</div></div><div class="alert-card warn"><span class="ak">hydro</span><div class="at"><a href="https://www.noel.gv.at/wasserstand/" target="_blank" rel="noopener">Thebnerstraßl at low water</a></div><div class="ad">707 m³/s at/below the low-water threshold RNQ 1040 m³/s</div></div></div></div>
+  <nav class="pinned" aria-label="Pinned links"><span class="pin-cap" aria-hidden="true">📌 Pinned</span><a class="pin-link" href="https://docs.google.com/spreadsheets/d/1QNk0QfEv2NwIRFgHn0onHVYs0AWfdmJ7eeZhdZ7w18s/edit?usp=sharing" target="_blank" rel="noopener noreferrer"><svg class="pin-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false"><rect x="2" y="2" width="20" height="20" rx="4" fill="#0f9d58"/><rect x="6" y="7.5" width="12" height="9" fill="#ffffff"/><path fill="#0f9d58" d="M6 10.5h12v1H6zm0 3h12v1H6zM9.5 7.5h1v9h-1zm4 0h1v9h-1z"/></svg>Financie<span class="pin-arrow" aria-hidden="true">↗</span></a><a class="pin-link" href="https://docs.google.com/spreadsheets/d/1mcZ2YwhIkFrU2POez7GjqUfocy-7sbInFxMG9f6CyYg/edit?usp=sharing" target="_blank" rel="noopener noreferrer"><svg class="pin-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false"><rect x="2" y="2" width="20" height="20" rx="4" fill="#0f9d58"/><rect x="6" y="7.5" width="12" height="9" fill="#ffffff"/><path fill="#0f9d58" d="M6 10.5h12v1H6zm0 3h12v1H6zM9.5 7.5h1v9h-1zm4 0h1v9h-1z"/></svg>Deti<span class="pin-arrow" aria-hidden="true">↗</span></a><a class="pin-link" href="https://docs.google.com/spreadsheets/d/1gf8GJY4NLsEaTRWd3MoDBJXalUew1Zpigs7aSEM4dgk/edit?usp=sharing" target="_blank" rel="noopener noreferrer"><svg class="pin-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false"><rect x="2" y="2" width="20" height="20" rx="4" fill="#0f9d58"/><rect x="6" y="7.5" width="12" height="9" fill="#ffffff"/><path fill="#0f9d58" d="M6 10.5h12v1H6zm0 3h12v1H6zM9.5 7.5h1v9h-1zm4 0h1v9h-1z"/></svg>Buy<span class="pin-arrow" aria-hidden="true">↗</span></a><a class="pin-link" href="https://docs.google.com/spreadsheets/d/16PDvf2-zlmQGl9XJvApwqAHIqTCWs3DlhAcTkIqkNzM/edit?usp=sharing" target="_blank" rel="noopener noreferrer"><svg class="pin-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false"><rect x="2" y="2" width="20" height="20" rx="4" fill="#0f9d58"/><rect x="6" y="7.5" width="12" height="9" fill="#ffffff"/><path fill="#0f9d58" d="M6 10.5h12v1H6zm0 3h12v1H6zM9.5 7.5h1v9h-1zm4 0h1v9h-1z"/></svg>Chata Štrba<span class="pin-arrow" aria-hidden="true">↗</span></a><a class="pin-link" href="https://docs.google.com/spreadsheets/d/19OuTubeCR5xG17mB_ZHMqeQu00blnE2Z0LfmthYeWco/edit?usp=sharing" target="_blank" rel="noopener noreferrer"><svg class="pin-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false"><rect x="2" y="2" width="20" height="20" rx="4" fill="#0f9d58"/><rect x="6" y="7.5" width="12" height="9" fill="#ffffff"/><path fill="#0f9d58" d="M6 10.5h12v1H6zm0 3h12v1H6zM9.5 7.5h1v9h-1zm4 0h1v9h-1z"/></svg>Rekonštrukcia<span class="pin-arrow" aria-hidden="true">↗</span></a><a class="pin-link" href="https://docs.google.com/spreadsheets/d/1x5-USl71bYvbGplMlMpJt-lI8C0GGkr4aJwnidgdWu4/edit?usp=sharing" target="_blank" rel="noopener noreferrer"><svg class="pin-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false"><rect x="2" y="2" width="20" height="20" rx="4" fill="#0f9d58"/><rect x="6" y="7.5" width="12" height="9" fill="#ffffff"/><path fill="#0f9d58" d="M6 10.5h12v1H6zm0 3h12v1H6zM9.5 7.5h1v9h-1zm4 0h1v9h-1z"/></svg>Výlety<span class="pin-arrow" aria-hidden="true">↗</span></a><a class="pin-link" href="https://s-dom.sk/" target="_blank" rel="noopener noreferrer"><span class="pin-emoji" aria-hidden="true">🍽️</span>Hladomorňa<span class="pin-arrow" aria-hidden="true">↗</span></a></nav>
+  <div class="grid">
+    <section class="card c-weather"><h2>🌤️ Weather<span class="sub">now + 5-day</span></h2><div class="weather-main"><div class="weather-now"><div class="weather-emoji">☁️</div><div><div class="temp-big">5.6°C<small>Overcast</small></div></div></div></div><div class="metro"><div class="m"><div class="k">Humidity</div><div class="v">75%</div></div><div class="m"><div class="k">Wind</div><div class="v">4.6 km/h</div></div><div class="m"><div class="k">UV max</div><div class="v">1.8</div></div><div class="m"><div class="k">Feels</div><div class="v">3.1°C</div></div><div class="m"><div class="k">Daylight</div><div class="v">06:25 – 16:44 · 10h</div></div></div><div class="chart-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 155" width="100%" height="auto" role="group" fill="currentColor" aria-label="5-day temperature forecast" font-family="system-ui,sans-serif" style="color:var(--ink)"><defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0654c"/><stop offset="55%" stop-color="#f5a623"/><stop offset="100%" stop-color="#4c9cf0"/></linearGradient></defs><line x1="10" y1="130" x2="460" y2="130" stroke="var(--border)" stroke-width="1" opacity=".8"/><text x="20.0" y="130.0" font-size="9" fill="var(--muted)" text-anchor="start" stroke="var(--bg)" stroke-width="3" paint-order="stroke" transform="translate(0,8)">1.4°</text><g class="fx-day" data-day="0" id="fxday-0" role="tab" tabindex="0" aria-selected="true" aria-controls="fxpane-0" aria-label="Sun 25 Oct · Slight rain · 11.5° · low 4.7° · 100% rain — hourly rain below"><rect class="fx-hl" x="21.0" y="6" width="84.0" height="146" rx="8"/><text class="fx-dow" x="63.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Sun</text><text x="63.0" y="35" font-size="15" text-anchor="middle">🌦️</text><rect x="55.0" y="66.1" width="16" height="39.0" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="63.0" cy="66.1" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="63.0" cy="105.1" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="77.0" y="69.6" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">11.5°</text><text x="77.0" y="108.6" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">4.7°</text><text x="63.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">3.7 mm</text></g><g class="fx-day" data-day="1" id="fxday-1" role="tab" tabindex="0" aria-selected="false" aria-controls="fxpane-1" aria-label="Mon 26 Oct · Overcast · 13.7° · low 6.7° · 8% rain — hourly rain below"><rect class="fx-hl" x="107.0" y="6" width="84.0" height="146" rx="8"/><text class="fx-dow" x="149.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Mon</text><text x="149.0" y="35" font-size="15" text-anchor="middle">☁️</text><rect x="141.0" y="53.5" width="16" height="40.1" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="149.0" cy="53.5" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="149.0" cy="93.6" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="163.0" y="57.0" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">13.7°</text><text x="163.0" y="97.1" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">6.7°</text><text x="149.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">Dry</text></g><g class="fx-day" data-day="2" id="fxday-2" role="tab" tabindex="0" aria-selected="false" aria-controls="fxpane-2" aria-label="Tue 27 Oct · Overcast · 12.4° · low 3.4° · 0% rain — hourly rain below"><rect class="fx-hl" x="193.0" y="6" width="84.0" height="146" rx="8"/><text class="fx-dow" x="235.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Tue</text><text x="235.0" y="35" font-size="15" text-anchor="middle">☁️</text><rect x="227.0" y="60.9" width="16" height="51.6" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="235.0" cy="60.9" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="235.0" cy="112.5" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="249.0" y="64.4" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">12.4°</text><text x="249.0" y="116.0" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">3.4°</text><text x="235.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">Dry</text></g><g class="fx-day" data-day="3" id="fxday-3" role="tab" tabindex="0" aria-selected="false" aria-controls="fxpane-3" aria-label="Wed 28 Oct · Slight rain · 12.1° · low 4.3° · 23% rain — hourly rain below"><rect class="fx-hl" x="279.0" y="6" width="84.0" height="146" rx="8"/><text class="fx-dow" x="321.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Wed</text><text x="321.0" y="35" font-size="15" text-anchor="middle">🌦️</text><rect x="313.0" y="62.6" width="16" height="44.7" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="321.0" cy="62.6" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="321.0" cy="107.4" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="335.0" y="66.1" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">12.1°</text><text x="335.0" y="110.9" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">4.3°</text><text x="321.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">1.6 mm</text></g><g class="fx-day" data-day="4" id="fxday-4" role="tab" tabindex="0" aria-selected="false" aria-controls="fxpane-4" aria-label="Thu 29 Oct · Slight rain · 13.4° · low 8° · 19% rain — hourly rain below"><rect class="fx-hl" x="365.0" y="6" width="84.0" height="146" rx="8"/><text class="fx-dow" x="407.0" y="16" font-size="10.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".65" text-anchor="middle">Thu</text><text x="407.0" y="35" font-size="15" text-anchor="middle">🌦️</text><rect x="399.0" y="55.2" width="16" height="31.0" rx="8" fill="url(#tg)" opacity=".92"/><circle cx="407.0" cy="55.2" r="4" fill="#f0654c" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><circle cx="407.0" cy="86.2" r="4" fill="#4c9cf0" stroke="var(--bg)" stroke-width="3" paint-order="stroke"/><text x="421.0" y="58.7" font-size="11.5" font-weight="700" stroke="var(--bg)" stroke-width="3" paint-order="stroke" text-anchor="start">13.4°</text><text x="421.0" y="89.7" font-size="10" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".75" text-anchor="start">8°</text><text x="407.0" y="149" font-size="9.5" font-weight="600" stroke="var(--bg)" stroke-width="3" paint-order="stroke" opacity=".7" text-anchor="middle">0.8 mm</text></g></svg></div><div class="timeline fx-pane" id="fxpane-0" role="tabpanel" aria-labelledby="fxday-0" data-day="0"><div class="tl-cap">🌧️ Rain (mm) &amp; UV · 24h · Today</div><div class="tl-bars"><div class="tl-bar dry" style="height:2px" title="00:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="01:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="02:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="03:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="04:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="05:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="06:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="07:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="08:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="09:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="10:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="11:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="12:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="13:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="14:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="15:00 · 0 mm"></div><div class="tl-bar" style="height:8px" title="16:00 · 0.2 mm"></div><div class="tl-bar" style="height:17px" title="17:00 · 0.4 mm"></div><div class="tl-bar" style="height:25px" title="18:00 · 0.6 mm"></div><div class="tl-bar" style="height:34px" title="19:00 · 0.8 mm"></div><div class="tl-bar" style="height:34px" title="20:00 · 0.8 mm"></div><div class="tl-bar" style="height:13px" title="21:00 · 0.3 mm"></div><div class="tl-bar" style="height:25px" title="22:00 · 0.6 mm"></div><div class="tl-bar dry" style="height:2px" title="23:00 · 0 mm"></div></div><div class="tl-x"><span>00</span><span></span><span></span><span>03</span><span></span><span></span><span>06</span><span></span><span></span><span>09</span><span></span><span></span><span>12</span><span></span><span></span><span>15</span><span></span><span></span><span>18</span><span></span><span></span><span>21</span><span></span><span></span></div><div class="tl-day">Feels <b>2.6°–8°C</b> · Wind up to <b>20.1 km/h</b> · Rain <b>3.7 mm</b> · Sun <b>06:25–16:44</b></div><div class="tl-foot"><span>Peak rain <b>0.8 mm</b></span><span>Peak UV 1.8</span></div></div><div class="timeline fx-pane" id="fxpane-1" role="tabpanel" aria-labelledby="fxday-1" data-day="1" hidden><div class="tl-cap">🌧️ Rain (mm) &amp; UV · 24h · Mon 26 Oct</div><div class="tl-bars"><div class="tl-bar dry" style="height:2px" title="00:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="01:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="02:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="03:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="04:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="05:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="06:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="07:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="08:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="09:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="10:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="11:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="12:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="13:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="14:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="15:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="16:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="17:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="18:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="19:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="20:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="21:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="22:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="23:00 · 0 mm"></div></div><div class="tl-x"><span>00</span><span></span><span></span><span>03</span><span></span><span></span><span>06</span><span></span><span></span><span>09</span><span></span><span></span><span>12</span><span></span><span></span><span>15</span><span></span><span></span><span>18</span><span></span><span></span><span>21</span><span></span><span></span></div><div class="tl-day">Feels <b>4.4°–10.4°C</b> · Wind up to <b>17.9 km/h</b> · Rain <b>0 mm</b> · Sun <b>06:27–16:42</b></div><div class="tl-foot"><span>Peak rain <b>0 mm</b></span><span>Peak UV 2.55</span></div></div><div class="timeline fx-pane" id="fxpane-2" role="tabpanel" aria-labelledby="fxday-2" data-day="2" hidden><div class="tl-cap">🌧️ Rain (mm) &amp; UV · 24h · Tue 27 Oct</div><div class="tl-bars"><div class="tl-bar dry" style="height:2px" title="00:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="01:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="02:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="03:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="04:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="05:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="06:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="07:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="08:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="09:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="10:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="11:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="12:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="13:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="14:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="15:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="16:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="17:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="18:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="19:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="20:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="21:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="22:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="23:00 · 0 mm"></div></div><div class="tl-x"><span>00</span><span></span><span></span><span>03</span><span></span><span></span><span>06</span><span></span><span></span><span>09</span><span></span><span></span><span>12</span><span></span><span></span><span>15</span><span></span><span></span><span>18</span><span></span><span></span><span>21</span><span></span><span></span></div><div class="tl-day">Feels <b>1°–10.4°C</b> · Wind up to <b>10 km/h</b> · Rain <b>0 mm</b> · Sun <b>06:28–16:40</b></div><div class="tl-foot"><span>Peak rain <b>0 mm</b></span><span>Peak UV 2.75</span></div></div><div class="timeline fx-pane" id="fxpane-3" role="tabpanel" aria-labelledby="fxday-3" data-day="3" hidden><div class="tl-cap">🌧️ Rain (mm) &amp; UV · 24h · Wed 28 Oct</div><div class="tl-bars"><div class="tl-bar dry" style="height:2px" title="00:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="01:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="02:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="03:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="04:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="05:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="06:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="07:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="08:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="09:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="10:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="11:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="12:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="13:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="14:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="15:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="16:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="17:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="18:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="19:00 · 0 mm"></div><div class="tl-bar" style="height:34px" title="20:00 · 0.4 mm"></div><div class="tl-bar" style="height:34px" title="21:00 · 0.4 mm"></div><div class="tl-bar" style="height:34px" title="22:00 · 0.4 mm"></div><div class="tl-bar" style="height:34px" title="23:00 · 0.4 mm"></div></div><div class="tl-x"><span>00</span><span></span><span></span><span>03</span><span></span><span></span><span>06</span><span></span><span></span><span>09</span><span></span><span></span><span>12</span><span></span><span></span><span>15</span><span></span><span></span><span>18</span><span></span><span></span><span>21</span><span></span><span></span></div><div class="tl-day">Feels <b>2.1°–10.9°C</b> · Wind up to <b>16.1 km/h</b> · Rain <b>1.6 mm</b> · Sun <b>06:30–16:39</b></div><div class="tl-foot"><span>Peak rain <b>0.4 mm</b></span><span>Peak UV 2.55</span></div></div><div class="timeline fx-pane" id="fxpane-4" role="tabpanel" aria-labelledby="fxday-4" data-day="4" hidden><div class="tl-cap">🌧️ Rain (mm) &amp; UV · 24h · Thu 29 Oct</div><div class="tl-bars"><div class="tl-bar" style="height:34px" title="00:00 · 0.4 mm"></div><div class="tl-bar" style="height:34px" title="01:00 · 0.4 mm"></div><div class="tl-bar dry" style="height:2px" title="02:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="03:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="04:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="05:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="06:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="07:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="08:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="09:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="10:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="11:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="12:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="13:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="14:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="15:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="16:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="17:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="18:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="19:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="20:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="21:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="22:00 · 0 mm"></div><div class="tl-bar dry" style="height:2px" title="23:00 · 0 mm"></div></div><div class="tl-x"><span>00</span><span></span><span></span><span>03</span><span></span><span></span><span>06</span><span></span><span></span><span>09</span><span></span><span></span><span>12</span><span></span><span></span><span>15</span><span></span><span></span><span>18</span><span></span><span></span><span>21</span><span></span><span></span></div><div class="tl-day">Feels <b>5.2°–9.8°C</b> · Wind up to <b>17.6 km/h</b> · Rain <b>0.8 mm</b> · Sun <b>06:31–16:37</b></div><div class="tl-foot"><span>Peak rain <b>0.4 mm</b></span><span>Peak UV 1.45</span></div></div></section>
+    <section class="card c-env"><h2>🌍 Environment<span class="sub">air quality + pollen</span></h2><div class="env-grid"><div class="env-box"><div class="aqi-head">Air quality</div><div class="aqi-num aqi-good">27</div><div class="aqi-sub">Fair · driven by O3</div><div class="pol-row"><span class="pol">PM2.5 8.6</span><span class="pol">PM10 10.8</span><span class="pol">O₃ 53.0</span><span class="pol">NO₂ 6.6</span></div></div><div class="env-box"><div class="aqi-sub">Pollen: low / none today</div></div></div></section>
+    <section class="card c-health"><h2>❤️🛌 Health<span class="sub">Garmin</span></h2><div class="health-grid"><div class="health-cell"><div class="k">Sleep</div><div class="v">—</div></div><div class="health-cell"><div class="k">Sleep score</div><div class="v">—</div></div><div class="health-cell"><div class="k">Resting HR</div><div class="v">59 bpm</div></div><div class="health-cell"><div class="k">Recovery</div><div class="v">0</div></div></div><div class="health-src">Garmin Connect</div></section>
+    <section class="card c-stocks"><h2>📈 VWCE.DE</h2><div class="h2sub">Vanguard FTSE All-World UCITS ETF USD Accumulation</div><div class="stock-head"><div class="stock-price">169.3 EUR</div><div class="stock-move up" id="stockMove">▲ 0.01%</div></div><div class="stock-meta">Vanguard FTSE All-World UCITS ETF USD Accumulation · last close 2026-10-23</div><div class="stock-chart-wrap"><svg class="stock-chart" id="stockChart" viewBox="0 0 600 190" preserveAspectRatio="none" aria-label="Share price chart"></svg><div class="stock-axis" id="stockAxis" aria-hidden="true"></div><div class="stock-tip" id="stockTip" role="tooltip"></div></div><div class="stock-ranges" id="stockRanges"><span class="stock-range" data-range="1D">1D</span><span class="stock-range" data-range="1M">1M</span><span class="stock-range" data-range="6M">6M</span><span class="stock-range" data-range="1Y">1Y</span><span class="stock-range" data-range="3Y">3Y</span><span class="stock-range" data-range="5Y">5Y</span><span class="stock-range" data-range="MAX">MAX</span></div><a class="stock-link" href="https://finance.yahoo.com/quote/VWCE.DE" target="_blank" rel="noopener">↗ Open in broker / portfolio view</a><script type="application/json" id="stockData">{"symbol":"VWCE.DE","currency":"EUR","name":"Vanguard FTSE All-World UCITS ETF USD Accumulation","series":[{"t":"2019-07-28","q":69.63999938964844},{"t":"2019-08-04","q":68.52999877929688},{"t":"2019-08-11","q":68.69999694824219},{"t":"2019-08-18","q":68.37000274658203},{"t":"2019-08-25","q":70.23999786376953},{"t":"2019-09-01","q":71.5},{"t":"2019-09-08","q":72.41999816894531},{"t":"2019-09-15","q":72.7300033569336},{"t":"2019-09-22","q":72.44999694824219},{"t":"2019-09-29","q":71.08000183105469},{"t":"2019-10-06","q":72.29000091552734},{"t":"2019-10-13","q":71.7300033569336},{"t":"2019-10-20","q":72.9800033569336},{"t":"2019-10-27","q":73.30000305175781},{"t":"2019-11-03","q":74.8499984741211},{"t":"2019-11-10","q":75.06999969482422},{"t":"2019-11-17","q":74.8499984741211},{"t":"2019-11-24","q":75.61000061035156},{"t":"2019-12-01","q":75.70999908447266},{"t":"2019-12-08","q":75.86000061035156},{"t":"2019-12-15","q":77.58000183105469},{"t":"2019-12-22","q":77.5},{"t":"2019-12-29","q":77.3499984741211},{"t":"2020-01-05","q":78.37999725341797},{"t":"2020-01-12","q":79.54000091552734},{"t":"2020-01-19","q":79.54000091552734},{"t":"2020-01-26","q":76.79000091552734},{"t":"2020-02-02","q":79.94999694824219},{"t":"2020-02-09","q":81.5199966430664},{"t":"2020-02-16","q":80.5999984741211},{"t":"2020-02-23","q":70.44000244140625},{"t":"2020-03-01","q":68.98999786376953},{"t":"2020-03-08","q":59.709999084472656},{"t":"2020-03-15","q":58.119998931884766},{"t":"2020-03-22","q":60.33000183105469},{"t":"2020-03-29","q":60.310001373291016},{"t":"2020-04-05","q":65.80000305175781},{"t":"2020-04-12","q":66.9000015258789},{"t":"2020-04-19","q":66.47000122070312},{"t":"2020-04-26","q":68.37999725341797},{"t":"2020-05-03","q":69.0999984741211},{"t":"2020-05-10","q":67.26000213623047},{"t":"2020-05-17","q":69.08999633789062},{"t":"2020-05-24","q":69.83999633789062},{"t":"2020-05-31","q":73.83000183105469},{"t":"2020-06-07","q":70.6500015258789},{"t":"2020-06-14","q":72.94000244140625},{"t":"2020-06-21","q":70.94999694824219},{"t":"2020-06-28","q":72.7699966430664},{"t":"2020-07-05","q":73.38999938964844},{"t":"2020-07-12","q":73.72000122070312},{"t":"2020-07-19","q":72.52999877929688},{"t":"2020-07-26","q":71.37000274658203},{"t":"2020-08-02","q":73.5199966430664},{"t":"2020-08-09","q":74.16999816894531},{"t":"2020-08-16","q":74.4800033569336},{"t":"2020-08-23","q":75.80999755859375},{"t":"2020-08-30","q":74.06999969482422},{"t":"2020-09-06","q":73.94000244140625},{"t":"2020-09-13","q":73.95999908447266},{"t":"2020-09-20","q":73.18000030517578},{"t":"2020-09-27","q":74.56999969482422},{"t":"2020-10-04","q":76.30999755859375},{"t":"2020-10-11","q":77.05000305175781},{"t":"2020-10-18","q":75.66000366210938},{"t":"2020-10-25","q":73.18000030517578},{"t":"2020-11-01","q":76.9800033569336},{"t":"2020-11-08","q":78.91999816894531},{"t":"2020-11-15","q":79.73999786376953},{"t":"2020-11-22","q":80.70999908447266},{"t":"2020-11-29","q":80.68000030517578},{"t":"2020-12-06","q":80.0999984741211},{"t":"2020-12-13","q":80.76000213623047},{"t":"2020-12-20","q":80.8499984741211},{"t":"2020-12-27","q":81.41999816894531},{"t":"2021-01-03","q":83.66999816894531},{"t":"2021-01-10","q":84.01000213623047},{"t":"2021-01-17","q":84.62000274658203},{"t":"2021-01-24","q":82.2300033569336},{"t":"2021-01-31","q":86.36000061035156},{"t":"2021-02-07","q":87.16000366210938},{"t":"2021-02-14","q":87.19999694824219},{"t":"2021-02-21","q":84.62000274658203},{"t":"2021-02-28","q":84.30000305175781},{"t":"2021-03-07","q":87.4000015258789},{"t":"2021-03-14","q":87.80999755859375},{"t":"2021-03-21","q":88.31999969482422},{"t":"2021-03-28","q":90.0},{"t":"2021-04-04","q":90.58000183105469},{"t":"2021-04-11","q":91.45999908447266},{"t":"2021-04-18","q":90.75},{"t":"2021-04-25","q":90.79000091552734},{"t":"2021-05-02","q":91.27999877929688},{"t":"2021-05-09","q":89.80000305175781},{"t":"2021-05-16","q":89.95999908447266},{"t":"2021-05-23","q":91.16999816894531},{"t":"2021-05-30","q":91.77999877929688},{"t":"2021-06-06","q":92.62999725341797},{"t":"2021-06-13","q":92.83999633789062},{"t":"2021-06-20","q":94.22000122070312},{"t":"2021-06-27","q":95.22000122070312},{"t":"2021-07-04","q":95.29000091552734},{"t":"2021-07-11","q":95.26000213623047},{"t":"2021-07-18","q":96.41999816894531},{"t":"2021-07-25","q":95.36000061035156},{"t":"2021-08-01","q":96.91000366210938},{"t":"2021-08-08","q":97.37999725341797},{"t":"2021-08-15","q":96.58000183105469},{"t":"2021-08-22","q":97.70999908447266},{"t":"2021-08-29","q":98.20999908447266},{"t":"2021-09-05","q":97.72000122070312},{"t":"2021-09-12","q":97.16999816894531},{"t":"2021-09-19","q":97.23999786376953},{"t":"2021-09-26","q":95.75},{"t":"2021-10-03","q":97.19000244140625},{"t":"2021-10-10","q":98.86000061035156},{"t":"2021-10-17","q":99.54000091552734},{"t":"2021-10-24","q":100.69999694824219},{"t":"2021-10-31","q":102.5999984741211},{"t":"2021-11-07","q":103.41999816894531},{"t":"2021-11-14","q":104.4800033569336},{"t":"2021-11-21","q":101.0},{"t":"2021-11-28","q":100.18000030517578},{"t":"2021-12-05","q":102.91999816894531},{"t":"2021-12-12","q":102.36000061035156},{"t":"2021-12-19","q":103.81999969482422},{"t":"2021-12-26","q":104.72000122070312},{"t":"2022-01-02","q":102.77999877929688},{"t":"2022-01-09","q":101.87999725341797},{"t":"2022-01-16","q":99.81999969482422},{"t":"2022-01-23","q":98.20999908447266},{"t":"2022-01-30","q":98.20999908447266},{"t":"2022-02-06","q":99.5},{"t":"2022-02-13","q":97.52999877929688},{"t":"2022-02-20","q":97.5},{"t":"2022-02-27","q":96.88999938964844},{"t":"2022-03-06","q":95.87999725341797},{"t":"2022-03-13","q":99.55999755859375},{"t":"2022-03-20","q":101.27999877929688},{"t":"2022-03-27","q":101.45999908447266},{"t":"2022-04-03","q":102.0},{"t":"2022-04-10","q":101.27999877929688},{"t":"2022-04-17","q":99.13999938964844},{"t":"2022-04-24","q":99.41999816894531},{"t":"2022-05-01","q":96.06999969482422},{"t":"2022-05-08","q":95.76000213623047},{"t":"2022-05-15","q":92.80000305175781},{"t":"2022-05-22","q":96.30000305175781},{"t":"2022-05-29","q":95.86000061035156},{"t":"2022-06-05","q":93.11000061035156},{"t":"2022-06-12","q":88.51000213623047},{"t":"2022-06-19","q":91.83999633789062},{"t":"2022-06-26","q":90.97000122070312},{"t":"2022-07-03","q":95.19999694824219},{"t":"2022-07-10","q":94.12999725341797},{"t":"2022-07-17","q":95.93000030517578},{"t":"2022-07-24","q":98.69000244140625},{"t":"2022-07-31","q":99.36000061035156},{"t":"2022-08-07","q":101.30000305175781},{"t":"2022-08-14","q":102.12000274658203},{"t":"2022-08-21","q":100.5199966430664},{"t":"2022-08-28","q":97.77999877929688},{"t":"2022-09-04","q":98.55000305175781},{"t":"2022-09-11","q":94.48999786376953},{"t":"2022-09-18","q":92.7699966430664},{"t":"2022-09-25","q":91.33000183105469},{"t":"2022-10-02","q":92.02999877929688},{"t":"2022-10-09","q":90.69000244140625},{"t":"2022-10-16","q":91.87999725341797},{"t":"2022-10-23","q":93.75},{"t":"2022-10-30","q":92.87999725341797},{"t":"2022-11-06","q":94.9800033569336},{"t":"2022-11-13","q":94.83000183105469},{"t":"2022-11-20","q":95.95999908447266},{"t":"2022-11-27","q":96.18000030517578},{"t":"2022-12-04","q":94.4000015258789},{"t":"2022-12-11","q":91.25},{"t":"2022-12-18","q":91.01000213623047},{"t":"2022-12-25","q":90.61000061035156},{"t":"2023-01-01","q":92.95999908447266},{"t":"2023-01-08","q":94.0},{"t":"2023-01-15","q":93.61000061035156},{"t":"2023-01-22","q":95.8499984741211},{"t":"2023-01-29","q":97.5},{"t":"2023-02-05","q":96.7699966430664},{"t":"2023-02-12","q":96.41999816894531},{"t":"2023-02-19","q":94.93000030517578},{"t":"2023-02-26","q":96.33000183105469},{"t":"2023-03-05","q":93.86000061035156},{"t":"2023-03-12","q":92.6500015258789},{"t":"2023-03-19","q":92.75},{"t":"2023-03-26","q":95.33999633789062},{"t":"2023-04-02","q":94.87999725341797},{"t":"2023-04-09","q":95.48999786376953},{"t":"2023-04-16","q":95.44999694824219},{"t":"2023-04-23","q":95.33000183105469},{"t":"2023-04-30","q":95.25},{"t":"2023-05-07","q":96.20999908447266},{"t":"2023-05-14","q":97.8499984741211},{"t":"2023-05-21","q":98.37000274658203},{"t":"2023-05-28","q":99.8499984741211},{"t":"2023-06-04","q":100.23999786376953},{"t":"2023-06-11","q":101.4000015258789},{"t":"2023-06-18","q":99.25},{"t":"2023-06-25","q":100.9800033569336},{"t":"2023-07-02","q":99.6500015258789},{"t":"2023-07-09","q":100.23999786376953},{"t":"2023-07-16","q":101.54000091552734},{"t":"2023-07-23","q":103.5199966430664},{"t":"2023-07-30","q":101.69999694824219},{"t":"2023-08-06","q":100.83999633789062},{"t":"2023-08-13","q":99.08999633789062},{"t":"2023-08-20","q":100.44000244140625},{"t":"2023-08-27","q":103.13999938964844},{"t":"2023-09-03","q":102.72000122070312},{"t":"2023-09-10","q":103.62000274658203},{"t":"2023-09-17","q":101.4800033569336},{"t":"2023-09-24","q":101.0999984741211},{"t":"2023-10-01","q":100.08000183105469},{"t":"2023-10-08","q":101.73999786376953},{"t":"2023-10-15","q":98.44999694824219},{"t":"2023-10-22","q":96.83000183105469},{"t":"2023-10-29","q":100.68000030517578},{"t":"2023-11-05","q":100.86000061035156},{"t":"2023-11-12","q":102.27999877929688},{"t":"2023-11-19","q":102.94000244140625},{"t":"2023-11-26","q":104.12000274658203},{"t":"2023-12-03","q":105.36000061035156},{"t":"2023-12-10","q":106.77999877929688},{"t":"2023-12-17","q":106.68000030517578},{"t":"2023-12-24","q":107.08000183105469},{"t":"2023-12-31","q":106.41999816894531},{"t":"2024-01-07","q":107.54000091552734},{"t":"2024-01-14","q":107.63999938964844},{"t":"2024-01-21","q":110.12000274658203},{"t":"2024-01-28","q":111.33999633789062},{"t":"2024-02-04","q":112.58000183105469},{"t":"2024-02-11","q":113.69999694824219},{"t":"2024-02-18","q":114.54000091552734},{"t":"2024-02-25","q":115.04000091552734},{"t":"2024-03-03","q":115.12000274658203},{"t":"2024-03-10","q":114.80000305175781},{"t":"2024-03-17","q":117.62000274658203},{"t":"2024-03-24","q":118.27999877929688},{"t":"2024-03-31","q":116.87999725341797},{"t":"2024-04-07","q":117.72000122070312},{"t":"2024-04-14","q":114.27999877929688},{"t":"2024-04-21","q":116.44000244140625},{"t":"2024-04-28","q":116.62000274658203},{"t":"2024-05-05","q":118.63999938964844},{"t":"2024-05-12","q":119.55999755859375},{"t":"2024-05-19","q":119.4000015258789},{"t":"2024-05-26","q":117.5199966430664},{"t":"2024-06-02","q":120.45999908447266},{"t":"2024-06-09","q":121.68000030517578},{"t":"2024-06-16","q":122.69999694824219},{"t":"2024-06-23","q":123.18000030517578},{"t":"2024-06-30","q":123.41999816894531},{"t":"2024-07-07","q":124.83999633789062},{"t":"2024-07-14","q":122.0999984741211},{"t":"2024-07-21","q":121.33999633789062},{"t":"2024-07-28","q":117.5199966430664},{"t":"2024-08-04","q":118.04000091552734},{"t":"2024-08-11","q":121.73999786376953},{"t":"2024-08-18","q":122.0999984741211},{"t":"2024-08-25","q":123.0199966430664},{"t":"2024-09-01","q":118.83999633789062},{"t":"2024-09-08","q":122.69999694824219},{"t":"2024-09-15","q":123.27999877929688},{"t":"2024-09-22","q":125.55999755859375},{"t":"2024-09-29","q":126.5999984741211},{"t":"2024-10-06","q":128.1999969482422},{"t":"2024-10-13","q":129.66000366210938},{"t":"2024-10-20","q":129.02000427246094},{"t":"2024-10-27","q":127.23999786376953},{"t":"2024-11-03","q":131.97999572753906},{"t":"2024-11-10","q":131.36000061035156},{"t":"2024-11-17","q":134.82000732421875},{"t":"2024-11-24","q":134.55999755859375},{"t":"2024-12-01","q":136.0399932861328},{"t":"2024-12-08","q":135.77999877929688},{"t":"2024-12-15","q":134.05999755859375},{"t":"2024-12-22","q":134.36000061035156},{"t":"2024-12-29","q":135.24000549316406},{"t":"2025-01-05","q":133.72000122070312},{"t":"2025-01-12","q":137.02000427246094},{"t":"2025-01-19","q":137.13999938964844},{"t":"2025-01-26","q":138.86000061035156},{"t":"2025-02-02","q":138.66000366210938},{"t":"2025-02-09","q":138.6999969482422},{"t":"2025-02-16","q":138.97999572753906},{"t":"2025-02-23","q":135.82000732421875},{"t":"2025-03-02","q":128.39999389648438},{"t":"2025-03-09","q":127.08000183105469},{"t":"2025-03-16","q":128.3800048828125},{"t":"2025-03-23","q":126.9000015258789},{"t":"2025-03-30","q":115.80000305175781},{"t":"2025-04-06","q":113.91999816894531},{"t":"2025-04-13","q":115.81999969482422},{"t":"2025-04-20","q":119.80000305175781},{"t":"2025-04-27","q":124.13999938964844},{"t":"2025-05-04","q":124.94000244140625},{"t":"2025-05-11","q":130.6999969482422},{"t":"2025-05-18","q":127.13999938964844},{"t":"2025-05-25","q":128.47999572753906},{"t":"2025-06-01","q":130.17999267578125},{"t":"2025-06-08","q":128.5800018310547},{"t":"2025-06-15","q":128.0399932861328},{"t":"2025-06-22","q":130.10000610351562},{"t":"2025-06-29","q":130.27999877929688},{"t":"2025-07-06","q":131.27999877929688},{"t":"2025-07-13","q":132.5800018310547},{"t":"2025-07-20","q":133.39999389648438},{"t":"2025-07-27","q":132.0399932861328},{"t":"2025-08-03","q":134.1999969482422},{"t":"2025-08-10","q":135.47999572753906},{"t":"2025-08-17","q":136.39999389648438},{"t":"2025-08-24","q":135.47999572753906},{"t":"2025-08-31","q":135.55999755859375},{"t":"2025-09-07","q":138.33999633789062},{"t":"2025-09-14","q":139.0399932861328},{"t":"2025-09-21","q":139.05999755859375},{"t":"2025-09-28","q":141.66000366210938},{"t":"2025-10-05","q":140.1199951171875},{"t":"2025-10-12","q":140.10000610351562},{"t":"2025-10-19","q":143.0},{"t":"2025-10-23","q":143.0},{"t":"2025-10-26","q":145.5399932861328},{"t":"2025-10-27","q":145.0399932861328},{"t":"2025-10-28","q":145.22000122070312},{"t":"2025-10-29","q":145.60000610351562},{"t":"2025-10-30","q":145.66000366210938},{"t":"2025-10-31","q":145.5399932861328},{"t":"2025-11-02","q":141.5399932861328},{"t":"2025-11-03","q":145.77999877929688},{"t":"2025-11-04","q":145.25999450683594},{"t":"2025-11-05","q":145.4600067138672},{"t":"2025-11-06","q":143.36000061035156},{"t":"2025-11-07","q":141.5399932861328},{"t":"2025-11-09","q":143.67999267578125},{"t":"2025-11-10","q":144.5399932861328},{"t":"2025-11-11","q":145.02000427246094},{"t":"2025-11-12","q":145.74000549316406},{"t":"2025-11-13","q":143.82000732421875},{"t":"2025-11-14","q":143.67999267578125},{"t":"2025-11-16","q":140.8000030517578},{"t":"2025-11-17","q":143.02000427246094},{"t":"2025-11-18","q":141.17999267578125},{"t":"2025-11-19","q":141.3800048828125},{"t":"2025-11-20","q":142.22000122070312},{"t":"2025-11-21","q":140.8000030517578},{"t":"2025-11-23","q":144.83999633789062},{"t":"2025-11-24","q":142.4600067138672},{"t":"2025-11-25","q":142.8000030517578},{"t":"2025-11-26","q":144.4199981689453},{"t":"2025-11-27","q":144.25999450683594},{"t":"2025-11-28","q":144.83999633789062},{"t":"2025-11-30","q":145.16000366210938},{"t":"2025-12-01","q":144.3000030517578},{"t":"2025-12-02","q":144.25999450683594},{"t":"2025-12-03","q":144.17999267578125},{"t":"2025-12-04","q":144.5399932861328},{"t":"2025-12-05","q":145.16000366210938},{"t":"2025-12-07","q":143.17999267578125},{"t":"2025-12-08","q":144.89999389648438},{"t":"2025-12-09","q":144.97999572753906},{"t":"2025-12-10","q":144.72000122070312},{"t":"2025-12-11","q":144.0800018310547},{"t":"2025-12-12","q":143.17999267578125},{"t":"2025-12-14","q":144.17999267578125},{"t":"2025-12-15","q":143.4600067138672},{"t":"2025-12-16","q":142.44000244140625},{"t":"2025-12-17","q":141.8000030517578},{"t":"2025-12-18","q":143.52000427246094},{"t":"2025-12-19","q":144.17999267578125},{"t":"2025-12-21","q":144.6999969482422},{"t":"2025-12-22","q":144.39999389648438},{"t":"2025-12-23","q":144.6999969482422},{"t":"2025-12-28","q":145.13999938964844},{"t":"2025-12-29","q":144.97999572753906},{"t":"2025-12-30","q":145.4199981689453},{"t":"2026-01-02","q":145.13999938964844},{"t":"2026-01-04","q":148.89999389648438},{"t":"2026-01-05","q":147.0800018310547},{"t":"2026-01-06","q":147.6999969482422},{"t":"2026-01-07","q":148.0},{"t":"2026-01-08","q":147.72000122070312},{"t":"2026-01-09","q":148.89999389648438},{"t":"2026-01-11","q":149.89999389648438},{"t":"2026-01-12","q":149.0},{"t":"2026-01-13","q":149.25999450683594},{"t":"2026-01-14","q":148.39999389648438},{"t":"2026-01-15","q":150.24000549316406},{"t":"2026-01-16","q":149.89999389648438},{"t":"2026-01-18","q":147.72000122070312},{"t":"2026-01-19","q":148.0399932861328},{"t":"2026-01-20","q":146.66000366210938},{"t":"2026-01-21","q":147.0},{"t":"2026-01-22","q":147.97999572753906},{"t":"2026-01-23","q":147.72000122070312},{"t":"2026-01-25","q":147.22000122070312},{"t":"2026-01-26","q":147.24000549316406},{"t":"2026-01-27","q":147.16000366210938},{"t":"2026-01-28","q":147.3800048828125},{"t":"2026-01-29","q":146.13999938964844},{"t":"2026-01-30","q":147.22000122070312},{"t":"2026-02-01","q":147.82000732421875},{"t":"2026-02-02","q":148.5399932861328},{"t":"2026-02-03","q":148.10000610351562},{"t":"2026-02-04","q":147.75999450683594},{"t":"2026-02-05","q":146.5},{"t":"2026-02-06","q":147.82000732421875},{"t":"2026-02-08","q":147.6999969482422},{"t":"2026-02-09","q":148.5399932861328},{"t":"2026-02-10","q":148.89999389648438},{"t":"2026-02-11","q":149.0800018310547},{"t":"2026-02-12","q":147.83999633789062},{"t":"2026-02-13","q":147.6999969482422},{"t":"2026-02-15","q":149.8800048828125},{"t":"2026-02-16","q":147.5399932861328},{"t":"2026-02-17","q":147.82000732421875},{"t":"2026-02-18","q":149.5},{"t":"2026-02-19","q":149.16000366210938},{"t":"2026-02-20","q":149.8800048828125},{"t":"2026-02-22","q":149.82000732421875},{"t":"2026-02-23","q":148.82000732421875},{"t":"2026-02-24","q":149.72000122070312},{"t":"2026-02-25","q":150.86000061035156},{"t":"2026-02-26","q":150.4199981689453},{"t":"2026-02-27","q":149.82000732421875},{"t":"2026-03-01","q":148.33999633789062},{"t":"2026-03-02","q":150.02000427246094},{"t":"2026-03-03","q":147.67999267578125},{"t":"2026-03-04","q":149.3000030517578},{"t":"2026-03-05","q":148.33999633789062},{"t":"2026-03-08","q":146.77999877929688},{"t":"2026-03-09","q":146.39999389648438},{"t":"2026-03-10","q":148.5399932861328},{"t":"2026-03-11","q":148.0},{"t":"2026-03-12","q":146.9600067138672},{"t":"2026-03-13","q":146.77999877929688},{"t":"2026-03-15","q":142.63999938964844},{"t":"2026-03-16","q":147.3800048828125},{"t":"2026-03-17","q":147.8000030517578},{"t":"2026-03-18","q":146.8000030517578},{"t":"2026-03-19","q":144.27999877929688},{"t":"2026-03-20","q":142.63999938964844},{"t":"2026-03-22","q":140.97999572753906},{"t":"2026-03-23","q":143.33999633789062},{"t":"2026-03-24","q":143.24000549316406},{"t":"2026-03-25","q":144.67999267578125},{"t":"2026-03-26","q":142.9600067138672},{"t":"2026-03-27","q":140.97999572753906},{"t":"2026-03-29","q":144.74000549316406},{"t":"2026-03-30","q":141.89999389648438},{"t":"2026-03-31","q":141.82000732421875},{"t":"2026-04-01","q":144.89999389648438},{"t":"2026-04-02","q":144.74000549316406},{"t":"2026-04-05","q":148.55999755859375},{"t":"2026-04-07","q":143.9199981689453},{"t":"2026-04-08","q":148.0800018310547},{"t":"2026-04-09","q":148.16000366210938},{"t":"2026-04-10","q":148.55999755859375},{"t":"2026-04-12","q":153.66000366210938},{"t":"2026-04-13","q":148.47999572753906},{"t":"2026-04-14","q":150.27999877929688},{"t":"2026-04-15","q":150.77999877929688},{"t":"2026-04-16","q":151.6999969482422},{"t":"2026-04-17","q":153.66000366210938},{"t":"2026-04-19","q":153.60000610351562},{"t":"2026-04-20","q":152.8800048828125},{"t":"2026-04-21","q":152.55999755859375},{"t":"2026-04-22","q":153.3800048828125},{"t":"2026-04-23","q":153.77999877929688},{"t":"2026-04-24","q":153.60000610351562},{"t":"2026-04-26","q":153.9600067138672},{"t":"2026-04-27","q":153.5},{"t":"2026-04-28","q":152.8800048828125},{"t":"2026-04-29","q":153.1199951171875},{"t":"2026-04-30","q":153.9600067138672},{"t":"2026-05-03","q":158.13999938964844},{"t":"2026-05-04","q":154.55999755859375},{"t":"2026-05-05","q":155.97999572753906},{"t":"2026-05-06","q":158.05999755859375},{"t":"2026-05-07","q":157.97999572753906},{"t":"2026-05-08","q":158.13999938964844},{"t":"2026-05-10","q":159.44000244140625},{"t":"2026-05-11","q":158.6199951171875},{"t":"2026-05-12","q":156.9600067138672},{"t":"2026-05-13","q":159.13999938964844},{"t":"2026-05-14","q":161.02000427246094},{"t":"2026-05-15","q":159.44000244140625},{"t":"2026-05-17","q":161.6199951171875},{"t":"2026-05-18","q":158.44000244140625},{"t":"2026-05-19","q":158.1999969482422},{"t":"2026-05-20","q":159.75999450683594},{"t":"2026-05-21","q":159.9199981689453},{"t":"2026-05-22","q":161.6199951171875},{"t":"2026-05-24","q":163.16000366210938},{"t":"2026-05-25","q":162.77999877929688},{"t":"2026-05-26","q":162.5800018310547},{"t":"2026-05-27","q":162.1999969482422},{"t":"2026-05-28","q":162.82000732421875},{"t":"2026-05-29","q":163.16000366210938},{"t":"2026-05-31","q":162.36000061035156},{"t":"2026-06-01","q":163.9199981689453},{"t":"2026-06-02","q":164.8800048828125},{"t":"2026-06-03","q":164.13999938964844},{"t":"2026-06-04","q":163.8000030517578},{"t":"2026-06-05","q":162.36000061035156},{"t":"2026-06-07","q":162.4600067138672},{"t":"2026-06-08","q":161.55999755859375},{"t":"2026-06-09","q":159.5},{"t":"2026-06-10","q":159.24000549316406},{"t":"2026-06-11","q":159.55999755859375},{"t":"2026-06-12","q":162.4600067138672},{"t":"2026-06-14","q":165.44000244140625},{"t":"2026-06-15","q":164.60000610351562},{"t":"2026-06-16","q":164.16000366210938},{"t":"2026-06-17","q":164.63999938964844},{"t":"2026-06-18","q":165.4600067138672},{"t":"2026-06-19","q":165.44000244140625},{"t":"2026-06-21","q":163.6999969482422},{"t":"2026-06-22","q":166.0399932861328},{"t":"2026-06-23","q":163.9199981689453},{"t":"2026-06-24","q":164.8000030517578},{"t":"2026-06-25","q":164.1999969482422},{"t":"2026-06-26","q":163.6999969482422},{"t":"2026-06-28","q":165.8800048828125},{"t":"2026-06-29","q":163.44000244140625},{"t":"2026-06-30","q":165.22000122070312},{"t":"2026-07-01","q":165.94000244140625},{"t":"2026-07-02","q":164.97999572753906},{"t":"2026-07-03","q":165.8800048828125},{"t":"2026-07-05","q":166.13999938964844},{"t":"2026-07-06","q":166.60000610351562},{"t":"2026-07-07","q":164.82000732421875},{"t":"2026-07-08","q":163.77999877929688},{"t":"2026-07-09","q":165.55999755859375},{"t":"2026-07-10","q":166.13999938964844},{"t":"2026-07-12","q":163.5},{"t":"2026-07-13","q":165.77999877929688},{"t":"2026-07-14","q":165.66000366210938},{"t":"2026-07-15","q":165.8000030517578},{"t":"2026-07-16","q":165.4600067138672},{"t":"2026-07-17","q":163.5},{"t":"2026-07-19","q":164.27999877929688},{"t":"2026-07-20","q":164.17999267578125},{"t":"2026-07-21","q":165.13999938964844},{"t":"2026-07-22","q":165.39999389648438},{"t":"2026-07-23","q":163.36000061035156},{"t":"2026-07-24","q":164.27999877929688},{"t":"2026-07-26","q":162.9600067138672},{"t":"2026-07-27","q":163.36000061035156},{"t":"2026-07-28","q":163.77999877929688},{"t":"2026-07-29","q":162.39999389648438},{"t":"2026-07-30","q":162.02000427246094},{"t":"2026-07-31","q":162.9600067138672},{"t":"2026-08-02","q":168.3800048828125},{"t":"2026-08-03","q":165.10000610351562},{"t":"2026-08-04","q":167.5399932861328},{"t":"2026-08-05","q":168.0399932861328},{"t":"2026-08-06","q":167.83999633789062},{"t":"2026-08-07","q":168.3800048828125},{"t":"2026-08-09","q":168.8800048828125},{"t":"2026-08-10","q":168.47999572753906},{"t":"2026-08-11","q":168.47999572753906},{"t":"2026-08-12","q":168.8000030517578},{"t":"2026-08-13","q":169.6199951171875},{"t":"2026-08-14","q":168.8800048828125},{"t":"2026-08-16","q":166.3000030517578},{"t":"2026-08-17","q":169.05999755859375},{"t":"2026-08-18","q":166.89999389648438},{"t":"2026-08-19","q":166.5},{"t":"2026-08-20","q":165.66000366210938},{"t":"2026-08-21","q":166.3000030517578},{"t":"2026-08-23","q":168.5399932861328},{"t":"2026-08-24","q":165.6199951171875},{"t":"2026-08-25","q":166.3000030517578},{"t":"2026-08-26","q":166.5399932861328},{"t":"2026-08-27","q":167.13999938964844},{"t":"2026-08-28","q":168.5399932861328},{"t":"2026-08-30","q":167.8800048828125},{"t":"2026-08-31","q":166.66000366210938},{"t":"2026-09-01","q":166.6199951171875},{"t":"2026-09-02","q":166.82000732421875},{"t":"2026-09-03","q":168.05999755859375},{"t":"2026-09-04","q":167.8800048828125},{"t":"2026-09-06","q":166.86000061035156},{"t":"2026-09-07","q":167.77999877929688},{"t":"2026-09-08","q":167.5800018310547},{"t":"2026-09-09","q":166.22000122070312},{"t":"2026-09-10","q":165.25999450683594},{"t":"2026-09-11","q":166.86000061035156},{"t":"2026-09-13","q":167.13999938964844},{"t":"2026-09-14","q":166.22000122070312},{"t":"2026-09-15","q":165.36000061035156},{"t":"2026-09-16","q":166.3000030517578},{"t":"2026-09-17","q":167.66000366210938},{"t":"2026-09-18","q":167.13999938964844},{"t":"2026-09-20","q":169.74000549316406},{"t":"2026-09-21","q":169.47999572753906},{"t":"2026-09-22","q":170.5},{"t":"2026-09-23","q":170.0399932861328},{"t":"2026-09-24","q":168.9199981689453},{"t":"2026-09-25","q":169.74000549316406},{"t":"2026-09-27","q":171.13999938964844},{"t":"2026-09-28","q":169.1199951171875},{"t":"2026-09-29","q":169.39999389648438},{"t":"2026-09-30","q":169.77999877929688},{"t":"2026-10-01","q":169.3800048828125},{"t":"2026-10-02","q":171.13999938964844},{"t":"2026-10-04","q":172.86000061035156},{"t":"2026-10-05","q":172.89999389648438},{"t":"2026-10-06","q":173.55999755859375},{"t":"2026-10-07","q":172.9199981689453},{"t":"2026-10-08","q":171.89999389648438},{"t":"2026-10-09","q":172.86000061035156},{"t":"2026-10-11","q":170.44000244140625},{"t":"2026-10-12","q":173.47999572753906},{"t":"2026-10-13","q":172.60000610351562},{"t":"2026-10-14","q":172.47999572753906},{"t":"2026-10-15","q":170.94000244140625},{"t":"2026-10-16","q":170.44000244140625},{"t":"2026-10-18","q":169.3000030517578},{"t":"2026-10-19","q":170.8800048828125},{"t":"2026-10-20","q":170.36000061035156},{"t":"2026-10-21","q":171.32000732421875},{"t":"2026-10-22","q":169.27999877929688},{"t":"2026-10-23","q":169.3000030517578}]}</script></section>
+    <section class="card c-hydro"><h2>🌊 Hydrology<span class="sub">Danube + SHMÚ</span><span class="delta-badge down">▼ 51 m³/s</span></h2><div class="hydro-grid"><div class="hydro-box"><strong>🌊 <a href="https://www.noel.gv.at/wasserstand/" target="_blank" rel="noopener" title="Open the station graph">Thebnerstraßl ↗</a></strong><div class="big-num" style="color:var(--accent)">707 <small style="font-size:.65em;font-weight:400;color:var(--muted)">m³/s</small></div><div class="kv"><div class="k">Level</div><div class="v">75 cm (05:15)</div><div class="k">Forecast peak</div><div class="v">760 m³/s (00:00)</div><div class="k">MQ</div><div class="v">2010 m³/s</div><div class="k">RNQ</div><div class="v">1040 m³/s</div></div><div class="spark-wrap"><div class="spark-cap">📈 72h trend</div><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 46" width="100%" height="auto" role="img" font-family="system-ui,sans-serif" aria-label="Danube discharge trend over the last 72 hours"><line x1="5" y1="41" x2="295" y2="41" stroke="var(--border)" stroke-width="1"/><polyline points="5.0,38.5 11.0,35.7 17.1,34.6 23.1,38.5 29.2,39.6 35.2,37.1 41.2,38.5 47.3,38.5 53.3,41.0 59.4,39.6 65.4,37.1 71.5,32.1 77.5,28.4 83.5,26.2 89.6,24.8 95.6,26.2 101.7,26.2 107.7,24.8 113.8,23.7 119.8,22.6 125.8,23.7 131.9,22.6 137.9,21.2 144.0,18.7 150.0,14.8 156.0,12.0 162.1,12.0 168.1,9.2 174.2,6.4 180.2,5.0 186.2,6.4 192.3,9.2 198.3,10.6 204.4,9.2 210.4,5.0 216.5,5.0 222.5,6.4 228.5,9.2 234.6,12.0 240.6,12.0 246.7,12.0 252.7,13.4 258.8,14.8 264.8,16.2 270.8,16.2 276.9,18.7 282.9,22.6 289.0,24.8 295.0,24.8" fill="none" stroke="var(--chart)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="295.0" cy="24.8" r="3.5" fill="var(--accent)"/><text x="295" y="11" font-size="9" fill="var(--muted)" text-anchor="end">712 m³/s</text><text x="5" y="11" font-size="9" fill="var(--muted)" text-anchor="start">min 654</text></svg></div></div><div class="hydro-box"><strong>SHMÚ water</strong><div class="kv"><div class="k">Stations</div><div class="v">410</div><div class="k">Rising</div><div class="v">1</div><div class="k">Falling</div><div class="v">4</div></div></div></div></section>
+    <section class="card c-agenda"><h2>📅 Agenda</h2><div class="holiday up">📅 All Saints’ Day in 7d</div><div class="agenda"><div class="ev-col"><h3>💼 Work</h3><ul class="events"><li>Nothing scheduled.</li></ul></div><div class="ev-col"><h3>🏠 Private</h3><ul class="events"><li>Nothing scheduled.</li></ul></div></div></section>
+    <section class="card c-news"><h2>📰 News<span class="sub">Slovak + international</span><span class="delta-badge new">+30 new news</span></h2><div class="digest"><span class="digest-cap">⏱ Today's 3-minute digest</span><ul><li><span class="dk">Slovak</span><span class="dt">Slovakia completed its 2026 municipal and regional elections, with results showing shifts among major parties.</span></li><li><span class="dk">World</span><span class="dt">Israeli forces demolished homes in Hebron, displacing several Palestinian families.</span></li><li><span class="dk">Biz / Tech</span><span class="dt">New desert films &#x27;Odyssea&#x27; and &#x27;Sirat&#x27; spotlight the Western Sahara conflict.</span></li></ul></div><div class="news-tabs" role="tablist" aria-label="News outlets"><button type="button" class="news-tab" role="tab" id="ntab-sme" data-pane="sme" aria-selected="true" aria-controls="npane-sme">SME</button><button type="button" class="news-tab" role="tab" id="ntab-dennikn" data-pane="dennikn" aria-selected="false" aria-controls="npane-dennikn">Denník N</button><button type="button" class="news-tab" role="tab" id="ntab-postoj" data-pane="postoj" aria-selected="false" aria-controls="npane-postoj">Postoj<span class="news-badge" title="Ordered by what readers opened most, not by publication time: 5 of 5 articles ranked by Postoj itself">top</span></button><button type="button" class="news-tab" role="tab" id="ntab-kapital" data-pane="kapital" aria-selected="false" aria-controls="npane-kapital">Kapitál</button><button type="button" class="news-tab" role="tab" id="ntab-bbc" data-pane="bbc" aria-selected="false" aria-controls="npane-bbc">BBC</button><button type="button" class="news-tab" role="tab" id="ntab-guardian" data-pane="guardian" aria-selected="false" aria-controls="npane-guardian">Guardian<span class="news-badge" title="Ordered by what readers opened most, not by publication time: 5 of 5 articles ranked by Guardian itself">top</span></button><button type="button" class="news-tab" role="tab" id="ntab-nyt" data-pane="nyt" aria-selected="false" aria-controls="npane-nyt">NYT<span class="news-badge" title="Ordered by what readers opened most, not by publication time: 5 of 5 articles ranked by NYT itself">top</span></button></div><div class="news-pane" id="npane-sme" role="tabpanel" aria-labelledby="ntab-sme" data-pane="sme"><div class="news-col"><strong>SME <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/domov/c/kompletne-vysledky-komunalnych-a-vuc-volieb-2026?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Kompletné výsledky komunálnych a župných volieb 2026</a><span class="nc-age">27m</span></div><p class="nc-sum">Complete results of the 2026 municipal and regional elections released.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/svet/c/pre-cestujucich-otvorili-nove-medzinarodne-letisko-v-sydney?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Pre cestujúcich otvorili nové medzinárodné letisko v Sydney</a><span class="nc-age">57m</span></div><p class="nc-sum">A new international airport opened in Sydney for travelers.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/komentare/c/fico-oznacil-klucovy-suboj-a-ten-prehral-no-nebodoval-prakticky-nikto?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Fico označil kľúčový súboj a ten prehral. No nebodoval prakticky nikto</a><span class="nc-age">1h</span></div><p class="nc-sum">Fico called a key contest, lost it, and almost nobody voted.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/svet/c/britsky-premier-burnham-chce-uprimnu-diskusiu-o-obnoveni-volneho-pohybu-osob-s-eu?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Britský premiér Burnham chce úprimnú diskusiu o obnovení voľného pohybu osôb s EÚ</a><span class="nc-age">1h</span></div><p class="nc-sum">UK Prime Minister Burnham seeks honest talks on restoring free movement with the EU.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.sme.sk/svet/c/izrael-v-den-volieb-uzavrie-vsetky-pozemne-priechody-so-zapadnym-brehom-jordanu?utm_source=rss&amp;utm_medium=feed&amp;utm_campaign=www-rss" target="_blank" rel="noopener noreferrer">Izrael v deň volieb uzavrie všetky pozemné priechody so Západným brehom Jordánu</a><span class="nc-age">2h</span></div><p class="nc-sum">Israel will close all ground crossings with the West Bank on election day.</p></div></div></div><div class="news-pane" id="npane-dennikn" role="tabpanel" aria-labelledby="ntab-dennikn" data-pane="dennikn" hidden><div class="news-col"><strong>Denník N <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5647374/rokoval-aj-s-ps-s-trnkom-ma-dobre-vztahy-kto-je-novy-primator-kosic-lorinc/" target="_blank" rel="noopener noreferrer">Rokoval aj s PS, s Trnkom má dobré vzťahy. Kto je nový primátor Košíc Lörinc</a><span class="nc-age">3h</span></div><p class="nc-sum">Lörinc becomes Košice mayor, noting ties with PS and Trnka.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5647014/pozrite-si-ako-vyzeraju-zupne-zastupitelstva-podla-stran-a-koalicii/" target="_blank" rel="noopener noreferrer">Pozrite si, ako vyzerajú župné zastupiteľstvá podľa strán a koalícií</a><span class="nc-age">3h</span></div><p class="nc-sum">Guide shows regional councils by party and coalition.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5647244/porvaznik-trnka-tu-najblizsie-styri-roky-nebude-mat-eldorado/" target="_blank" rel="noopener noreferrer">Porvažník: Trnka tu najbližšie štyri roky nebude mať eldorádo</a><span class="nc-age">4h</span></div><p class="nc-sum">Partner says Trnka won’t have an Eldorado casino for at least four years.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5646950/jediny-zupan-z-ps-viskupic-podporili-ma-vsetci-ktori-mozu-byt-v-buducej-koalicii-mali-by-sa-inspirovat/" target="_blank" rel="noopener noreferrer">Jediný župan z PS Viskupič: Podporili ma všetci, ktorí môžu byť v budúcej koalícii. Mali by sa inšpirovať</a><span class="nc-age">4h</span></div><p class="nc-sum">Only PS regional councilor Viskupič says all potential coalition partners backed him.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://dennikn.sk/5647091/smer-dostal-facku-ale-ani-opozicia-nechytila-vlnu/" target="_blank" rel="noopener noreferrer">Smer dostal facku, ale ani opozícia nechytila vlnu</a><span class="nc-age">4h</span></div><p class="nc-sum">Smer took a hit, but the opposition failed to seize the opportunity.</p></div></div></div><div class="news-pane" id="npane-postoj" role="tabpanel" aria-labelledby="ntab-postoj" data-pane="postoj" hidden><div class="news-col"><strong>Postoj <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 5 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/202215/dve-prehry-smeru-neuspech-ps-a-zdvihnuty-prst-republiky" target="_blank" rel="noopener noreferrer">Čo ukázali županské súboje / Dve prehry Smeru, neúspech PS a zdvihnutý prst Republiky</a><span class="nc-age">5h</span></div><p class="nc-sum">Regional fights showed two Smer losses, PS failure, and Republic’s raised finger.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/202170/volebne-miestnosti-sa-otvorili-slovaci-si-vyberaju-starostov-primatorov-aj-zupanov" target="_blank" rel="noopener noreferrer">Voľby 2026 / Všetci župani obhájili posty. Vallo zdolal Ráža, Košice čaká zmena, Trnava má prvú primátorku</a><span class="nc-age">23h</span></div><p class="nc-sum">2026 elections: all regional leaders kept seats; Vallo beat Ráž, Košice gets new mayor, Trnava’s first woman mayor.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/202178/velka-nadej-krestanskych-demokratov-mozno-mozno-aj-nie" target="_blank" rel="noopener noreferrer">Nový šéf KDU-ČSL Jan Grolich / Veľká nádej kresťanských demokratov? Možno. Možno aj nie</a><span class="nc-age">15h</span></div><p class="nc-sum">Jan Grolich elected new KDU‑ČSL leader, sparking hope for Christian democrats.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://svetkrestanstva.postoj.sk/201714/kto-pride-do-moskvy" target="_blank" rel="noopener noreferrer">Patriarcha Kirill oslávi osemdesiatku / Kto príde do Moskvy?</a><span class="nc-age">17h</span></div><p class="nc-sum">Patriarch Kirill will celebrate his 80th birthday, with guests expected in Moscow.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.postoj.sk/202110/studenti-sa-chystaju-porazit-vucica-budu-to-mat-tazke" target="_blank" rel="noopener noreferrer">Reportáž z predvolebného Srbska / Študenti sa chystajú poraziť Vučića. Budú to mať ťažké</a><span class="nc-age">1d</span></div><p class="nc-sum">Serbian pre‑election report: students plan to challenge Vučić despite tough odds.</p></div></div></div><div class="news-pane" id="npane-kapital" role="tabpanel" aria-labelledby="ntab-kapital" data-pane="kapital" hidden><div class="news-col analysis"><strong>Kapitál <span class="nc-kind">/ analysis</span> <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/oktober-v-parizi/" target="_blank" rel="noopener noreferrer">Október v Paríži</a><span class="nc-age">1d</span></div><p class="nc-sum">October events take place in Paris.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/kathryn-mohr-rozhovor/" target="_blank" rel="noopener noreferrer">Zaujíma ma rozklad a zapadnuté susedstvá. Rozhovor s hudobníčkou Kathryn Mohr</a><span class="nc-age">2d</span></div><p class="nc-sum">Interview with musician Kathryn Mohr about her schedule and quiet neighborhoods.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/poustni-filmy-ktere-mlci-o-zapadni-sahare/" target="_blank" rel="noopener noreferrer">Odyssea a Sirat – pouštní filmy, které mlčí o Západní Sahaře</a><span class="nc-age">3d</span></div><p class="nc-sum">Desert films “Odyssea” and “Sirat” stay silent on Western Sahara.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/caro-claire-burke-nedavno/" target="_blank" rel="noopener noreferrer">Žena je vždy na vine</a><span class="nc-age">4d</span></div><p class="nc-sum">Article claims women are always blamed.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://kapital-noviny.sk/navi-pillay-nobelova-cena-za-mier/" target="_blank" rel="noopener noreferrer">Nobelova cena za mier pre Navi: povzbudenie v pochmúrnych časoch</a><span class="nc-age">5d</span></div><p class="nc-sum">Navi receives Nobel Peace Prize, offering hope in dark times.</p></div></div></div><div class="news-pane" id="npane-bbc" role="tabpanel" aria-labelledby="ntab-bbc" data-pane="bbc" hidden><div class="news-col"><strong>BBC <span class="nc-kind">5 articles</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/c95ynd587ynzo?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Almost 1,000 arrested as clashes follow another day of mass protests across France</a><span class="nc-age">17m</span></div><p class="nc-sum">Almost 1,000 arrested after another day of mass protests in France.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cqd09k1k7532o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Palestinian families displaced as Israeli forces demolish Hebron homes</a><span class="nc-age">5h</span></div><p class="nc-sum">Israeli forces demolish homes in Hebron, displacing Palestinian families.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/videos/cm0e0del4jewo?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Who are the candidates in Brazil&#x27;s presidential election?</a><span class="nc-age">6h</span></div><p class="nc-sum">List of candidates running in Brazil’s presidential election released.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/videos/cm89zqw9lx1do?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Fireworks and tear gas as protesters and riot police clash in Paris</a><span class="nc-age">8h</span></div><p class="nc-sum">Fireworks and tear gas erupt as protesters clash with police in Paris.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.bbc.co.uk/news/articles/cm1dwzvn6227o?at_medium=RSS&amp;at_campaign=rss" target="_blank" rel="noopener noreferrer">Vanessa Trump says she is cancer-free six months after revealing diagnosis</a><span class="nc-age">9h</span></div><p class="nc-sum">Vanessa Trump says she is cancer‑free six months after diagnosis.</p></div></div></div><div class="news-pane" id="npane-guardian" role="tabpanel" aria-labelledby="ntab-guardian" data-pane="guardian" hidden><div class="news-col"><strong>Guardian <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 5 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/uk-news/2026/oct/24/storm-boelo-travel-disrupted-events-cancelled-uk-hit-wind-and-rain" target="_blank" rel="noopener noreferrer">Storm Boelo: Travel disrupted and events cancelled as UK hit by wind and rain</a><span class="nc-age">5h</span></div><p class="nc-sum">Storm Boelo disrupts travel and cancels events across the UK.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/wellness/ng-interactive/2026/oct/24/body-donation-science" target="_blank" rel="noopener noreferrer">My mother donated her body to science. I really wasn’t prepared for what came next</a><span class="nc-age">16h</span></div><p class="nc-sum">Mother donates her body to science; author reflects on the unexpected aftermath.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/lifeandstyle/2026/oct/25/the-moment-i-knew-i-admitted-i-had-a-crush-on-her-she-replied-well-thats-good-isnt-it" target="_blank" rel="noopener noreferrer">The moment I knew: I admitted I had a crush on her. She replied, ‘Well, that’s good. Isn’t it?’</a><span class="nc-age">9h</span></div><p class="nc-sum">Person confesses crush; reply: “Well, that’s good. Isn’t it?”</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/uk-news/2026/oct/24/manhunt-under-way-to-find-prisoner-who-absconded-from-medical-facility" target="_blank" rel="noopener noreferrer">Manhunt under way to find prisoner who absconded from medical facility</a><span class="nc-age">10h</span></div><p class="nc-sum">Manhunt launched for prisoner who escaped from a medical facility.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.theguardian.com/uk-news/2026/oct/24/andy-burnham-john-healey-first-budget-devolution-growth-package" target="_blank" rel="noopener noreferrer">Healey’s first budget to include big devolution package to boost growth</a><span class="nc-age">7h</span></div><p class="nc-sum">Healey’s first budget proposes a large devolution package to boost growth.</p></div></div></div><div class="news-pane" id="npane-nyt" role="tabpanel" aria-labelledby="ntab-nyt" data-pane="nyt" hidden><div class="news-col"><strong>NYT <span class="nc-kind">5 articles</span> <span class="nc-kind nc-ranked">most-read ranks 5 of 5</span></strong><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/24/us/politics/obama-trump-midterms-campaign.html" target="_blank" rel="noopener noreferrer">Obama Issues Searing Attacks on Trump, Ramaswamy in Return to Campaign Trail</a><span class="nc-age">1h</span></div><p class="nc-sum">Obama launches sharp attacks on Trump and Ramaswamy on the campaign trail.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/24/us/politics/trump-netanyahu-iran-new-phase-of-war.html" target="_blank" rel="noopener noreferrer">A New Level of Threat and Fear Risks Pushing the U.S. and Iran Back to Full War</a><span class="nc-age">3h</span></div><p class="nc-sum">Rising U.S.–Iran threat could push both nations toward full war.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/24/opinion/elizabeth-holmes-you-can-see-everything.html" target="_blank" rel="noopener noreferrer">The Eyes of Elizabeth Holmes</a><span class="nc-age">5h</span></div><p class="nc-sum">Documentary “The Eyes of Elizabeth Holmes” released.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/24/world/europe/ukraine-starshield-drone-speed.html" target="_blank" rel="noopener noreferrer">Elon Musk Says Ukraine Violated Starlink’s Rules</a><span class="nc-age">4h</span></div><p class="nc-sum">Elon Musk accuses Ukraine of violating Starlink usage rules.</p></div><div class="nc-item"><div class="nc-head"><a class="nc-title" href="https://www.nytimes.com/2026/10/24/us/politics/democrats-expectations-blue-wave.html" target="_blank" rel="noopener noreferrer">Why Democrats Could Find It Hard to Win the Senate Despite Their Strong Polls</a><span class="nc-age">11h</span></div><p class="nc-sum">Democrats may struggle to win the Senate despite strong poll numbers.</p></div></div></div><div class="news-count">35 headlines across 7 outlets</div></section>
+    <section class="card c-jobs"><h2>💼 Job offers<span class="sub">impactpool, joshswaterjobs, profesia</span></h2><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212231" target="_blank" rel="noopener">Individual Contractor - Geospatial Analysts – Satellite Imagery and GIS (Geneva office based) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Geneva</div><div class="tags"><span class="tag top">★ top match</span><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span><span class="tag score">2 skill hits</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212232" target="_blank" rel="noopener">Individual Contractor - Geospatial Analysts – Satellite Imagery and GIS (Remote) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Remote</div><div class="tags"><span class="tag top">★ top match</span><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span><span class="tag score">2 skill hits</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212230" target="_blank" rel="noopener">Individual Contractor - Geospatial Quality Assurance, Training and Analytical Support Specialists (Remote) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Remote</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span><span class="tag score">1 skill hit</span></div></div><div class="item"><div class="it-title"><a href="https://www.impactpool.org/jobs/1212233" target="_blank" rel="noopener">Individual Contractor - Geospatial Quality Assurance, Training and Analytical Support Specialists (Geneva office based) UNITAR - United Nations Institute for Training and Research</a></div><div class="it-meta">UNITAR - United Nations Institute for Training and Research · Geneva</div><div class="tags"><span class="tag src">impactpool</span><span class="tag remote">remote</span><span class="tag">Internationally recruited Contractors Agreement level</span><span class="tag score">1 skill hit</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/394525/" target="_blank" rel="noopener">Consultancy : State of Global Water Resources report for 2026</a></div><div class="it-meta">World Meteorological Organization (WMO) · Home-based/Remote</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag remote">remote</span><span class="tag">Consultancy</span><span class="tag score">1 skill hit</span><span class="tag deadline">deadline 30 October, 2026</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/394620/" target="_blank" rel="noopener">Senior/ Principal Hydrogeologist</a></div><div class="it-meta">Groundwater Science · United Kingdom 🇬🇧</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag remote">remote</span><span class="tag">Full-Time</span></div></div><div class="item"><div class="it-title"><a href="https://www.joshswaterjobs.com/jobs/394622/" target="_blank" rel="noopener">Postdoctoral Research Fellow in Hydrology and Water Resources</a></div><div class="it-meta">University of Michigan · Ann Arbor, MI, USA 🇺🇸</div><div class="tags"><span class="tag src">joshswaterjobs</span><span class="tag">Postdoc</span><span class="tag score">2 skill hits</span><span class="tag deadline">deadline 31 January, 2027</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/rvs-group-slovensko/O5375024" target="_blank" rel="noopener">Koordinátor/ka legislatívnych povinností pre obce v oblasti prevádzky vodovodov a kanalizácií</a></div><div class="it-meta">RVS GROUP SLOVENSKO a.s. · Zochova 5, Bratislava, Slovensko (Pozícia umožňuje občasnú prácu z domu)</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">1 800 €</span><span class="tag score">1 skill hit</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/indra-avitech/O5369162" target="_blank" rel="noopener">GIS Developer (m/ž) - Letectvo</a></div><div class="it-meta">Indra Avitech, s. r. o. · Bratislava, Slovensko (Pozícia umožňuje občasnú prácu z domu)</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">2 200 €–4 000 €</span><span class="tag score">1 skill hit</span></div></div><div class="item"><div class="it-title"><a href="https://www.profesia.sk/praca/narodna-dialnicna-spolocnost/O5283696" target="_blank" rel="noopener">Špecialista prevádzky – vodohospodár (m/ž) (zástup za MD/RD)</a></div><div class="it-meta">Národná diaľničná spoločnosť, a.s. · Westend Gate, Dúbravská cesta, Karlova Ves</div><div class="tags"><span class="tag src">profesia</span><span class="tag money">1 800 €</span><span class="tag score">1 skill hit</span></div></div></section>
+    <section class="card c-reality"><h2>🏠 Real estate<span class="sub">Bratislava III</span><span class="delta-badge new">+8 new prop</span></h2><div class="item"><div class="it-title"><a href="https://www.topreality.sk/odstupenie-zahradky-400m2-mociar-raca-r9448709.html" target="_blank" rel="noopener">Odstúpenie Záhradky 400m2 / Močiar - Rača</a></div><div class="it-meta">Bratislava-Rača · Záhrada · 24.10.2026 · 400 m²</div><div class="tags"><span class="price">18 000 €</span><span class="tag pm2">45 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/6izb-rodinny-dom-s-garazou-r9447198.html" target="_blank" rel="noopener">6izb. rodinný dom s garážou</a></div><div class="it-meta">Bratislava-Vajnory · Rodinný dom · 24.10.2026 · 6-izb. · 242 m²</div><div class="tags"><span class="price">530 000 €</span><span class="tag pm2">2 190 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/exkluzivne-5-izbovy-rodinny-dom-s-2-samostatnymi-bytmi-na-pluhovej-ulici-nove-mesto-r9446558.html" target="_blank" rel="noopener">EXKLUZÍVNE: 5-izbový rodinný dom s 2 samostatnými bytmi na Pluhovej ulici (Nové Mesto)</a></div><div class="it-meta">Bratislava-Nové Mesto · Rodinný dom · 24.10.2026 · 5-izb. · 250 m²</div><div class="tags"><span class="price">768 500 €</span><span class="tag pm2">3 074 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/plus-reality-stavebny-pozemok-pre-vas-novy-domov-v-meste-bratislava-raca-na-predaj-r9439925.html" target="_blank" rel="noopener">PLUS REALITY | Stavebný pozemok pre Váš nový domov v meste Bratislava - Rača na predaj !</a></div><div class="it-meta">Bratislava-Rača · Pozemok pre rodinné domy · 24.10.2026 · 725 m²</div><div class="tags"><span class="price">340 000 €</span><span class="tag pm2">469 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/zahrada-zabi-majer-360-m2-odstupenie-r9438014.html" target="_blank" rel="noopener">Záhrada, Žabí Majer - 360 m2 - odstúpenie</a></div><div class="it-meta">Bratislava-Rača · Záhrada · 24.10.2026 · 360 m²</div><div class="tags"><span class="price">9 500 €</span><span class="tag pm2">26 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/herrys-na-predaj-4-izbova-novostavba-vo-vajnoroch-r9433981.html" target="_blank" rel="noopener">HERRYS - Na predaj 4-izbová novostavba vo Vajnoroch</a></div><div class="it-meta">Bratislava-Vajnory · Rodinný dom · 24.10.2026 · 4-izb. · 90 m²</div><div class="tags"><span class="price">380 000 €</span><span class="tag pm2">4 222 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/odstupenie-zahrady-racianska-ulica-r9428985.html" target="_blank" rel="noopener">Odstúpenie záhrady / Račianska ulica</a></div><div class="it-meta">Bratislava-Rača · Záhrada · 24.10.2026 · 400 m²</div><div class="tags"><span class="price">22 000 €</span><span class="tag pm2">55 €/m²</span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/blue-danube-living-predaj-investicny-pozemok-bratislava-nove-mesto-neronetova-ulica-plocha-pozemku-2128m2-r9442182.html" target="_blank" rel="noopener">Blue Danube Living - Predaj investičný pozemok - Bratislava-Nové Mesto, Neronetová ulica, plocha pozemku 2128m2</a></div><div class="it-meta">Bratislava-Nové Mesto · Záhrada · 25.10.2026 · 2128 m²</div><div class="tags"><span class="price"></span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/qreal-miesto-kde-sa-priroda-stretava-s-mestom-r9452430.html" target="_blank" rel="noopener">**QREAL**Miesto, kde sa príroda stretáva s mestom**</a></div><div class="it-meta">Bratislava-Rača · Pozemok pre rodinné domy · 24.10.2026 · 1193 m²</div><div class="tags"><span class="price"></span></div></div><div class="item"><div class="it-title"><a href="https://www.topreality.sk/mikelssen-na-predaj-nadstandardny-rodinny-dom-pod-lesom-v-novej-stvrti-ahoj-briezky-r9442476.html" target="_blank" rel="noopener">MIKELSSEN - Na predaj nadštandardný rodinný dom pod lesom v novej štvrti Ahoj Briežky</a></div><div class="it-meta">Bratislava-Nové Mesto · Rodinný dom · 24.10.2026 · 171 m²</div><div class="tags"><span class="price"></span></div></div></section>
+  </div>
+  <footer>Sources: impactpool.org · joshswaterjobs.com · profesia.sk · topreality.sk · noel.gv.at · shmu.sk · finance.yahoo.com · open-meteo.com · sme.sk · dennikn.sk · postoj.sk · kapital-noviny.sk · bbc.co.uk · theguardian.com · nytimes.com · garmin.com · 3 min ago · 2026-10-25 05:30</footer>
+  <nav class="archive-nav" aria-label="Previous briefs"><span class="archive-cap">Earlier briefs</span><a href="archive/2026-10-24.html" title="Brief for 2026-10-24">2026-10-24</a><a href="archive/2026-10-23.html" title="Brief for 2026-10-23">2026-10-23</a><a href="archive/2026-10-22.html" title="Brief for 2026-10-22">2026-10-22</a><a href="archive/2026-10-21.html" title="Brief for 2026-10-21">2026-10-21</a><a href="archive/2026-10-20.html" title="Brief for 2026-10-20">2026-10-20</a><a href="archive/2026-10-19.html" title="Brief for 2026-10-19">2026-10-19</a><a href="archive/2026-10-15.html" title="Brief for 2026-10-15">2026-10-15</a><a href="archive/2026-10-13.html" title="Brief for 2026-10-13">2026-10-13</a><a href="archive/2026-10-11.html" title="Brief for 2026-10-11">2026-10-11</a><a href="archive/2026-10-10.html" title="Brief for 2026-10-10">2026-10-10</a><a href="archive/2026-10-09.html" title="Brief for 2026-10-09">2026-10-09</a><a href="archive/2026-10-08.html" title="Brief for 2026-10-08">2026-10-08</a><a href="archive/2026-10-07.html" title="Brief for 2026-10-07">2026-10-07</a><a href="archive/2026-10-06.html" title="Brief for 2026-10-06">2026-10-06</a><a href="archive/2026-10-05.html" title="Brief for 2026-10-05">2026-10-05</a></nav>
+</div>
+<script>
+(function() {
+  var KEY = 'mb-theme', root = document.documentElement;
+  function explicit() {
+    try {
+      var t = localStorage.getItem(KEY);
+      return (t === 'light' || t === 'dark') ? t : null;
+    } catch (e) { return null; }
+  }
+  function systemDark() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  // Until the reader picks a mode, follow the OS. Once picked, stay put.
+  function current() { return explicit() || (systemDark() ? 'dark' : 'light'); }
+  function apply(t) {
+    root.setAttribute('data-theme', t);
+    var b = document.getElementById('themeToggle');
+    if (b) {
+      // Label the button with the mode it switches TO.
+      var to = t === 'dark' ? 'light' : 'dark';
+      var txt = t === 'dark' ? '\u2600\ufe0f' : '\uD83C\uDF19';
+      b.textContent = txt;
+      b.setAttribute('aria-label', 'Switch to ' + to + ' mode');
+      b.setAttribute('title', 'Switch to ' + to + ' mode');
+    }
+  }
+  // Two states only: every click is a visible change. The previous
+  // auto -> dark -> light cycle needed two clicks out of 'light', because the
+  // first click landed on 'auto', which looks the same on a light OS.
+  function toggle() {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+    apply(next);
+  }
+  apply(current());
+  var b = document.getElementById('themeToggle');
+  if (b) b.addEventListener('click', toggle);
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+    if (!explicit()) apply(current());
+  });
+  window.addEventListener('storage', function(e) {
+    if (e.key === KEY) apply(current());
+  });
+})();
+</script>
+<script>
+(function() {
+  // Plain tab switching: no autoplay, no transforms. The first pane ships
+  // visible and the rest carry [hidden], so this only runs when the reader
+  // clicks something.
+  var root = document.querySelector('.c-news');
+  if (!root) return;
+  var tabs = Array.prototype.slice.call(root.querySelectorAll('.news-tab'));
+  var panes = Array.prototype.slice.call(root.querySelectorAll('.news-pane'));
+  if (!tabs.length) return;
+
+  function select(fid, focus) {
+    tabs.forEach(function(t) {
+      var on = t.getAttribute('data-pane') === fid;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on && focus) t.focus();
+    });
+    panes.forEach(function(p) {
+      p.hidden = p.getAttribute('data-pane') !== fid;
+    });
+  }
+
+  tabs.forEach(function(tab, i) {
+    tab.addEventListener('click', function() {
+      select(tab.getAttribute('data-pane'), false);
+    });
+    tab.addEventListener('keydown', function(e) {
+      var next = -1;
+      if (e.key === 'ArrowRight') next = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft') next = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = tabs.length - 1;
+      if (next < 0) return;
+      e.preventDefault();
+      select(tabs[next].getAttribute('data-pane'), true);
+    });
+  });
+})();
+</script>
+<script>
+(function() {
+  // The 5-day chart columns are the day tabs; each has a matching hourly
+  // rain/UV timeline pane below. The first pane ships visible and the rest
+  // carry [hidden], so without JS the card simply shows today.
+  var root = document.querySelector('.c-weather');
+  if (!root) return;
+  var tabs = Array.prototype.slice.call(root.querySelectorAll('.fx-day'));
+  var panes = Array.prototype.slice.call(root.querySelectorAll('.fx-pane'));
+  if (!tabs.length || !panes.length) return;
+
+  function select(day, focus) {
+    tabs.forEach(function(t) {
+      var on = t.getAttribute('data-day') === day;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on && focus) t.focus();
+    });
+    panes.forEach(function(p) {
+      p.hidden = p.getAttribute('data-day') !== day;
+    });
+  }
+
+  tabs.forEach(function(tab, i) {
+    tab.addEventListener('click', function() {
+      select(tab.getAttribute('data-day'), false);
+    });
+    tab.addEventListener('keydown', function(e) {
+      var next = -1;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % tabs.length;
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + tabs.length) % tabs.length;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = tabs.length - 1;
+      else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        select(tab.getAttribute('data-day'), false);
+        return;
+      }
+      if (next < 0) return;
+      e.preventDefault();
+      select(tabs[next].getAttribute('data-day'), true);
+    });
+  });
+})();
+</script>
+<script>
+(function() {
+  var TWO_DAYS = 2 * 24 * 3600 * 1000;
+  var RANGES = {
+    '1D': TWO_DAYS,
+    '1M': 31 * 24 * 3600 * 1000,
+    '6M': 183 * 24 * 3600 * 1000,
+    '1Y': 366 * 24 * 3600 * 1000,
+    '3Y': 3 * 366 * 24 * 3600 * 1000,
+    '5Y': 5 * 366 * 24 * 3600 * 1000,
+    'MAX': Infinity
+  };
+  var W = 600, H = 190;
+  var PL = 46, PR = 12, PT = 14, PB = 24;
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function ts(p) { return Date.parse(p.t + 'T00:00:00'); }
+
+  function loadData() {
+    var el = document.getElementById('stockData');
+    if (!el) return null;
+    try { return JSON.parse(el.textContent); } catch (e) { return null; }
+  }
+
+  function sliceFor(key, pts) {
+    var ms = RANGES[key];
+    if (ms === Infinity) return pts;
+    var lastT = ts(pts[pts.length - 1]);
+    var cut = 0;
+    for (var i = pts.length - 1; i >= 0; i--) {
+      if (lastT - ts(pts[i]) <= ms) cut++; else break;
+    }
+    var out = pts.slice(pts.length - cut);
+    if (out.length < 2) out = pts.slice(pts.length - 2);
+    return out;
+  }
+
+  function niceStep(span, target) {
+    if (span <= 0) return 1;
+    var rough = span / target;
+    var pow = Math.pow(10, Math.floor(Math.log(rough) / Math.LN10));
+    var norm = rough / pow;
+    var f = norm < 1.5 ? 1 : (norm < 3 ? 2 : (norm < 7 ? 5 : 10));
+    return f * pow;
+  }
+
+function fmtTick(v, step) {
+  var dec = step >= 1 ? 0 : (step >= 0.1 ? 1 : 2);
+  return v.toFixed(dec);
+}
+
+  function fmtPrice(v) {
+    var s = v.toFixed(2);
+    if (s.indexOf('.') !== -1) s = s.replace(/0+$/, '').replace(/\.$/, '');
+    return s;
+  }
+
+  function fmtDate(iso, withYear) {
+    var p = iso.split('-');
+    if (p.length < 3) return iso;
+    var d = +p[2], m = MONTHS[+p[1] - 1], y = p[0];
+    return d + ' ' + m + (withYear ? ' ' + y : '');
+  }
+
+  function draw(points, key) {
+    var svg = document.getElementById('stockChart');
+    var tip = document.getElementById('stockTip');
+    if (tip) tip.style.display = 'none';
+    if (!svg || !points || points.length < 2) {
+      if (svg) svg.innerHTML = '';
+      window.stockPts = null;
+      return;
+    }
+    var pts = sliceFor(key, points);
+    if (pts.length < 2) return;
+    window.stockPts = pts;
+
+    var qs = pts.map(function(p) { return p.q; });
+    var min = Math.min.apply(null, qs), max = Math.max.apply(null, qs);
+    if (max - min < 1e-9) {
+      max = min + (min === 0 ? 0.5 : Math.max(Math.abs(min) * 0.01, 0.05));
+      min = min - (min === 0 ? 0.5 : Math.abs(min) * 0.01);
+    }
+    var pad = (max - min) * 0.08;
+    min -= pad; max += pad;
+
+    var x = function(i) { return PL + (i / (pts.length - 1)) * (W - PL - PR); };
+    var y = function(q) { return PT + (1 - (q - min) / (max - min)) * (H - PT - PB); };
+    window.stockMapY = y;
+
+    var d = pts.map(function(p, i) { return (i ? 'L' : 'M') + x(i).toFixed(2) + ',' + y(p.q).toFixed(2); }).join('');
+    var area = d + 'L' + x(pts.length - 1).toFixed(2) + ',' + (H - PB).toFixed(2) +
+      'L' + x(0).toFixed(2) + ',' + (H - PB).toFixed(2) + 'Z';
+
+    var grid = '', yLabels = [], xLabels = [];
+    var step = niceStep(max - min, 5);
+    var tick = Math.ceil(min / step) * step;
+    for (; tick <= max; tick += step) {
+      var gy = y(tick);
+      grid += '<line class="axis" x1="' + PL + '" y1="' + gy.toFixed(1) +
+        '" x2="' + (W - PR) + '" y2="' + gy.toFixed(1) + '"/>';
+      yLabels.push({ text: fmtTick(tick, step), x: (PL - 6) / W * 100, y: gy / H * 100 });
+    }
+    grid += '<line class="axis" x1="' + PL + '" y1="' + (H - PB) +
+      '" x2="' + (W - PR) + '" y2="' + (H - PB) + '"/>';
+
+    var spanDays = (ts(pts[pts.length - 1]) - ts(pts[0])) / 86400000;
+    var nl = spanDays <= 5 ? 2 : 4;
+    for (var j = 0; j < nl; j++) {
+      var i = Math.round(j / (nl - 1) * (pts.length - 1));
+      xLabels.push({ text: fmtDate(pts[i].t, spanDays > 400),
+        x: x(i) / W * 100, y: (H - PB + 13) / H * 100 });
+    }
+
+    var dot = '<circle class="dot" cx="' + x(pts.length - 1).toFixed(2) +
+      '" cy="' + y(qs[qs.length - 1]).toFixed(2) + '" r="2.6"/>';
+
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.innerHTML = grid +
+      '<path class="area" d="' + area + '"/>' +
+      '<path class="line" d="' + d + '"/>' +
+      dot;
+    setAxis(yLabels, xLabels);
+  }
+
+  function setAxis(yLabels, xLabels) {
+    var axis = document.getElementById('stockAxis');
+    if (!axis) return;
+    var parts = [];
+    var unit = window.stockCurrency || '';
+    if (unit) parts.push({ text: unit, cls: 'aU', x: PL / W * 100, y: 3 / H * 100 });
+    for (var k = 0; k < yLabels.length; k++) {
+      parts.push({ text: yLabels[k].text, cls: 'aY', x: yLabels[k].x, y: yLabels[k].y });
+    }
+    for (var m = 0; m < xLabels.length; m++) {
+      parts.push({ text: xLabels[m].text, cls: 'aX', x: xLabels[m].x, y: xLabels[m].y });
+    }
+    var s = '';
+    for (var n = 0; n < parts.length; n++) {
+      var p = parts[n];
+      var align = p.cls === 'aX' ? 'translateX(-50%) ' : (p.cls === 'aY' ? 'translate(-100%,-50%) ' : '');
+      s += '<div class="' + p.cls + '" style="left:' + p.x.toFixed(2) +
+        '%;top:' + p.y.toFixed(2) + '%;transform:' + align + '">' + p.text + '</div>';
+    }
+    axis.innerHTML = s;
+  }
+
+  function hideTip() {
+    var tip = document.getElementById('stockTip');
+    if (tip) tip.style.display = 'none';
+    var svg = document.getElementById('stockChart');
+    if (svg) {
+      var g = svg.querySelector('#stockHover');
+      if (g) g.parentNode.removeChild(g);
+    }
+  }
+
+  function onMove(e) {
+    var svg = document.getElementById('stockChart');
+    var pts = window.stockPts;
+    if (!svg || !pts || pts.length < 2 || !window.stockMapY) return;
+    var rect = svg.getBoundingClientRect();
+    if (rect.width < 2) return;
+    var svgX = (e.clientX - rect.left) / rect.width * W;
+    var ratio = (svgX - PL) / (W - PL - PR);
+    var i = Math.round(ratio * (pts.length - 1));
+    if (i < 0) i = 0;
+    if (i > pts.length - 1) i = pts.length - 1;
+    var px = PL + (i / (pts.length - 1)) * (W - PL - PR);
+    var py = window.stockMapY(pts[i].q);
+
+    var g = svg.querySelector('#stockHover');
+    if (!g) {
+      g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('id', 'stockHover');
+      svg.appendChild(g);
+    }
+    g.innerHTML =
+      '<line class="stock-cross" x1="' + px.toFixed(2) + '" y1="' + PT +
+      '" x2="' + px.toFixed(2) + '" y2="' + (H - PB) + '"/>' +
+      '<circle class="dot" r="3" cx="' + px.toFixed(2) + '" cy="' + py.toFixed(2) + '"/>';
+
+    var tip = document.getElementById('stockTip');
+    if (!tip) return;
+    var unit = window.stockCurrency ? ' ' + window.stockCurrency : '';
+    tip.textContent = fmtDate(pts[i].t, true) + '  ·  ' + fmtPrice(pts[i].q) + unit;
+    var w = rect.width;
+    var left = px / W * w;
+    if (left < 46) left = 46;
+    if (left > w - 46) left = w - 46;
+    tip.style.left = left + 'px';
+    tip.style.top = (py / H * rect.height) + 'px';
+    tip.style.display = 'block';
+  }
+
+  function updateMove(pts) {
+    var el = document.getElementById('stockMove');
+    if (!el || !pts || pts.length < 2) return;
+    var first = pts[0].q, last = pts[pts.length - 1].q;
+    var pct = first ? (last - first) / first * 100 : 0;
+    var up = pct >= 0;
+    el.textContent = (up ? '\u25b2' : '\u25bc') + ' ' + Math.abs(pct).toFixed(2) + '%';
+    el.classList.toggle('up', up);
+    el.classList.toggle('down', !up);
+  }
+
+  function setRange(key) {
+    var btns = document.querySelectorAll('.stock-range');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', btns[i].getAttribute('data-range') === key);
+    }
+    draw(window.stockSeries, key);
+    updateMove(window.stockPts);
+  }
+
+  var data = loadData();
+  if (data && data.series && data.series.length) {
+    window.stockSeries = data.series;
+    window.stockCurrency = data.currency || '';
+    var svgEl = document.getElementById('stockChart');
+    if (svgEl) {
+      svgEl.addEventListener('pointermove', onMove);
+      svgEl.addEventListener('pointerleave', hideTip);
+    }
+    var buttons = document.querySelectorAll('.stock-range');
+    if (buttons.length) {
+      for (var b = 0; b < buttons.length; b++) {
+        (function(btn) {
+          btn.addEventListener('click', function() { setRange(btn.getAttribute('data-range')); });
+        })(buttons[b]);
+      }
+      setRange('1M');
+    } else {
+      draw(data.series, 'MAX');
+    }
+  }
+})();
+</script>
+</body>
+</html>
