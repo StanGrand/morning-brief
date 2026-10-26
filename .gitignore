@@ -3,5 +3,6 @@
 !.gitignore
 !index.html
 !europe.html
+!.gitattributes
 !archive/
 !archive/*.html

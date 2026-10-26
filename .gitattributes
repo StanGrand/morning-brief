@@ -1,0 +1,5 @@
+# Publish raw bytes. Windows' core.autocrlf=true would otherwise rewrite
+# line endings on commit, so the deployed page would differ from the
+# generated output\index.html by a few hundred bytes and silently break the
+# SHA-256 verification step.
+* -text
