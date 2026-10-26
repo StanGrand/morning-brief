@@ -2,5 +2,6 @@
 *
 !.gitignore
 !index.html
+!europe.html
 !archive/
 !archive/*.html
