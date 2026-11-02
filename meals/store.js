@@ -7,7 +7,8 @@
  *     meals: [Meal, ...],
  *     plan:  { 'YYYY-MM-DD' (Monday): Week },   // see normPlan below
  *     settings: { avgMode: 'week' | 'planned', showPantry: boolean,
- *                 senderName: string, shareShop: boolean },   // last two: "Poslať plán"
+ *                 senderName: string, shareShop: boolean,     // these two: "Poslať plán"
+ *                 kcalTarget: number },                       // daily energy for the WHO ranges
  *     pantry: [{ key, name, aisle, added: 'YYYY-MM-DD' }]   // "Špajza"
  *   }
  *
@@ -146,7 +147,12 @@
     return { version: VERSION, meals: seedMeals(), plan: {}, settings: defaultSettings(), pantry: [] };
   }
   // avgMode: 'week' = ÷7, 'planned' = ÷ planned days; showPantry: list staples on the shopping list
-  function defaultSettings() { return { avgMode: 'week', showPantry: false, senderName: '', shareShop: false }; }
+  var KCAL_DEFAULT = 2000;
+  function defaultSettings() { return { avgMode: 'week', showPantry: false, senderName: '', shareShop: false, kcalTarget: KCAL_DEFAULT }; }
+  function kcalTarget(v) {
+    var n = Math.round(Number(v));
+    return n >= 1000 && n <= 5000 ? n : KCAL_DEFAULT;
+  }
 
   // ---- validation / normalisation (never trust what is in storage) ----
   function num(v, dflt) {
@@ -257,7 +263,8 @@
         avgMode: s.avgMode === 'planned' ? 'planned' : 'week',
         showPantry: s.showPantry === true,
         senderName: str(s.senderName).replace(/\s+/g, ' ').trim().slice(0, 40),
-        shareShop: s.shareShop === true
+        shareShop: s.shareShop === true,
+        kcalTarget: kcalTarget(s.kcalTarget)
       },
       pantry: normPantry(raw.pantry)
     };
@@ -473,6 +480,20 @@
   /** Nutrition of `servings` portions of a meal. */
   function nutritionFor(meal, servings) { return addTo(zero(), meal.nutrition, servings); }
 
+  /** WHO/FAO population intake goals (Technical Report Series 916, 2003) as
+   *  grams per day for a daily energy intake of `kcal`: protein 10-15 %,
+   *  carbohydrates 55-75 %, fat 15-30 % of energy (4 / 4 / 9 kcal per g). */
+  var WHO_SHARES = { protein: [0.10, 0.15, 4], carbs: [0.55, 0.75, 4], fat: [0.15, 0.30, 9] };
+  function whoTargets(kcal) {
+    kcal = kcalTarget(kcal);
+    var out = { calories: kcal };
+    Object.keys(WHO_SHARES).forEach(function (k) {
+      var r = WHO_SHARES[k];
+      out[k] = { min: kcal * r[0] / r[2], max: kcal * r[1] / r[2], pctMin: r[0] * 100, pctMax: r[1] * 100 };
+    });
+    return out;
+  }
+
   /** Ingredient amounts for `servings` portions (recipe is for defaultServings). */
   function scaleIngredients(meal, servings) {
     var k = servings / meal.defaultServings;
@@ -484,7 +505,11 @@
   }
 
   /** Totals for a week: per day, the pool, the whole week, and the counts
-   *  needed for the daily average. */
+   *  needed for the daily average.
+   *
+   *  Nutrition is what ONE person eats: one portion of every planned meal,
+   *  however many portions are cooked (the servings only scale the
+   *  ingredients and the shopping list). */
   function weekSummary(key) {
     var w = getWeek(key);
     var days = [], total = zero(), pool = zero(), entries = 0, servings = 0;
@@ -493,7 +518,7 @@
       list.forEach(function (e) {
         var m = getMeal(e.mealId);
         if (!m) return;
-        addTo(t, m.nutrition, e.servings);
+        addTo(t, m.nutrition, 1);
         entries++; servings += e.servings;
       });
       days.push(t);
@@ -502,7 +527,7 @@
     w.pool.forEach(function (e) {
       var m = getMeal(e.mealId);
       if (!m) return;
-      addTo(pool, m.nutrition, e.servings);
+      addTo(pool, m.nutrition, 1);
       entries++; servings += e.servings;
     });
     addTo(total, pool, 1);
@@ -627,6 +652,7 @@
     getWeek: getWeek, addToPlan: addToPlan, setServings: setServings,
     removeEntry: removeEntry, clearWeek: clearWeek, importWeek: importWeek,
     nutritionFor: nutritionFor, scaleIngredients: scaleIngredients, weekSummary: weekSummary,
+    whoTargets: whoTargets, kcalTarget: kcalTarget,
     shoppingList: shoppingList, foldKey: foldKey,
     getPantry: getPantry, inPantry: inPantry, addToPantry: addToPantry,
     removeFromPantry: removeFromPantry, clearPantry: clearPantry,

@@ -170,13 +170,53 @@ select.add:hover{color:var(--accent);border-color:var(--accent)}
   border-radius:999px;padding:3px 8px;cursor:pointer;white-space:nowrap}
 .seg button[aria-checked="true"]{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
 .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding-top:10px;border-top:1px solid var(--border)}
-.bar{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.62rem;color:var(--muted);font-weight:600}
-.bar-track{width:100%;height:46px;background:var(--cell);border-radius:5px;display:flex;align-items:flex-end;overflow:hidden}
+/* day picker: Ø (week) + one bar per day; the dashed line is the daily target */
+.bars{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;margin:2px 0 12px}
+.bar{display:flex;flex-direction:column;align-items:center;gap:4px;font:inherit;font-size:.66rem;color:var(--muted);
+  font-weight:600;background:none;border:0;border-radius:8px;padding:4px 2px;cursor:pointer;min-width:0}
+.bar:hover{background:var(--cell)}
+.bar:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.bar[aria-pressed="true"]{background:var(--cell);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.bar.wk{border-right:1px solid var(--border);border-radius:8px 0 0 8px}
+.bar-track{position:relative;width:100%;height:46px;background:var(--cell);border-radius:5px;display:flex;align-items:flex-end;overflow:hidden}
+.bar[aria-pressed="true"] .bar-track{background:var(--card)}
 .bar-fill{width:100%;background:var(--ink);opacity:.8;border-radius:5px 5px 0 0;min-height:0}
+.bar-goal{position:absolute;left:0;right:0;border-top:1px dashed var(--muted)}
 .bar.today span{color:var(--accent-text)}
 .bar.today .bar-fill{background:var(--accent);opacity:1}
 .sum-note{font-size:.7rem;color:var(--muted);margin:9px 0 0}
+.sum-note.who{font-size:.68rem}
+/* the selected day: energy ring + protein / carbs / fat against the WHO range */
+.sum-day{display:flex;align-items:center;gap:14px;margin:8px 0 12px}
+.sum-day .sum-kcal{margin:0}
+.sum-sub{font-size:.72rem;font-weight:500;color:var(--muted);letter-spacing:0;margin-top:5px}
+.ring{position:relative;flex:none;width:84px;height:84px}
+.ring svg{display:block}
+.ring-bg{fill:none;stroke:var(--cell);stroke-width:8}
+.ring-fg{fill:none;stroke:var(--ink);stroke-width:8;stroke-linecap:round;transition:stroke-dasharray .25s ease}
+.ring-fg.over{stroke:var(--accent)}
+.ring-t{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.ring-t b{font-size:.92rem;font-variant-numeric:tabular-nums}
+.ring-t small{font-size:.62rem;color:var(--muted)}
+.sum-macros-rb{display:grid;gap:10px}
+.rb-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:.76rem}
+.rb-k{font-weight:600}
+.rb-v{font-variant-numeric:tabular-nums}
+.rb-v small{color:var(--muted)}
+.rb-track{position:relative;height:8px;margin-top:4px;border-radius:999px;background:var(--cell);overflow:hidden}
+.rb-band{position:absolute;top:0;bottom:0;background:var(--ok-bg);box-shadow:inset 1px 0 0 var(--ok),inset -1px 0 0 var(--ok)}
+.rb-fill{position:absolute;left:0;top:2px;bottom:2px;border-radius:999px;background:var(--ink)}
+.rb.ok .rb-fill{background:var(--ok)}
+.rb.high .rb-fill{background:var(--accent)}
+.rb.low .rb-fill{background:var(--warn-ink)}
+.sum-target{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid var(--border);
+  font-size:.74rem;color:var(--muted)}
+.sum-target input{width:6.5em;padding:4px 8px;font:inherit;font-size:.8rem}
+/* a day name in the planner opens that day in the nutrition panel */
+button.day-pick{font:inherit;color:inherit;text-align:left;background:none;border:0;padding:0;cursor:pointer;border-radius:6px}
+button.day-pick:hover b{text-decoration:underline;text-decoration-color:var(--muted);text-underline-offset:3px}
+button.day-pick:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.day.picked{box-shadow:inset 0 0 0 1.5px var(--ink)}
 
 /* ---- recipes ---- */
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
@@ -332,9 +372,7 @@ footer.foot{color:var(--muted);font-size:.7rem;margin-top:22px;letter-spacing:.0
   .pantry-side{position:static}
   .planner{grid-template-columns:1fr}
   .plan-side{position:static}   /* days first: the week's summary follows */
-  .summary{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
-  .summary h2,.summary .bars,.summary .sum-note{grid-column:1/-1}
-  .summary .sum-block:nth-of-type(2){border-top:0;padding-top:0}
+  .summary{display:block}
 }
 @media (max-width:640px){
   .ing-head{display:none}
@@ -366,7 +404,6 @@ footer.foot{color:var(--muted);font-size:.7rem;margin-top:22px;letter-spacing:.0
   .share-foot .btn{flex:1 1 40%}
   .pantry-add .btn{justify-self:start}
   .summary{display:block}
-  .summary .sum-block:nth-of-type(2){border-top:1px solid var(--border);padding-top:10px}
   /* ‹ date › on one full row, the buttons below it */
   .weektitle{min-width:0;flex:1 1 calc(100% - 84px)}
   #weekToday,#weekClear,#weekShare{flex:1 1 auto}

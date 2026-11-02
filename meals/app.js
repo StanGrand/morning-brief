@@ -375,7 +375,9 @@
   function entryRow(e) {
     var m = Store.getMeal(e.mealId);
     if (!m) return null;
-    var t = Store.nutritionFor(m, e.servings);
+    // One portion: what one person eats (the servings only scale the
+    // ingredients and the shopping list).
+    var t = Store.nutritionFor(m, 1);
     return el('div', { cls: 'entry' }, [
       el('div', { cls: 'e-top' }, [
         el('span', { cls: 'e-name', text: m.name }),
@@ -390,7 +392,7 @@
           el('button', { type: 'button', 'data-step': '1', 'data-entry': e.id, 'data-focus': 'inc:' + e.id,
                          'aria-label': 'Pridať porciu', disabled: e.servings >= Store.MAX_SERVINGS, text: '+' })
         ]),
-        el('span', { cls: 'e-nut', text: macroLine(t) })
+        el('span', { cls: 'e-nut', title: 'Na 1 porciu', text: '1 porcia: ' + macroLine(t) })
       ]),
       m.ingredients.length
         ? el('details', { cls: 'e-ing', 'data-entry': e.id, open: !!openIngredients[e.id] },
@@ -408,9 +410,16 @@
   }
 
   function dayBlock(slot, title, sub, totals, entries, isToday) {
-    return el('div', { cls: 'day' + (isToday ? ' today' : '') + (slot === 'pool' ? ' pool' : '') }, [
+    var picked = slot !== 'pool' && selDay === slot;
+    var head = slot === 'pool'
+      ? el('div', { cls: 'day-title' }, [el('b', { text: title }), sub ? el('span', { text: sub }) : null])
+      // the day's name opens that day in the nutrition panel
+      : el('button', { type: 'button', cls: 'day-title day-pick', 'data-pick': String(slot), 'data-focus': 'pick:' + slot,
+                       'aria-pressed': picked ? 'true' : 'false', title: 'Výživa za tento deň' },
+          [el('b', { text: title }), sub ? el('span', { text: sub }) : null]);
+    return el('div', { cls: 'day' + (isToday ? ' today' : '') + (picked ? ' picked' : '') + (slot === 'pool' ? ' pool' : '') }, [
       el('div', { cls: 'day-head' }, [
-        el('div', { cls: 'day-title' }, [el('b', { text: title }), sub ? el('span', { text: sub }) : null]),
+        head,
         totals.calories ? el('span', { cls: 'day-kcal', text: int(totals.calories) + ' kcal' }) : null
       ]),
       el('div', { cls: 'day-body' }, [
@@ -431,49 +440,124 @@
     $('weekToday').hidden = diff === 0;
   }
 
+  // ---- nutrition panel: one portion per meal, WHO ranges, per day or week
+  var selDay = defaultDay();      // 0..6 = that day only, null = the whole week
+
+  function defaultDay() { return week === thisWeek ? (new Date().getDay() + 6) % 7 : null; }
+
+  function ring(value, target) {
+    // progress circle for the day's energy vs the daily target
+    var R = 34, C = 2 * Math.PI * R, p = target ? value / target : 0;
+    var shown = Math.min(p, 1), over = p > 1.1;
+    var svg = '<svg viewBox="0 0 80 80" width="84" height="84" aria-hidden="true">' +
+      '<circle cx="40" cy="40" r="' + R + '" class="ring-bg"/>' +
+      '<circle cx="40" cy="40" r="' + R + '" class="ring-fg' + (over ? ' over' : '') + '" stroke-dasharray="' +
+      (C * shown).toFixed(1) + ' ' + C.toFixed(1) + '" transform="rotate(-90 40 40)"/></svg>';
+    var box = el('div', { cls: 'ring', role: 'img', 'aria-label': int(value) + ' z ' + int(target) + ' kcal (' + Math.round(p * 100) + ' %)' });
+    box.innerHTML = svg;
+    box.appendChild(el('div', { cls: 'ring-t' }, [el('b', { text: Math.round(p * 100) + ' %' }), el('small', { text: 'z ' + int(target) })]));
+    return box;
+  }
+
+  function rangeBar(label, value, r) {
+    // a bar with the recommended range shaded; the fill is the amount eaten
+    var top = r.max * 1.35, pct = function (v) { return Math.max(0, Math.min(100, v / top * 100)); };
+    var state = value < r.min ? 'low' : value > r.max ? 'high' : 'ok';
+    var word = state === 'low' ? 'pod odporúčaním' : state === 'high' ? 'nad odporúčaním' : 'v odporúčanom rozsahu';
+    return el('div', { cls: 'rb ' + state }, [
+      el('div', { cls: 'rb-top' }, [
+        el('span', { cls: 'rb-k', text: label }),
+        el('span', { cls: 'rb-v' }, [el('b', { text: int(value) + ' g' }),
+          el('small', { text: ' · ' + int(r.min) + '–' + int(r.max) + ' g' })])
+      ]),
+      el('div', { cls: 'rb-track', role: 'img', 'aria-label': label + ' ' + int(value) + ' g, ' + word +
+                  ' (' + int(r.min) + '–' + int(r.max) + ' g, ' + r.pctMin + '–' + r.pctMax + ' % energie)' }, [
+        el('span', { cls: 'rb-band', style: 'left:' + pct(r.min).toFixed(1) + '%;width:' + (pct(r.max) - pct(r.min)).toFixed(1) + '%' }),
+        el('span', { cls: 'rb-fill', style: 'width:' + pct(value).toFixed(1) + '%' })
+      ])
+    ]);
+  }
+
   function renderSummary(s) {
     var mode = Store.getSetting('avgMode');
+    var kcal = Store.kcalTarget(Store.getSetting('kcalTarget'));
+    var who = Store.whoTargets(kcal);
+    var monday = Store.parseKey(week);
+    var todayIdx = week === thisWeek ? (new Date().getDay() + 6) % 7 : -1;
     var div = mode === 'planned' && s.plannedDays ? s.plannedDays : 7;
     var avg = { calories: s.total.calories / div, protein: s.total.protein / div,
                 carbs: s.total.carbs / div, fat: s.total.fat / div };
-    var max = Math.max.apply(null, s.days.map(function (d) { return d.calories; }).concat([1]));
-    var todayIdx = week === thisWeek ? (new Date().getDay() + 6) % 7 : -1;
+    var max = Math.max.apply(null, s.days.map(function (d) { return d.calories; }).concat([kcal, 1]));
+    var day = selDay, t = day === null ? avg : s.days[day];
 
-    function block(label, t, extra) {
-      return el('div', { cls: 'sum-block' }, [
-        el('div', { cls: 'sum-label' }, [el('span', { text: label }), extra || null]),
-        el('div', { cls: 'sum-kcal' }, [int(t.calories), el('small', { text: ' kcal' })]),
-        el('div', { cls: 'sum-macros' }, [
-          macro('Bielkoviny', t.protein, ' g'), macro('Sacharidy', t.carbs, ' g'), macro('Tuky', t.fat, ' g')
-        ])
-      ]);
-    }
-    var seg = el('div', { cls: 'seg', role: 'radiogroup', 'aria-label': 'Priemer počítať' }, [
-      el('button', { type: 'button', role: 'radio', 'data-avg': 'week', 'data-focus': 'avg:week',
-                     'aria-checked': mode !== 'planned' ? 'true' : 'false', text: '÷ 7 dní' }),
-      el('button', { type: 'button', role: 'radio', 'data-avg': 'planned', 'data-focus': 'avg:planned',
-                     'aria-checked': mode === 'planned' ? 'true' : 'false',
-                     text: '÷ ' + s.plannedDays + ' ' + (s.plannedDays === 1 ? 'deň' : s.plannedDays >= 2 && s.plannedDays <= 4 ? 'dni' : 'dní') + ' s plánom' })
-    ]);
     var box = $('summary');
     box.textContent = '';
-    box.appendChild(el('h2', null, ['Sumár týždňa',
-      el('span', { cls: 'sub', text: s.entries ? s.entries + '× jedlo · ' + portions(s.servings) : 'prázdny' })]));
-    box.appendChild(block('Spolu za týždeň', s.total));
-    box.appendChild(block('Denný priemer', avg, seg));
-    if (mode === 'planned' && !s.plannedDays) {
-      box.appendChild(el('p', { cls: 'sum-note', text: 'Žiadny deň nemá jedlo, priemer je ÷ 7.' }));
-    }
-    box.appendChild(el('div', { cls: 'bars', 'aria-hidden': 'true' }, s.days.map(function (d, i) {
-      return el('div', { cls: 'bar' + (i === todayIdx ? ' today' : ''), title: DAY_NAMES[i] + ': ' + int(d.calories) + ' kcal' }, [
-        el('div', { cls: 'bar-track' }, [el('div', { cls: 'bar-fill', style: 'height:' + Math.round(d.calories / max * 100) + '%' })]),
+    box.appendChild(el('h2', null, ['Výživa', el('span', { cls: 'sub', text: '1 porcia z každého jedla' })]));
+
+    // day picker: the week's bars double as buttons
+    box.appendChild(el('div', { cls: 'bars', role: 'group', 'aria-label': 'Vybrať deň' }, [
+      el('button', { type: 'button', cls: 'bar wk', 'data-pick': 'week', 'data-focus': 'pick:week',
+                     'aria-pressed': day === null ? 'true' : 'false', title: 'Celý týždeň' }, [
+        el('div', { cls: 'bar-track' }, [el('div', { cls: 'bar-fill', style: 'height:' + Math.round(avg.calories / max * 100) + '%' })]),
+        el('span', { text: 'Ø' })
+      ])
+    ].concat(s.days.map(function (d, i) {
+      var dd = new Date(monday); dd.setDate(monday.getDate() + i);
+      return el('button', { type: 'button', cls: 'bar' + (i === todayIdx ? ' today' : ''), 'data-pick': String(i),
+                            'data-focus': 'pick:s' + i, 'aria-pressed': day === i ? 'true' : 'false',
+                            title: DAY_NAMES[i] + ' ' + dm(dd) + ': ' + int(d.calories) + ' kcal' }, [
+        el('div', { cls: 'bar-track' }, [
+          el('div', { cls: 'bar-goal', style: 'bottom:' + Math.round(kcal / max * 100) + '%' }),
+          el('div', { cls: 'bar-fill', style: 'height:' + Math.round(d.calories / max * 100) + '%' })
+        ]),
         el('span', { text: DAY_SHORT[i] })
       ]);
-    })));
-    if (s.pool.calories) {
-      box.appendChild(el('p', { cls: 'sum-note', text: 'Týždenný výber (' + int(s.pool.calories) +
-        ' kcal) je v súčte aj v priemere, v stĺpcoch dní nie.' }));
+    }))));
+
+    var title;
+    if (day === null) {
+      title = el('div', { cls: 'sum-label' }, [el('span', { text: 'Denný priemer týždňa' }),
+        el('div', { cls: 'seg', role: 'radiogroup', 'aria-label': 'Priemer počítať' }, [
+          el('button', { type: 'button', role: 'radio', 'data-avg': 'week', 'data-focus': 'avg:week',
+                         'aria-checked': mode !== 'planned' ? 'true' : 'false', text: '÷ 7 dní' }),
+          el('button', { type: 'button', role: 'radio', 'data-avg': 'planned', 'data-focus': 'avg:planned',
+                         'aria-checked': mode === 'planned' ? 'true' : 'false',
+                         text: '÷ ' + s.plannedDays + ' ' + (s.plannedDays === 1 ? 'deň' : s.plannedDays >= 2 && s.plannedDays <= 4 ? 'dni' : 'dní') + ' s plánom' })
+        ])]);
+    } else {
+      var dd = new Date(monday); dd.setDate(monday.getDate() + day);
+      title = el('div', { cls: 'sum-label' }, [el('span', { text: DAY_NAMES[day] + ' ' + dm(dd) + (day === todayIdx ? ' · dnes' : '') })]);
     }
+    var empty = !t.calories;
+    box.appendChild(el('div', { cls: 'sum-block' }, [
+      title,
+      el('div', { cls: 'sum-day' }, [
+        ring(t.calories, kcal),
+        el('div', { cls: 'sum-kcal' }, [int(t.calories), el('small', { text: ' kcal' }),
+          el('div', { cls: 'sum-sub', text: empty ? (day === null ? 'Tento týždeň nie je nič naplánované.' : 'Na tento deň nie je nič naplánované.')
+                                                   : 'cieľ ' + int(kcal) + ' kcal' })])
+      ]),
+      el('div', { cls: 'sum-macros-rb' }, [
+        rangeBar('Bielkoviny', t.protein, who.protein),
+        rangeBar('Sacharidy', t.carbs, who.carbs),
+        rangeBar('Tuky', t.fat, who.fat)
+      ])
+    ]));
+    if (day === null) {
+      box.appendChild(el('p', { cls: 'sum-note', text: 'Spolu za týždeň: ' + macroLine(s.total) +
+        (s.pool.calories ? ' (vrátane týždenného výberu ' + int(s.pool.calories) + ' kcal, v dňoch nie je).' : '.') }));
+      if (mode === 'planned' && !s.plannedDays) {
+        box.appendChild(el('p', { cls: 'sum-note', text: 'Žiadny deň nemá jedlo, priemer je ÷ 7.' }));
+      }
+    }
+    box.appendChild(el('label', { cls: 'sum-target' }, [
+      el('span', { text: 'Denný príjem energie' }),
+      el('input', { type: 'number', id: 'kcalTarget', min: '1000', max: '5000', step: '50', inputmode: 'numeric',
+                    value: String(kcal), 'data-focus': 'kcal' }),
+      el('span', { text: 'kcal' })
+    ]));
+    box.appendChild(el('p', { cls: 'sum-note who', text: 'Odporúčanie WHO/FAO: bielkoviny 10–15 %, sacharidy 55–75 %, ' +
+      'tuky 15–30 % dennej energie. Rozsahy v gramoch sú prepočítané na ' + int(kcal) + ' kcal.' }));
   }
 
   function renderPlanner() {
@@ -509,6 +593,7 @@
   $('days').addEventListener('click', function (e) {
     var b = e.target.closest('button');
     if (!b) return;
+    if (b.dataset.pick) { pick(b.dataset.pick); return; }
     if (b.dataset.step) {
       var entry = findEntry(b.dataset.entry);
       if (entry) Store.setServings(week, entry.id, entry.servings + Number(b.dataset.step));
@@ -526,10 +611,22 @@
       if (d.open) openIngredients[d.dataset.entry] = true; else delete openIngredients[d.dataset.entry];
     }
   }, true);
+  function pick(v) {
+    var d = v === 'week' ? null : Number(v);
+    selDay = selDay === d && d !== null ? null : d;   // a second click goes back to the week
+    renderPlanner();
+  }
   $('summary').addEventListener('click', function (e) {
+    var p = e.target.closest('[data-pick]');
+    if (p) { pick(p.dataset.pick); return; }
     var b = e.target.closest('[data-avg]');
     if (!b) return;
     Store.setSetting('avgMode', b.dataset.avg);
+    renderPlanner();
+  });
+  $('summary').addEventListener('change', function (e) {
+    if (e.target.id !== 'kcalTarget') return;
+    Store.setSetting('kcalTarget', Store.kcalTarget(e.target.value));
     renderPlanner();
   });
 
@@ -541,9 +638,9 @@
     return hit;
   }
 
-  $('weekPrev').addEventListener('click', function () { week = Store.shiftWeek(week, -1); renderPlanner(); });
-  $('weekNext').addEventListener('click', function () { week = Store.shiftWeek(week, 1); renderPlanner(); });
-  $('weekToday').addEventListener('click', function () { week = thisWeek; renderPlanner(); $('weekNext').focus(); });
+  $('weekPrev').addEventListener('click', function () { week = Store.shiftWeek(week, -1); selDay = defaultDay(); renderPlanner(); });
+  $('weekNext').addEventListener('click', function () { week = Store.shiftWeek(week, 1); selDay = defaultDay(); renderPlanner(); });
+  $('weekToday').addEventListener('click', function () { week = thisWeek; selDay = defaultDay(); renderPlanner(); $('weekNext').focus(); });
   $('weekClear').addEventListener('click', async function () {
     var s = Store.weekSummary(week);
     if (!s.entries) return;
@@ -1029,7 +1126,7 @@
     var mode = $('importMode').hidden ? 'add'
       : (importDlg.querySelector('input[name="importMode"]:checked') || {}).value || 'replace';
     var n = Store.importWeek(p.week, p.days.map(conv), conv(p.pool), mode);
-    week = p.week;
+    week = p.week; selDay = defaultDay();
     openIngredients = {};
     renderAll();
     toast('Plán načítaný: ' + n + '× jedlo, týždeň ' + rangeOf(p.week) + '.');
