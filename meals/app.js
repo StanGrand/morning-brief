@@ -413,8 +413,10 @@
         el('div', { cls: 'day-title' }, [el('b', { text: title }), sub ? el('span', { text: sub }) : null]),
         totals.calories ? el('span', { cls: 'day-kcal', text: int(totals.calories) + ' kcal' }) : null
       ]),
-      el('div', { cls: 'entries' }, entries.map(entryRow)),
-      addSelect(slot, 'Pridať jedlo: ' + title)
+      el('div', { cls: 'day-body' }, [
+        el('div', { cls: 'entries' }, entries.map(entryRow)),
+        addSelect(slot, 'Pridať jedlo: ' + title)
+      ])
     ]);
   }
 

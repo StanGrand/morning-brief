@@ -113,22 +113,26 @@ input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--accent);mar
 .weektitle strong{font-size:.95rem;font-weight:700;font-variant-numeric:tabular-nums}
 .weektitle span{font-size:.68rem;color:var(--muted);letter-spacing:.04em}
 #weekClear{margin-left:auto}
-.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;align-items:start}
-.day{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
-  padding:11px 12px 12px;box-shadow:var(--shadow);min-width:0;display:flex;flex-direction:column;gap:7px}
-.day.today{box-shadow:inset 0 0 0 1.5px var(--accent),var(--shadow)}
-.day.pool{background:var(--cell);box-shadow:none;border-style:dashed}
-.day-head{display:flex;align-items:baseline;gap:8px}
-.day-title{display:flex;align-items:baseline;gap:2px 7px;min-width:0;flex-wrap:wrap}
-.day.pool .day-title b{white-space:nowrap}
-.day-title b{font-size:.84rem;font-weight:700}
-.day-title span{font-size:.7rem;color:var(--muted);white-space:nowrap}
+.days{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden}
+/* one row per day: label column + meals as tiles (a timetable, not a masonry) */
+.day{display:grid;grid-template-columns:118px minmax(0,1fr);gap:12px;padding:12px 14px 12px 16px;
+  border-top:1px solid var(--border);min-width:0;position:relative}
+.day:first-child{border-top:0}
+.day.today{background:linear-gradient(90deg,var(--accent-soft),transparent 55%)}
+.day.today::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.day.pool{background:var(--cell);border-top:1px dashed var(--border)}
+.day-head{display:flex;flex-direction:column;gap:2px;padding-top:3px;min-width:0}
+.day-title{display:flex;flex-direction:column;gap:1px;min-width:0}
+.day-title b{font-size:.86rem;font-weight:700}
+.day-title span{font-size:.7rem;color:var(--muted)}
 .day.today .day-title span{color:var(--accent-text);font-weight:600}
-.day-kcal{margin-left:auto;font-size:.72rem;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.day-kcal{font-size:.72rem;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;margin-top:4px}
+.day-body{display:flex;flex-direction:column;gap:8px;min-width:0;align-items:flex-start}
+.entries{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;width:100%;align-items:start}
 .entries:empty{display:none}
-.entry{background:var(--cell);border-radius:var(--radius-inner);padding:7px 8px 7px 10px;margin-top:5px}
-.entry:first-child{margin-top:0}
-.day.pool .entry{background:var(--card)}
+.entry{background:var(--cell);border-radius:var(--radius-inner);padding:7px 8px 7px 10px;min-width:0}
+.day.pool .entry,.day.today .entry{background:var(--card);box-shadow:inset 0 0 0 1px var(--border)}
 .e-top{display:flex;align-items:flex-start;gap:6px}
 .e-name{flex:1 1 auto;font-size:.82rem;font-weight:600;line-height:1.25;padding-top:4px;min-width:0}
 .entry .x{width:24px;height:24px;font-size:.95rem;border-color:transparent;background:none;color:var(--muted)}
@@ -146,7 +150,8 @@ input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--accent);mar
 .e-ing summary,.ingr summary{font-size:.7rem;color:var(--muted);cursor:pointer;width:max-content;max-width:100%}
 .e-ing summary:hover,.ingr summary:hover{color:var(--accent)}
 .e-ing[open]{padding-bottom:2px}
-select.add{font-size:.76rem;color:var(--muted);background:transparent;border-style:dashed;cursor:pointer}
+select.add{font-size:.76rem;color:var(--muted);background:transparent;border-style:dashed;cursor:pointer;
+  width:auto;min-width:190px;max-width:100%;padding-top:5px;padding-bottom:5px}
 select.add:hover{color:var(--accent);border-color:var(--accent)}
 
 /* summary card */
@@ -326,7 +331,7 @@ footer.foot{color:var(--muted);font-size:.7rem;margin-top:22px;letter-spacing:.0
   .shop-export{position:static;order:-1}
   .pantry-side{position:static}
   .planner{grid-template-columns:1fr}
-  .plan-side{position:static;order:-1}
+  .plan-side{position:static}   /* days first: the week's summary follows */
   .summary{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
   .summary h2,.summary .bars,.summary .sum-note{grid-column:1/-1}
   .summary .sum-block:nth-of-type(2){border-top:0;padding-top:0}
@@ -340,6 +345,13 @@ footer.foot{color:var(--muted);font-size:.7rem;margin-top:22px;letter-spacing:.0
   .i-pantry{grid-area:p;justify-self:end}.i-del{grid-area:d}
   .fgrid.four{grid-template-columns:1fr 1fr}
   .pantry-add{grid-template-columns:1fr 1fr}
+  /* phones: day label above its meals */
+  .day{grid-template-columns:minmax(0,1fr);gap:8px;padding:11px 12px 12px 14px}
+  .day-head{flex-direction:row;align-items:baseline;padding-top:0}
+  .day-title{flex-direction:row;align-items:baseline;gap:7px}
+  .day-kcal{margin:0 0 0 auto}
+  .entries{grid-template-columns:minmax(0,1fr)}
+  .day-body select.add{width:100%}
   .pantry-add .p-name{grid-column:1/-1}
 }
 @media (max-width:520px){
@@ -355,7 +367,9 @@ footer.foot{color:var(--muted);font-size:.7rem;margin-top:22px;letter-spacing:.0
   .pantry-add .btn{justify-self:start}
   .summary{display:block}
   .summary .sum-block:nth-of-type(2){border-top:1px solid var(--border);padding-top:10px}
-  .weektitle{min-width:0;flex:1}
+  /* ‹ date › on one full row, the buttons below it */
+  .weektitle{min-width:0;flex:1 1 calc(100% - 84px)}
+  #weekToday,#weekClear,#weekShare{flex:1 1 auto}
   #weekClear{margin-left:0}
   .fgrid{grid-template-columns:1fr 96px}
   .dlg,.dlg.share{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;margin:0}
