@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mushroom map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin="">
+<style>
+  :root {
+    --bg:#fafafa; --card:#ffffff; --ink:#0d0d0d; --muted:#6a6a6a;
+    --accent:#d6220d; --hair:#e6e6e6; --cell:#f4f4f4; --ok:#1a7f4b; --home:#2563b8;
+    --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) {
+    --bg:#0b0b0b; --card:#151515; --ink:#f5f5f5; --muted:#9b9b9b;
+    --accent:#ff4b33; --hair:#262626; --cell:#1c1c1c; --ok:#5ed88a; --home:#60a5fa;
+  } }
+  :root[data-theme="dark"] {
+    --bg:#0b0b0b; --card:#151515; --ink:#f5f5f5; --muted:#9b9b9b;
+    --accent:#ff4b33; --hair:#262626; --cell:#1c1c1c; --ok:#5ed88a; --home:#60a5fa;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; }
+  body { font:15px/1.45 var(--body); color:var(--ink); background:var(--bg); overflow:hidden;
+    -webkit-font-smoothing:antialiased; }
+  header { position:fixed; top:0; left:0; right:0; z-index:1000; display:flex; align-items:center;
+    flex-wrap:wrap; gap:10px 18px; background:var(--bg); border-bottom:1px solid var(--hair);
+    padding:14px max(20px, env(safe-area-inset-right,0px)) 14px max(20px, env(safe-area-inset-left,0px)); }
+  .backlink { display:inline-flex; align-items:center; gap:9px; color:var(--ink); text-decoration:none;
+    font:600 1.15rem/1.1 var(--body); letter-spacing:-.02em; white-space:nowrap; }
+  .backlink:hover { opacity:.75; }
+  .brand-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); flex:none; }
+  header h1 { font:400 .95rem/1.2 var(--body); color:var(--muted); margin:0; }
+  header h1::before { content:"/"; margin-right:12px; opacity:.5; }
+  #search { flex:0 1 280px; min-width:140px; margin-left:auto; padding:7px 14px; border-radius:999px;
+    border:1px solid var(--hair); background:var(--card); color:var(--ink); font:inherit; font-size:.9rem; outline:none; }
+  #search::placeholder { color:var(--muted); }
+  #search:focus { border-color:var(--ink); }
+  header .sub { color:var(--muted); font-size:.86rem; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .theme-btn { width:32px; height:32px; border-radius:50%; border:1px solid transparent; padding:0;
+    background:transparent; color:var(--muted); cursor:pointer; font:400 1rem/1 var(--body); }
+  .theme-btn:hover { color:var(--ink); border-color:var(--hair); }
+  @media (max-width:640px) {
+    header { gap:8px 12px; } header h1 { display:none; }
+    #search { flex:1 1 100%; order:3; margin-left:0; } .sub { margin-left:auto; }
+  }
+  #map { position:fixed; top:var(--head,61px); left:0; right:0; bottom:0; }
+  .leaflet-container { background:var(--bg); font:inherit; }
+  .leaflet-bar, .leaflet-touch .leaflet-bar { border:1px solid var(--hair) !important; box-shadow:none !important;
+    border-radius:10px; overflow:hidden; }
+  .leaflet-bar a, .leaflet-bar a:hover { background:var(--card); color:var(--ink); border-bottom:1px solid var(--hair);
+    width:32px; height:32px; font:400 18px/30px var(--body); }
+  .leaflet-bar a:last-child { border-bottom:0; }
+  .leaflet-control-attribution { font-size:10px !important; background:color-mix(in srgb, var(--bg) 80%, transparent) !important;
+    color:var(--muted) !important; }
+  .leaflet-control-attribution a { color:var(--muted) !important; }
+  .leaflet-popup-content-wrapper { border-radius:12px; box-shadow:none; border:1px solid var(--hair);
+    background:var(--card); color:var(--ink); }
+  .leaflet-popup-tip { background:var(--card); box-shadow:none; border:1px solid var(--hair); }
+  .leaflet-popup-content { margin:14px 16px; min-width:220px; max-width:290px; line-height:1.4; }
+  .leaflet-container a.leaflet-popup-close-button { color:var(--muted); font:400 18px/24px var(--body); width:24px; height:24px;
+    top:6px; right:6px; border-radius:50%; background:color-mix(in srgb, var(--card) 85%, transparent); z-index:2; }
+  .popup-img { display:block; margin:-14px -16px 12px; height:150px; overflow:hidden; border-radius:11px 11px 0 0; background:var(--cell); }
+  .popup-img img { width:100%; height:100%; object-fit:cover; display:block; }
+  .popup-title { font-weight:600; font-size:.95rem; margin:0 18px 2px 0; letter-spacing:-.01em; }
+  .popup-meta, .popup-approx { color:var(--muted); font-size:.8rem; margin:0 0 8px; }
+  .popup-approx { font-style:italic; margin-top:-4px; font-size:.76rem; }
+  .popup-text { font-size:.86rem; margin:0 0 8px; max-height:9.5em; overflow:auto; overflow-wrap:anywhere; }
+  .verdict { font-weight:600; font-size:.8rem; }
+  .verdict.yes { color:var(--ok); } .verdict.no { color:var(--muted); }
+  .chips { display:flex; flex-wrap:wrap; gap:4px 10px; font-size:.78rem; color:var(--muted); margin:0 0 10px; }
+  .leaflet-container a.popup-link { color:var(--ink); font-size:.84rem; text-decoration:underline;
+    text-decoration-color:var(--hair); text-underline-offset:3px; }
+  .leaflet-container a.popup-link:hover { text-decoration-color:var(--ink); }
+  .links { display:flex; gap:14px; flex-wrap:wrap; }
+
+  .mk { background:transparent !important; border:none !important; }
+  .dot { display:block; width:12px; height:12px; border-radius:50%; transform:translate(-6px,-6px);
+    background:var(--ok); border:2px solid var(--card); box-shadow:0 0 0 1px var(--ok); }
+  .dot.no { background:var(--card); border:2px solid var(--muted); box-shadow:0 0 0 1px var(--card); }
+  .dot.age1 { opacity:.75; } .dot.age2 { opacity:.45; }
+  .dot.on { width:16px; height:16px; transform:translate(-8px,-8px); box-shadow:0 0 0 2px var(--ink); }
+  .near-ring { stroke:var(--home); opacity:.7; }
+  .home-dot { display:block; width:10px; height:10px; border-radius:50%; background:var(--home); border:2px solid var(--card);
+    box-shadow:0 0 0 1px var(--home); transform:translate(-5px,-5px); }
+  .clu { display:flex; align-items:center; justify-content:center; border-radius:50%;
+    background:var(--card); color:var(--ink); border:1px solid var(--hair); font:600 12px/1 var(--body);
+    font-variant-numeric:tabular-nums; }
+  .clu.some { border-color:var(--ok); box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--ok) 35%, transparent); }
+  .clu:hover, .clu.hl { border-color:var(--ink); }
+
+  .legend { position:fixed; bottom:16px; left:16px; z-index:1000; max-width:calc(100vw - 32px);
+    background:var(--card); border:1px solid var(--hair); border-radius:12px; padding:5px;
+    font-size:.8rem; color:var(--muted); display:flex; align-items:center; flex-wrap:wrap; gap:2px; }
+  .legend .sep { width:1px; align-self:stretch; background:var(--hair); margin:4px; }
+  .fbtn, .legend select { border:0; background:none; color:var(--muted); font:500 .8rem/1 var(--body);
+    padding:7px 10px; border-radius:999px; cursor:pointer; display:inline-flex; gap:6px; align-items:center; }
+  .legend select { appearance:none; -webkit-appearance:none; }
+  .legend select option { background:var(--card); color:var(--ink); }
+  .fbtn:hover, .legend select:hover, .legend select.set { color:var(--ink); }
+  .legend select.set { background:var(--cell); box-shadow:0 0 0 1px var(--hair); }
+  .fbtn.kind[aria-pressed="false"] { text-decoration:line-through; }
+  .fbtn .dot { transform:none; width:10px; height:10px; }
+  .fbtn.reset { text-decoration:underline; text-decoration-color:var(--hair); text-underline-offset:3px; }
+  .fbtn[hidden] { display:none; }
+  .fbtn:focus-visible, .legend select:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+  @media (max-width:640px) { .legend { bottom:12px; left:8px; right:8px; max-width:none; } }
+
+  #panel { position:fixed; z-index:1001; top:calc(var(--head, 61px) + 12px); right:12px; bottom:12px;
+    width:min(380px, calc(100vw - 24px)); background:var(--card); border:1px solid var(--hair);
+    border-radius:14px; display:flex; flex-direction:column; overflow:hidden; }
+  #panel[hidden] { display:none; }
+  .ph { display:flex; align-items:flex-start; gap:12px; padding:16px 14px 10px 18px; border-bottom:1px solid var(--hair); }
+  .ph h2 { font:600 1rem/1.25 var(--body); margin:0; }
+  .ph .where { color:var(--muted); font-size:.82rem; margin-top:2px; }
+  .ph .x { margin-left:auto; flex:none; width:32px; height:32px; border-radius:50%; border:1px solid transparent;
+    background:none; color:var(--muted); font:400 1.1rem/1 var(--body); cursor:pointer; }
+  .ph .x:hover { color:var(--ink); border-color:var(--hair); }
+  #panelList { list-style:none; margin:0; padding:0 18px; overflow:auto; flex:1; overscroll-behavior:contain; }
+  .row { display:grid; grid-template-columns:64px 1fr; column-gap:12px; padding:12px 0; border-bottom:1px solid var(--hair); }
+  .row:last-child { border-bottom:0; }
+  .row.focus { background:var(--cell); margin:0 -18px; padding:12px 18px; }
+  .thumb { position:relative; width:64px; height:64px; border-radius:8px; overflow:hidden; background:var(--cell);
+    display:flex; align-items:center; justify-content:center; }
+  .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .thumb .dot { position:absolute; left:5px; top:5px; transform:none; width:10px; height:10px; }
+  .thumb.none .dot { position:static; }
+  .row-title { font-weight:600; font-size:.88rem; line-height:1.3; }
+  .row-meta { color:var(--muted); font-size:.76rem; margin-top:2px; }
+  .row-text { font-size:.82rem; margin-top:4px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .row-links { margin-top:5px; display:flex; gap:12px; font-size:.78rem; }
+  .row-links a, .row-links button { color:var(--muted); text-decoration:underline; text-decoration-color:var(--hair);
+    text-underline-offset:3px; background:none; border:0; padding:0; font:inherit; cursor:pointer; }
+  .row-links a:hover, .row-links button:hover { color:var(--ink); }
+  .empty { color:var(--muted); font-size:.86rem; padding:16px 0; }
+
+  /* growing conditions (2026-11-02): region pills on the map + a side panel */
+  :root { --good:#1a7f4b; --fair:#b26a00; --poor:#8a8a8a; }
+  @media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) { --good:#5ed88a; --fair:#f0a640; --poor:#8a8a8a; } }
+  :root[data-theme="dark"] { --good:#5ed88a; --fair:#f0a640; --poor:#8a8a8a; }
+  .rg { display:inline-flex; align-items:center; gap:5px; white-space:nowrap; transform:translate(-50%,-50%);
+    background:var(--card); border:1px solid var(--hair); border-radius:999px; padding:2px 8px 2px 6px;
+    font:600 11px/1.4 var(--body); color:var(--ink); cursor:pointer; font-variant-numeric:tabular-nums; }
+  .rg i { width:8px; height:8px; border-radius:50%; background:var(--poor); }
+  .rg.good i, .lv.good { background:var(--good); } .rg.fair i, .lv.fair { background:var(--fair); }
+  .rg.good { border-color:color-mix(in srgb, var(--good) 55%, var(--hair)); }
+  .rg.fair { border-color:color-mix(in srgb, var(--fair) 55%, var(--hair)); }
+  /* while the conditions panel is open the reports step back */
+  body.cond-open .leaflet-marker-pane .dot, body.cond-open .clu { opacity:.25 !important; }
+  .rg { position:relative; z-index:2; }
+  .hbtn { border:1px solid var(--hair); background:var(--card); color:var(--ink); border-radius:999px;
+    font:500 .84rem/1 var(--body); padding:8px 12px; cursor:pointer; white-space:nowrap; }
+  .hbtn:hover, .hbtn[aria-pressed="true"] { border-color:var(--ink); }
+  #cond { position:fixed; z-index:1002; top:calc(var(--head, 61px) + 12px); right:12px; bottom:12px;
+    width:min(440px, calc(100vw - 24px)); background:var(--card); border:1px solid var(--hair);
+    border-radius:14px; display:flex; flex-direction:column; overflow:hidden; }
+  #cond[hidden] { display:none; }
+  .cbody { overflow:auto; padding:4px 18px 18px; overscroll-behavior:contain; }
+  .cbody h3 { font:600 .9rem/1.3 var(--body); margin:18px 0 6px; }
+  .cbody .note { color:var(--muted); font-size:.78rem; line-height:1.4; margin:0 0 8px; }
+  .cbody p { font-size:.84rem; line-height:1.45; margin:0 0 8px; }
+  .cbody p b { font-weight:600; }
+  table.rg-t { width:100%; border-collapse:collapse; font-size:.8rem; font-variant-numeric:tabular-nums; }
+  .rg-t th { text-align:left; font-weight:500; color:var(--muted); padding:4px 4px 6px 0; font-size:.74rem; }
+  .rg-t td { padding:6px 4px 6px 0; border-top:1px solid var(--hair); vertical-align:middle; }
+  .rg-t td.n { text-align:right; }
+  .rg-t .sc { font-weight:600; }
+  .lv { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--poor); margin-right:6px; }
+  .bars { display:inline-flex; align-items:flex-end; gap:1px; height:18px; }
+  .bars span { width:3px; background:var(--home); opacity:.75; min-height:1px; }
+  .tabs { display:flex; flex-wrap:wrap; gap:4px; margin:4px 0 8px; }
+  .tabs button { border:0; background:none; color:var(--muted); font:500 .78rem/1 var(--body); padding:6px 9px;
+    border-radius:999px; cursor:pointer; }
+  .tabs button[aria-pressed="true"] { background:var(--cell); color:var(--ink); box-shadow:0 0 0 1px var(--hair); }
+  .shot { display:block; width:100%; border-radius:10px; border:1px solid var(--hair); background:var(--cell); min-height:120px; }
+  .shot img { display:block; width:100%; height:auto; border-radius:10px; }
+  @media (max-width:640px) {
+    #cond { top:auto; left:0; right:0; bottom:0; width:auto; max-height:72vh; border-radius:14px 14px 0 0; border-width:1px 0 0; }
+    body.cond-open .legend { display:none; }
+    .hbtn { padding:7px 10px; }
+  }
+  @media (max-width:640px) {
+    #panel { top:auto; left:0; right:0; bottom:0; width:auto; max-height:62vh; border-radius:14px 14px 0 0; border-width:1px 0 0; }
+    body.panel-open .legend { display:none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <a class="backlink" href="index.html" title="Back to today's brief"><span class="brand-dot" aria-hidden="true"></span>Daily Brief</a>
+  <h1>Mushroom map</h1>
+  <input id="search" type="search" placeholder="Search place, species or text…" aria-label="Search reports">
+  <span class="sub" id="count">94 reports</span>
+  <button class="hbtn" id="condBtn" type="button" aria-pressed="false" hidden>Conditions</button>
+  <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme"></button>
+</header>
+<div id="map"></div>
+<div class="legend" id="filters" role="group" aria-label="Filter reports">
+  <button class="fbtn kind" type="button" data-kind="yes" aria-pressed="true"><span class="dot"></span>Found something</button>
+  <button class="fbtn kind" type="button" data-kind="no" aria-pressed="true"><span class="dot no"></span>Nothing</button>
+  <span class="sep" aria-hidden="true"></span>
+  <select id="period" aria-label="Period">
+    <option value="3">Last 3 days</option>
+    <option value="7">Last 7 days</option>
+    <option value="14">Last 14 days</option>
+    <option value="0">All kept</option>
+  </select>
+  <select id="species" aria-label="Species"><option value="">Any species</option></select>
+  <button class="fbtn reset" type="button" id="resetFilters" hidden>Reset</button>
+</div>
+<aside id="panel" hidden aria-labelledby="panelTitle">
+  <div class="ph"><div><h2 id="panelTitle"></h2><div class="where" id="panelWhere"></div></div>
+    <button class="x" id="panelClose" type="button" aria-label="Close list">&times;</button></div>
+  <ul id="panelList"></ul>
+</aside>
+<aside id="cond" hidden aria-labelledby="condTitle">
+  <div class="ph"><div><h2 id="condTitle">Growing conditions</h2><div class="where" id="condWhere"></div></div>
+    <button class="x" id="condClose" type="button" aria-label="Close conditions">&times;</button></div>
+  <div class="cbody" id="condBody"></div>
+</aside>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin=""></script>
+<script>
+const DATA = [{"id": "p942198", "date": "2026-11-02", "area": "Snina", "loc": "Belá nad Cirochou", "grew": true, "user": "Tomas11", "text": "Dá sa ešte niečo najst, čo miesto to 1kozák,našla sa aj nejaka bedľa,po smrekovych ani náznak...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942198", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/02/tomas-pisko_942198_t.jpg", "sp": ["bedla"], "lat": 48.974421, "lon": 22.1072708, "geo": "place", "km": 374.3}, {"id": "p942193", "date": "2026-11-01", "area": "Malacky", "loc": "Studienka", "grew": false, "user": "peto.g", "text": "Uz iba 1 suchohrib, zaver uplne chudobnej sezony.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942193", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/02/peter_goetz_942193_t.jpg", "sp": ["suchohrib"], "lat": 48.5266791, "lon": 17.1367028, "geo": "place", "km": 35.3}, {"id": "p942180", "date": "2026-11-01", "area": "Žilina", "loc": "Turie", "grew": true, "user": "ZILINAK", "text": "bedla", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942180", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/patrik-dian_942180_t.jpg", "sp": ["bedla"], "lat": 49.1491194, "lon": 18.7526706, "geo": "place", "km": 157.4}, {"id": "p942179", "date": "2026-11-01", "area": "Prešov", "loc": "Záhradné, Bikoš", "grew": true, "user": "Jaro1980", "text": "Záhradné -aspoň niečo..na inak osvedčených miestach na masliaky a rýdziky - rýdziky 0 - slovom nula, z hríbovitých 5 masliakov obyčajných ( 2 zdravé), hrsť prášiviek, na jednej lúke pod lesom aj malé bedle alebo bedličky, nebrali sme, pretože v tomto vývojovom štádiu som si nebol 100% istý...+ podpňovky z lesa - Bikoš, podpňovky nie veľa, ale v top kvalite", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942179", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/jaroslav-oravec_942179_t.jpg", "sp": ["masliak", "bedla", "podpnovka", "rydzik", "prasnica"], "lat": 49.089516, "lon": 21.2683874, "geo": "place", "km": 317.9}, {"id": "p942168", "date": "2026-11-01", "area": "Modra", "loc": "Pezinská baba", "grew": true, "user": "VladoŠ.", "text": "Dávam že rástli ale iba hliva a na tú som išiel priamo. Inak nič iné.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942168", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/vladimir-sevecka_942168_t.jpg", "sp": ["hliva"], "lat": 48.3497553, "lon": 17.1966215, "geo": "place", "km": 16.0}, {"id": "p942167", "date": "2026-11-01", "area": "Martin", "loc": "", "grew": true, "user": "dunčo", "text": "Rastú.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942167", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/milan_kosaristan_942167_t.jpg", "sp": [], "lat": 49.0724921, "lon": 18.929193, "geo": "area", "km": 162.2}, {"id": "p942166", "date": "2026-11-01", "area": "Levice", "loc": "Svodov", "grew": true, "user": "IanB", "text": "Pri návšteve rodiska, som vybehol pozrieť svoj les mladosti, v ktorom teraz vládla podpňovka.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942166", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/marian-buda_942166_t.jpg", "sp": ["podpnovka"], "lat": 48.079961, "lon": 18.6539295, "geo": "place", "km": 112.5}, {"id": "p942163", "date": "2026-11-01", "area": "Prievidza", "loc": "Prievidza", "grew": true, "user": "Roqe", "text": "Pár trsov hlivy sa našlo.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942163", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/michal_chochula_942163_t.jpg", "sp": ["hliva"], "lat": 48.7718361, "lon": 18.6234916, "geo": "area", "km": 125.3}, {"id": "p942159", "date": "2026-11-01", "area": "Košice", "loc": "Kokšov-Bakša", "grew": true, "user": "jokol", "text": "staré meandre Hornádu, vybehol som do topoľového pralesa, nebol som prvý ale niečo som našiel (dobré kilečko), akurát som poblúdil, zapadol do bažiny po kolená, predieral sa húštinami, dodriapal sa, dlho som hľadal odložený bicykel, to v supermarkete nezažiješ, tie hlivy stáli za to 😁", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942159", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/jozef-kolibar_942159_t.jpg", "sp": ["hliva"], "lat": 48.6475338, "lon": 21.3226784, "geo": "place", "km": 311.7}, {"id": "p942148", "date": "2026-11-01", "area": "Michalovce", "loc": "okolie Veľké Kapušany", "grew": true, "user": "mikino.719", "text": "Toho roku to je fantázia 🍄", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942148", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/mikulas_pavlik_942148_t.jpg", "sp": [], "lat": 48.5538814, "lon": 22.0773719, "geo": "place", "km": 365.9}, {"id": "p942147", "date": "2026-11-01", "area": "Košice", "loc": "skároš", "grew": true, "user": "kalapos", "text": "Posledný.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942147", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/ondrej_baricko_942147_t.jpg", "sp": [], "lat": 48.588406, "lon": 21.3761935, "geo": "place", "km": 314.8}, {"id": "p942146", "date": "2026-11-01", "area": "Košice", "loc": "Skároš", "grew": true, "user": "kalapos", "text": "Zdravím,ešte sa voľačo našlo.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942146", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/ondrej_baricko_942146_t.jpg", "sp": [], "lat": 48.588406, "lon": 21.3761935, "geo": "place", "km": 314.8}, {"id": "p942144", "date": "2026-11-01", "area": "Čadca", "loc": "Makov sirsie okolie", "grew": true, "user": "hribik 808", "text": "Mladé veru nerastú, starých mrazom oslahanych sa dá zopár nájsť.... Povedal som nech to neberie tatovi ale on si nedá povedať... Niečo možno z tých starých sosnakov a smrekacov nakraja 🤣🤣🤣", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942144", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/stefan_jurkemik_942144_t.jpg", "sp": [], "lat": 49.3695054, "lon": 18.4745656, "geo": "place", "km": 161.4}, {"id": "p942137", "date": "2026-11-01", "area": "Bratislava", "loc": "Pezinok", "grew": true, "user": "Nikaaa", "text": "Posledné XXL podpňovky... Nad Limbachom... krásne...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942137", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/dominika-herova_942137_t.jpg", "sp": ["podpnovka"], "lat": 48.2854539, "lon": 17.270194, "geo": "place", "km": 12.3}, {"id": "p942135", "date": "2026-11-01", "area": "Kysucké Nové Mesto", "loc": "", "grew": true, "user": "Mischel", "text": "Rastie hliva ustricová", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942135", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/michal_marcis_942135_t.jpg", "sp": ["hliva"], "lat": 49.2999184, "lon": 18.7865084, "geo": "area", "km": 170.6}, {"id": "p942134", "date": "2026-11-01", "area": "Michalovce", "loc": "Biela Hora", "grew": true, "user": "Vladimír Andráš", "text": "Bedľe u nás kupodivu práve začínajú....niesú veľké ako v lete, ale sú krásne....", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942134", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/vladimir-andras_942134_t.jpg", "sp": ["bedla"], "lat": 48.7762525, "lon": 21.9364328, "geo": "place", "km": 358.3}, {"id": "h1636b72230", "date": "2026-11-01", "area": "Snina", "loc": "Kolonica", "grew": true, "user": "Lukas93", "text": "Bedlí veľmi slušne, kozare buď pozbierané alebo nerastú", "photo": "", "img": "", "sp": ["kozak", "bedla"], "lat": 48.9569949, "lon": 22.2570221, "geo": "place", "km": 384.7}, {"id": "p942131", "date": "2026-10-31", "area": "Michalovce", "loc": "Suché", "grew": true, "user": "Easyhunter", "text": "Len pečiarky na lúke a hlivy ustricové na starých spadnutých topoľoch.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942131", "img": "https://www.nahuby.sk/images/fotosutaz/2026/11/01/milan-maskal_942131_t.jpg", "sp": ["hliva", "peciarka"], "lat": 48.7659706, "lon": 21.8369819, "geo": "place", "km": 350.9}, {"id": "p942116", "date": "2026-10-31", "area": "Ružomberok", "loc": "Nad Klačnom", "grew": true, "user": "El magico", "text": "Les bol mokrý, huby rástli. Našli sme veľmi veľa rýdzikov a plávok. Hríbov smrekových a suchohríbov nebolo veľa.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942116", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/tomas-ficiak_942116_t.jpg", "sp": ["hrib", "suchohrib", "rydzik", "plavka"], "lat": 49.0815718, "lon": 19.3034168, "geo": "area", "km": 185.6}, {"id": "p942104", "date": "2026-10-31", "area": "Tvrdošín", "loc": "Prostredný", "grew": true, "user": "rudolf", "text": "Zarodila.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942104", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/rudolf-suran_942104_t.jpg", "sp": [], "lat": 49.3015158, "lon": 19.5365407, "geo": "place", "km": 213.0}, {"id": "p942103", "date": "2026-10-31", "area": "Malacky", "loc": "Studienka", "grew": true, "user": "Pištinko", "text": "Hubári zo Záhoria máme tento rok vždy nejaký dôvod byť nespokojní. Najprv rast hríbov zablokovalo totálne sucho a teraz sa pridal ešte aj chlad /najmä v noci/. Napriek tomu som našiel 3 bedle, 1 masliak a trocha tanečníc. Nič iné sa u nás v lese a na lúkach nenájde.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942103", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/stefan-pavelka_942103_t.jpg", "sp": ["hrib", "masliak", "bedla", "tanecnica"], "lat": 48.5266791, "lon": 17.1367028, "geo": "place", "km": 35.3}, {"id": "p942102", "date": "2026-10-31", "area": "Banská Bystrica", "loc": "Suchý vrch", "grew": true, "user": "Amatér", "text": "Našli sme nejaké masliaky a rydziky", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942102", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/patrik-sebellei_942102_t.jpg", "sp": ["masliak", "rydzik"], "lat": 48.7268557, "lon": 19.0763935, "geo": "place", "km": 153.2}, {"id": "p942098", "date": "2026-10-31", "area": "Banská Štiavnica", "loc": "Okolie BS", "grew": false, "user": "fero666", "text": "Les je v krásnej jesennej farbe, ale s hubami je to bieda....", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942098", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/fero_hubina_942098_t.jpg", "sp": [], "lat": 48.4580926, "lon": 18.8988414, "geo": "area", "km": 132.2}, {"id": "p942097", "date": "2026-10-31", "area": "Bytča", "loc": "Okolie Bytče", "grew": true, "user": "Tatanka - Yotanka", "text": "Dnes pekná jesenná prechádzka. Rásti ešte suchohríby hnedé.😃👍", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942097", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/vladimir_kuderavy_942097_t.jpg", "sp": ["suchohrib"], "lat": 49.2235748, "lon": 18.5586825, "geo": "area", "km": 152.9}, {"id": "p942094", "date": "2026-10-31", "area": "Žilina", "loc": "Okolie Žiliny", "grew": true, "user": "johny69", "text": "Neviem , niekto di ta červený prst hore 30.10.26, asi sa mu zdá niečo v neporiadku, nechápem prečo, dam ine foto,ale v pohode, pozdravujem dnešných hubárov-,, bojovníkov,,", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942094", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/jan_durajka_942094_t.jpg", "sp": [], "lat": 49.2234674, "lon": 18.7393139, "geo": "area", "km": 162.2}, {"id": "p942090", "date": "2026-10-31", "area": "Trnava", "loc": "Jahodník", "grew": true, "user": "peter.gasparovic", "text": "Dnes na trase, 11,47 km – hliva ustricová.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942090", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/peter_gasparovic_942090_t.jpg", "sp": ["hliva"], "lat": 48.486158, "lon": 17.403356, "geo": "place", "km": 36.0}, {"id": "p942088", "date": "2026-10-31", "area": "Humenné", "loc": "Hažín nad Cirochou", "grew": true, "user": "Tono od Cirochy", "text": "Pri Ciroche rástli stovky plodníc. Tak mám aspoň postarané o robotu.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942088", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/anton_petrov_942088_t.jpg", "sp": [], "lat": 48.9292642, "lon": 21.9617287, "geo": "place", "km": 362.9}, {"id": "p942087", "date": "2026-10-31", "area": "Snina", "loc": "Laborecká vrchovina, Hrahorka", "grew": true, "user": "JOKO", "text": "Ešte to ako tak rástlo vďaka teplejším nociam. Les som ešte nezamkol.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942087", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/jozef_koval_942087_t.jpg", "sp": [], "lat": 49.0183144, "lon": 22.1461325, "geo": "place", "km": 378.1}, {"id": "p942085", "date": "2026-10-31", "area": "Košice", "loc": "Zlatá Idka", "grew": true, "user": "FORESTWOOD", "text": "Moje huby nikto nevyzbiera z lesa 🌲🌻", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942085", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/marian-bodak_942085_t.jpg", "sp": [], "lat": 48.7522811, "lon": 21.0060729, "geo": "place", "km": 290.5}, {"id": "p942084", "date": "2026-10-31", "area": "Košice", "loc": "Zlatá Idka", "grew": true, "user": "FORESTWOOD", "text": "Moje huby nikto nevyzbiera z lesa 🌲🌻", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942084", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/marian-bodak_942084_t.jpg", "sp": [], "lat": 48.7522811, "lon": 21.0060729, "geo": "place", "km": 290.5}, {"id": "p942078", "date": "2026-10-31", "area": "Martin", "loc": "Turčianske Kľačany", "grew": true, "user": "dunčo", "text": "Hríby sosnové.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942078", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/milan_kosaristan_942078_t.jpg", "sp": ["hrib"], "lat": 49.1156281, "lon": 18.9489559, "geo": "place", "km": 166.2}, {"id": "p942072", "date": "2026-10-31", "area": "Kysucké Nové Mesto", "loc": "Povina", "grew": true, "user": "Fulvio", "text": "…nebyt AI,tak nemam ani jeden hrib😂 …zial-okrem KRASNEJ/uprsanej prechadzky-iba jediny kozak😉,uz je po sezone,ktora ANI NEBOLA😢.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942072", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/fulvio_tajny_942072_t.jpg", "sp": ["hrib", "kozak"], "lat": 49.3120458, "lon": 18.8084713, "geo": "place", "km": 172.6}, {"id": "p942069", "date": "2026-10-31", "area": "Liptovský Mikuláš", "loc": "Východná", "grew": true, "user": "Hubárka", "text": "V lese vidno aj rôzne nejedlé jesenné hubky, z ktorých dominujú najmä líšky oranžové...Po jedlých pôvabniciach resp.rýdzikoch v okruhu lesa pri žel.stanici ani stopa...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942069", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/maria-karabinosova_942069_t.jpg", "sp": ["rydzik", "povabnica"], "lat": 49.0612289, "lon": 19.8946117, "geo": "place", "km": 222.8}, {"id": "hc96ff0a98d", "date": "2026-10-31", "area": "Košice", "loc": "Mala Ida, Ťahanovský les", "grew": false, "user": "Mufty", "text": "Nula celá, nula nula nula", "photo": "", "img": "", "sp": [], "lat": 48.678819, "lon": 21.1671605, "geo": "place", "km": 300.9}, {"id": "h3dc739aaff", "date": "2026-10-31", "area": "Trebišov", "loc": "PcVO", "grew": false, "user": "paress", "text": "Nula cela nula nula nic.", "photo": "", "img": "", "sp": [], "lat": 48.6286222, "lon": 21.7201711, "geo": "area", "km": 340.4}, {"id": "p942070", "date": "2026-10-30", "area": "Malacky", "loc": "Cerveny kriz", "grew": true, "user": "Gabus", "text": "Najvzacnejsi hri ...tzv hrib kilometrovy ... Cca 8,5km a 4 hodiny v lese ... Ten najhnusnejsi teren, vyschnute mociare ... Sezonu asi koncim", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942070", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/31/gabriela-gogora_942070_t.jpg", "sp": ["hrib"], "lat": 48.4762521, "lon": 17.0596879, "geo": "place", "km": 30.4}, {"id": "p942060", "date": "2026-10-30", "area": "Prešov", "loc": "Prešov, Bikoš", "grew": true, "user": "Jaro1980", "text": "3/4 košíka podpňoviek v lese - obyčajné aj žlté. Milo prekvapený čo sa týka množstva a kvality. Mladé sa stále tlačia a ešte budú ...nemrzne...Okrem podpňoviek aj hliva ustricová, zatiaľ na starom pni na záhrade ...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942060", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/jaroslav-oravec_942060_t.jpg", "sp": ["hliva", "podpnovka"], "lat": 49.0252815, "lon": 21.2091453, "geo": "place", "km": 311.8}, {"id": "p942059", "date": "2026-10-30", "area": "Brezno", "loc": "", "grew": true, "user": "jaskyniar", "text": "No už sa začínajú objavovať pôvabnice a aj jeden modračik sa este objavil", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942059", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/marian_jagercik_942059_t.jpg", "sp": ["modrak", "povabnica"], "lat": 48.8053349, "lon": 19.6409612, "geo": "area", "km": 195.1}, {"id": "p942043", "date": "2026-10-30", "area": "Nitra", "loc": "Širšie okolie Nitry", "grew": true, "user": "fero666", "text": "Na zemi nerástlo nič, ale na stromoch a pňoch to ide...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942043", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/fero_hubina_942043_t.jpg", "sp": [], "lat": 48.31295, "lon": 18.0894593, "geo": "area", "km": 70.5}, {"id": "p942037", "date": "2026-10-30", "area": "Liptovský Mikuláš", "loc": "Východná", "grew": true, "user": "Hubárka", "text": "Dnešný výsledok...Ca 5 km...Asi najslabšia sezóna za posledné roky, ale pritrafil sa pri tých kuriatkach aj suchohríb a zopár plávok...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942037", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/maria-karabinosova_942037_t.jpg", "sp": ["suchohrib", "plavka", "kuriatko"], "lat": 49.0612289, "lon": 19.8946117, "geo": "place", "km": 222.8}, {"id": "p942034", "date": "2026-10-30", "area": "Malacky", "loc": "Studienka horareň", "grew": true, "user": "torpiš", "text": "Naše posledne tohoročne bedle , ziadne ostane hriby neboli!!!", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942034", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/jozef_dlugos_942034_t.jpg", "sp": ["hrib", "bedla"], "lat": 48.5191773, "lon": 17.1536967, "geo": "place", "km": 34.4}, {"id": "p942033", "date": "2026-10-30", "area": "Bratislava", "loc": "Bratislava - luzny les", "grew": true, "user": "Hela", "text": "Na zber plamienok to uz dnes nebolo. Len na fotku. Nasla som zopar malickych trsikov, ci im bude dopriate dorast je otazne...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942033", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/hela-kellyerova_942033_t.jpg", "sp": ["plamienka"], "lat": 48.1435026, "lon": 17.1082867, "geo": "area", "km": 8.0}, {"id": "p942032", "date": "2026-10-30", "area": "Michalovce", "loc": "okolie Veľké Kapušany", "grew": true, "user": "mikino.719", "text": "Hliva ustricovita", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942032", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/mikulas_pavlik_942032_t.jpg", "sp": ["hliva"], "lat": 48.5538814, "lon": 22.0773719, "geo": "place", "km": 365.9}, {"id": "p942031", "date": "2026-10-30", "area": "Bratislava", "loc": "Malé Karpaty", "grew": false, "user": "Mousik", "text": "Smrekový mohykán, žeby posledný tento rok? Uvidíme.. 🍄‍🟫🍁🍂", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942031", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/uzivatel_38766_942031_t.jpg", "sp": [], "lat": 48.1435026, "lon": 17.1082867, "geo": "area", "km": 8.0}, {"id": "p942030", "date": "2026-10-30", "area": "Liptovský Mikuláš", "loc": "Východná", "grew": true, "user": "Hubárka", "text": "Začínajú veľmi opatrne kuriatka lievikovité...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942030", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/maria-karabinosova_942030_t.jpg", "sp": ["kuriatko"], "lat": 49.0612289, "lon": 19.8946117, "geo": "place", "km": 222.8}, {"id": "p942028", "date": "2026-10-30", "area": "Michalovce", "loc": "Prímestská časť Šíravy", "grew": true, "user": "mihar", "text": "Na stojacom kmeni topoľa hliva ustricovitá", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942028", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/michal_harvan_942028_t.jpg", "sp": ["hliva"], "lat": 48.7062406, "lon": 21.7212164, "geo": "place", "km": 341.5}, {"id": "p942023", "date": "2026-10-30", "area": "Košice", "loc": "Jahodna", "grew": false, "user": "FURBY", "text": "Okrem hlivy na obrazku absolutne nic", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942023", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/tomas-gurbal_942023_t.jpg", "sp": ["hliva"], "lat": 48.7653918, "lon": 21.1224814, "geo": "place", "km": 299.2}, {"id": "p942020", "date": "2026-10-30", "area": "Banská Bystrica", "loc": "Banská Bystrica okolie", "grew": false, "user": "sano bb", "text": "Nerastie skoro nič okrem pár suchohríbov.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942020", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/rastislav-truben_942020_t.jpg", "sp": ["suchohrib"], "lat": 48.735429, "lon": 19.1457338, "geo": "area", "km": 158.3}, {"id": "h799a1b85a1", "date": "2026-10-30", "area": "Senica", "loc": "Mikulášov", "grew": false, "user": "bokú", "text": "Iba pár bedlí, hríbovité sme nenašli žiadne...", "photo": "", "img": "", "sp": ["bedla"], "lat": 48.5712548, "lon": 17.2222862, "geo": "place", "km": 40.6}, {"id": "h0d79a9d0bc", "date": "2026-10-30", "area": "Malacky", "loc": "Laksarska nova ves", "grew": false, "user": "bkalas", "text": "Naivne sme hladali suchohriby, nevideli sme ale nic, par muchotraviek", "photo": "", "img": "", "sp": ["suchohrib", "muchotravka"], "lat": 48.5783406, "lon": 17.1839295, "geo": "place", "km": 41.1}, {"id": "p942019", "date": "2026-10-29", "area": "Martin", "loc": "Priekopa", "grew": true, "user": "Miťko", "text": "Pôvabnica dvojfarebná.Niektorí nemusia do lesa, keď im to rastie v záhrade.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942019", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/miroslav_mikus_942019_t.jpg", "sp": ["povabnica"], "lat": 49.1059095, "lon": 18.927668, "geo": "place", "km": 164.3}, {"id": "p942015", "date": "2026-10-29", "area": "Snina", "loc": "Ruský Potok", "grew": true, "user": "Gudzan", "text": "Da sa ešte niečo nájsť.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942015", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/29/martin-rilak_942015_t.jpg", "sp": [], "lat": 49.0282651, "lon": 22.4092006, "geo": "place", "km": 397.1}, {"id": "p942005", "date": "2026-10-29", "area": "Michalovce", "loc": "Trnava pri Laborci", "grew": true, "user": "tarnavčan(MI)", "text": "Iba tak ....", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942005", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/29/milan_onuska_942005_t.jpg", "sp": [], "lat": 48.8166508, "lon": 21.9335076, "geo": "place", "km": 358.7}, {"id": "p941988", "date": "2026-10-29", "area": "Košice", "loc": "Medzev", "grew": true, "user": "Maxi", "text": "Píšem že rástli, ale s váhaním, lebo sme boli dvaja a dva dubáky, z nich druhý papuča, jeden kozák, niekoľko muchotrávok a pár nejedlých hubiek, .... no, nie že by to nebolo dačo ale že rástli je trochu silné slovo...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941988", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/29/ondrej_maksi_941988_t.jpg", "sp": ["hrib", "kozak", "muchotravka"], "lat": 48.7003257, "lon": 20.892266, "geo": "place", "km": 281.3}, {"id": "p941982", "date": "2026-10-29", "area": "Dolný Kubín", "loc": "Racibor", "grew": true, "user": "MarekBB1", "text": "Dnes zrejme rozlúčka so sezónou. Ani som nedúfal že niečo nájdem. V lese božský kľud, len šuchot lístia pod nohami a jemný zvuk padajúcich listov.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941982", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/29/marek_drimal_941982_t.jpg", "sp": [], "lat": 49.2533515, "lon": 19.3319993, "geo": "place", "km": 197.7}, {"id": "p941978", "date": "2026-10-29", "area": "Bratislava", "loc": "Lužný les", "grew": true, "user": "Kali", "text": "Syn bol dnes s kamarátom pozrieť hlivy. Chalani si dali cez 5 hodín v lese 🙂💪🏼", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941978", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/29/karol-losonczy_941978_t.jpg", "sp": ["hliva"], "lat": 48.1435026, "lon": 17.1082867, "geo": "area", "km": 8.0}, {"id": "p941977", "date": "2026-10-29", "area": "Michalovce", "loc": "Prímestská časť Šíravy", "grew": true, "user": "mihar", "text": "Na stojacom kmeni topoľa hliva ustricovitá", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941977", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/29/michal_harvan_941977_t.jpg", "sp": ["hliva"], "lat": 48.7062406, "lon": 21.7212164, "geo": "place", "km": 341.5}, {"id": "p941976", "date": "2026-10-29", "area": "Humenné", "loc": "Kamenica n/Cir.", "grew": true, "user": "Lessy", "text": "... dnes opäť rýchlovka a dá sa povedať, že skalné miestečka nesklamali ... 😉", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941976", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/29/jaroslav-voronak_941976_t.jpg", "sp": [], "lat": 48.9350033, "lon": 21.9020268, "geo": "area", "km": 358.8}, {"id": "p941974", "date": "2026-10-29", "area": "Brezno", "loc": "", "grew": false, "user": "jaskyniar", "text": "Včera par modrakov", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941974", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/29/marian_jagercik_941974_t.jpg", "sp": ["modrak"], "lat": 48.8053349, "lon": 19.6409612, "geo": "area", "km": 195.1}, {"id": "p941961", "date": "2026-10-29", "area": "Martin", "loc": "Malá Fatra", "grew": true, "user": "Miťko", "text": "Rástli hríby sosnové, smrekové.Pôvabnice fialové,strmulky inovaťové, hnojníky obyčajné, muchitrávky červené a iné huby.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941961", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/29/miroslav_mikus_941961_t.jpg", "sp": ["hrib", "povabnica", "strmulka", "muchotravka"], "lat": 49.0934113, "lon": 18.8042819, "geo": "place", "km": 156.3}, {"id": "h31b75a4a21", "date": "2026-10-29", "area": "Spišská Nová Ves", "loc": "Bindt", "grew": true, "user": "roman24", "text": "Rástli len podpinky, cca 3/4 koša, 1 hríb, 1 modrák, 1 suchohríb a 3 rýdziky. Sucho pretrváva, v lese obrovský deficit vlahy. Huby rástli len pri bahniskách diviakov. Inak takmer žiadne ani divé huby. Najhoršia hubárska sezóna za 30 rokov čo pamätám.", "photo": "", "img": "", "sp": ["hrib", "suchohrib", "modrak", "podpnovka", "rydzik"], "lat": 48.8775102, "lon": 20.5831739, "geo": "place", "km": 263.4}, {"id": "p941955", "date": "2026-10-28", "area": "Dolný Kubín", "loc": "Zázrivá", "grew": true, "user": "Pokai-mu", "text": "smrekove su uz asi v cudu, vsetky co som stretol boli k.o., potesili aj kozaky", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941955", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/martin-cech_941955_t.jpg", "sp": ["kozak"], "lat": 49.2762228, "lon": 19.1548037, "geo": "place", "km": 188.9}, {"id": "p941954", "date": "2026-10-28", "area": "Humenné", "loc": "Dlhé n.Cir.", "grew": false, "user": "chozé", "text": "V lese húb ako šafránu a šafrán žiaden. Klasická tohtoročná \"kilometrovka\". Hríby ani rýdziky žiadne, pár mladučkých masliakov. V lese konečne nie je saharské sucho,", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941954", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/stefan-balaz_941954_t.jpg", "sp": ["hrib", "masliak", "rydzik"], "lat": 48.9373185, "lon": 22.0373269, "geo": "place", "km": 368.5}, {"id": "p941952", "date": "2026-10-28", "area": "Žilina", "loc": "Kunerad", "grew": true, "user": "Pĺaťo", "text": "Ale prechádzka,pekná.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941952", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/jaroslav-platek_941952_t.jpg", "sp": [], "lat": 49.0986408, "lon": 18.7104221, "geo": "place", "km": 151.4}, {"id": "p941951", "date": "2026-10-28", "area": "Žilina", "loc": "Kunerad", "grew": true, "user": "Pĺaťo", "text": "Dnes len jeden na fotenie.😄", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941951", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/jaroslav-platek_941951_t.jpg", "sp": [], "lat": 49.0986408, "lon": 18.7104221, "geo": "place", "km": 151.4}, {"id": "p941948", "date": "2026-10-28", "area": "Košice", "loc": "Skároš", "grew": true, "user": "kalapos", "text": "Nič moc.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941948", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/ondrej_baricko_941948_t.jpg", "sp": [], "lat": 48.588406, "lon": 21.3761935, "geo": "place", "km": 314.8}, {"id": "p941945", "date": "2026-10-28", "area": "Žilina", "loc": "Lúčanská Malá Fatra Višňovská dolina", "grew": true, "user": "Tatanka - Yotanka", "text": "Na snečných svahoch rástli hríby zrnitohlúbikové a suchohríby hnedé.😃👍", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941945", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/vladimir_kuderavy_941945_t.jpg", "sp": ["hrib", "suchohrib"], "lat": 49.1448697, "lon": 18.8120014, "geo": "place", "km": 160.3}, {"id": "p941940", "date": "2026-10-28", "area": "Komárno", "loc": "", "grew": true, "user": "m@rek", "text": "Krásavec", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941940", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/marek_jancik_941940_t.jpg", "sp": [], "lat": 47.7574079, "lon": 18.1298249, "geo": "area", "km": 88.6}, {"id": "p941939", "date": "2026-10-28", "area": "Senica", "loc": "Valy", "grew": false, "user": "Pepo2", "text": "V lese krasne vlhko, clovek by povedal, ze idealne jesenne podmienky, ale podla toho, ako to dnes v lese vyzeralo, obavam sa, ze tato sezona je stratena. V podstate nerastie vobec nic…. Jedine pozitivum je, ze v lese nie su ziadne odpadky…", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941939", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/marian_duris_941939_t.jpg", "sp": [], "lat": 48.5702559, "lon": 17.119361, "geo": "place", "km": 40.2}, {"id": "p941938", "date": "2026-10-28", "area": "Komárno", "loc": "", "grew": true, "user": "m@rek", "text": "Potešili. Kto to potrebuje, môže si predstaviť, že sú v košíku.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941938", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/marek_jancik_941938_t.jpg", "sp": [], "lat": 47.7574079, "lon": 18.1298249, "geo": "area", "km": 88.6}, {"id": "p941937", "date": "2026-10-28", "area": "Košice", "loc": "Mokranská lúka", "grew": true, "user": "TONO", "text": "Čerstvé pečiarky.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941937", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/anton_himic_941937_t.jpg", "sp": ["peciarka"], "lat": 48.7172272, "lon": 21.2496774, "geo": "area", "km": 307.5}, {"id": "p941935", "date": "2026-10-28", "area": "Snina", "loc": "Belá", "grew": true, "user": "beny666", "text": "Ani som sa nedostal do lesa.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941935", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/jan-beno_941935_t.jpg", "sp": [], "lat": 48.974421, "lon": 22.1072708, "geo": "place", "km": 374.3}, {"id": "hdd5f59d38b", "date": "2026-10-28", "area": "Turčianske Teplice", "loc": "Mošovce", "grew": false, "user": "PeterRet", "text": "Na masliakových miestach po nich ani stopy, les v zásade bez plodníc.", "photo": "", "img": "", "sp": ["masliak"], "lat": 48.9093933, "lon": 18.8878711, "geo": "place", "km": 149.7}, {"id": "h07e2fe5cf2", "date": "2026-10-28", "area": "Košice", "loc": "Kysak", "grew": false, "user": "teginka", "text": "Nič, nič a ešte raz nič.", "photo": "", "img": "", "sp": [], "lat": 48.8541383, "lon": 21.2200209, "geo": "place", "km": 308.1}, {"id": "p941944", "date": "2026-10-27", "area": "Snina", "loc": "okolie Sniny", "grew": true, "user": "burdys", "text": "Dnes už iba maličko, došlo už aj na mňa", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941944", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/28/jozef_burda_941944_t.jpg", "sp": [], "lat": 48.9900623, "lon": 22.1556248, "geo": "area", "km": 378.1}, {"id": "p941925", "date": "2026-10-27", "area": "Bratislava", "loc": "Malé Karpaty", "grew": true, "user": "Mousik", "text": "V lese bolo parádne, je cítiť že trocha popršalo.. O pár dní by ešte mohlo niečo vykuknúť.. Potešilo ma cez kilo korálovca, ktorý dnes u mňa dominoval. Na konci výpravy dozber mladučkej hlivy a ako bónusik dva modráky. Som zvedavý čo prinesú ďalšie dni.. 👋🙂🙏🍄‍🟫🌿", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941925", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/uzivatel_38766_941925_t.jpg", "sp": ["modrak", "hliva"], "lat": 48.1435026, "lon": 17.1082867, "geo": "area", "km": 8.0}, {"id": "p941921", "date": "2026-10-27", "area": "Čadca", "loc": "Beskydy", "grew": true, "user": "JozefVendrynsky", "text": "Nejsem si jisty co je to za houby ? Vyrostlo jich několík u stodoly v okolí pařezu, kde stála před 2 roky vzrostlá jedle. Budu vděčný za každý názor. Děkuji.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941921", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/josef_janiczek_941921_t.jpg", "sp": [], "lat": 49.4305302, "lon": 18.8999037, "geo": "place", "km": 186.7}, {"id": "p941920", "date": "2026-10-27", "area": "Michalovce", "loc": "Michalovce-Topoľany", "grew": true, "user": "Tokaj", "text": "Rástli podpňovky.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941920", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/ivo_nagy_941920_t.jpg", "sp": ["podpnovka"], "lat": 48.7791271, "lon": 21.8901287, "geo": "place", "km": 354.9}, {"id": "p941917", "date": "2026-10-27", "area": "Čadca", "loc": "Staškov", "grew": true, "user": "Nachzehrer", "text": "Dnes sa podarilo za cca hodinu aj niečo tak do dvoch rúk malých, zväčša od slimákov dosť ohryzených suchohríbov, plus jeden vyrastený modrák. Zrejme moja posledná tohtoročná hubačka, sezóna už pravdepodobne končí.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941917", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/vladimir_kozak_941917_t.jpg", "sp": ["suchohrib", "modrak"], "lat": 49.4235748, "lon": 18.6951166, "geo": "place", "km": 176.1}, {"id": "p941910", "date": "2026-10-27", "area": "Poprad", "loc": "Poprad", "grew": true, "user": "elenôčka", "text": "Ešte zopár modrákov bolo.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941910", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/helena-tondrova_941910_t.jpg", "sp": ["modrak"], "lat": 49.0541521, "lon": 20.2976401, "geo": "area", "km": 249.6}, {"id": "p941900", "date": "2026-10-27", "area": "Ružomberok", "loc": "Ružomberok", "grew": true, "user": "dutky", "text": "Dnes ešte pár plávok,suchohríbov a jeden hríbik", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941900", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/vladimir-kudron_941900_t.jpg", "sp": ["hrib", "suchohrib", "plavka"], "lat": 49.0815718, "lon": 19.3034168, "geo": "area", "km": 185.6}, {"id": "p941898", "date": "2026-10-27", "area": "Stará Ľubovňa", "loc": "", "grew": true, "user": "marianzosabinova", "text": "Rýdziky", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941898", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/marian_palko_941898_t.jpg", "sp": ["rydzik"], "lat": 49.3001533, "lon": 20.6889231, "geo": "area", "km": 286.4}, {"id": "p941897", "date": "2026-10-27", "area": "Stará Ľubovňa", "loc": "", "grew": true, "user": "marianzosabinova", "text": "7 hríbov smrekových a podpňovky.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941897", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/marian_palko_941897_t.jpg", "sp": ["hrib", "podpnovka"], "lat": 49.3001533, "lon": 20.6889231, "geo": "area", "km": 286.4}, {"id": "p941891", "date": "2026-10-27", "area": "Malacky", "loc": "Studienka", "grew": true, "user": "Pištinko", "text": "Hoci v noci trocha mrzlo, tanečnice odolávajú. Lesík a tráva zachránili od mrazu aj zopár bedlí.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941891", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/stefan-pavelka_941891_t.jpg", "sp": ["bedla", "tanecnica"], "lat": 48.5266791, "lon": 17.1367028, "geo": "place", "km": 35.3}, {"id": "p941890", "date": "2026-10-27", "area": "Bratislava", "loc": "Bratislava - luzny les", "grew": true, "user": "Hela", "text": "Je koniec oktobra a to je cas, kedy sa v luhoch objavuju prve plamienky. Tak som vybehla opacit, ako sme na tom tuto jesen. A veru pestro....da sa najst vsetko mozne. Bola to radostna vyprava.😄", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941890", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/hela-kellyerova_941890_t.jpg", "sp": ["plamienka"], "lat": 48.1435026, "lon": 17.1082867, "geo": "area", "km": 8.0}, {"id": "p941878", "date": "2026-10-26", "area": "Banská Bystrica", "loc": "Pod Poľanou", "grew": false, "user": "JohnCenaWWE", "text": "Príroda maľuje obrazy", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941878", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/daniel_dorotovic_941878_t.jpg", "sp": [], "lat": 48.8233508, "lon": 19.2737789, "geo": "place", "km": 170.7}, {"id": "p941866", "date": "2026-10-26", "area": "Malacky", "loc": "Studienka", "grew": true, "user": "ABC", "text": "Priatelia, dnes som vyrazil na prieskumnícku výpravu. Bolo super póčo, ale huby žiadne. Do cesty sa mi priplietol jeden fešák a ako hovorí Pištinko, ak bude teplejšie, tak za pár dni by to mohlo vyzerať lepšie 🍄‍🟫", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941866", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/26/martin-mucha_941866_t.jpg", "sp": [], "lat": 48.5266791, "lon": 17.1367028, "geo": "place", "km": 35.3}, {"id": "p941862", "date": "2026-10-26", "area": "Žilina", "loc": "Kunerad", "grew": true, "user": "Pĺaťo", "text": "Zatiaľ nič nové nerastie,len dozber.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941862", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/26/jaroslav-platek_941862_t.jpg", "sp": [], "lat": 49.0986408, "lon": 18.7104221, "geo": "place", "km": 151.4}, {"id": "p942017", "date": "2026-10-25", "area": "Oravská Lesná", "loc": "", "grew": true, "user": "starší hubár", "text": "... ešte sa dalo niečo nájsť", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=942017", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/30/peter_mares_942017_t.jpg", "sp": [], "lat": 49.3689979, "lon": 19.1852951, "geo": "area", "km": 197.1}, {"id": "p941868", "date": "2026-10-25", "area": "Snina", "loc": "RO", "grew": false, "user": "Lukas93", "text": "Na dvoch stromoch hliv do misky, inak nič. Našiel som aj muchotravky na 3 miestach, čakal som okolo nich niečo ale 0 bodov.", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941868", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/26/lukas-marinic_941868_t.jpg", "sp": ["hliva", "muchotravka"], "lat": 48.9900623, "lon": 22.1556248, "geo": "area", "km": 378.1}, {"id": "p941844", "date": "2026-10-25", "area": "Malacky", "loc": "Stupava", "grew": true, "user": "pablo555", "text": "Turistika v okolí Stupavy, bolo vidieť už rôzne hubky v lese, hlavne podpňovky v rôznych štádiách a aj nejaká hliva, nebrali sme nič len sme sa kochali...", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941844", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/26/pavol_toth_941844_t.jpg", "sp": ["hliva", "podpnovka"], "lat": 48.2778249, "lon": 17.0388864, "geo": "place", "km": 11.2}, {"id": "p941831", "date": "2026-10-24", "area": "Dolný Kubín", "loc": "Zázrivá", "grew": true, "user": "Maco51", "text": "Väčšie zdravé kozáky osikové", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941831", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/26/marian_kysa_941831_t.jpg", "sp": ["kozak"], "lat": 49.2762228, "lon": 19.1548037, "geo": "place", "km": 188.9}, {"id": "p941830", "date": "2026-10-24", "area": "Dolný Kubín", "loc": "Zázrivá", "grew": true, "user": "Maco51", "text": "Za hodinku na osvedčenom mieste", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941830", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/26/marian_kysa_941830_t.jpg", "sp": [], "lat": 49.2762228, "lon": 19.1548037, "geo": "place", "km": 188.9}, {"id": "p941894", "date": "2026-10-20", "area": "Stará Ľubovňa", "loc": "", "grew": true, "user": "marianzosabinova", "text": "Podpňovky", "photo": "https://www.nahuby.sk/obrazok_detail.php?obrazok_id=941894", "img": "https://www.nahuby.sk/images/fotosutaz/2026/10/27/marian_palko_941894_t.jpg", "sp": ["podpnovka"], "lat": 49.3001533, "lon": 20.6889231, "geo": "area", "km": 286.4}];
+const SPECIES = {"hrib": ["hríb", "porcini"], "suchohrib": ["suchohríb", "bay bolete"], "kozak": ["kozák", "scaber stalk"], "modrak": ["modrák", "bolete (bluing)"], "masliak": ["masliak", "slippery jack"], "bedla": ["bedľa", "parasol"], "hliva": ["hliva", "oyster mushroom"], "podpnovka": ["podpňovka", "honey fungus"], "rydzik": ["rýdzik", "milk cap"], "plavka": ["plávka", "brittlegill"], "kuriatko": ["kuriatko", "chanterelle"], "povabnica": ["pôvabnica", "blewit"], "peciarka": ["pečiarka", "field mushroom"], "tanecnica": ["tanečnica", "fairy ring champignon"], "plamienka": ["plamienka", "velvet shank"], "strmulka": ["strmuľka", "clouded agaric"], "prasnica": ["prášnica", "puffball"], "muchotravka": ["muchotrávka", "fly agaric / amanita"]};
+const CONF = {"today": "2026-11-02", "home": [48.2097, 17.1497], "nearKm": 80.0, "source": "https://www.nahuby.sk/vyskyt-hub/Slovensko/ID0", "keepDays": 30, "cond": {"date": "2026-11-02", "regions": [{"name": "Záhorie", "lat": 48.53, "lon": 17.14, "elevation": 211.0, "score": 28, "label": "poor", "rain14_mm": 28.3, "rain_next3_mm": 0.5, "last_soaking_days": 11, "soil_moisture": 0.133, "temp_mean7": 7.5, "frost_nights7": 2, "rain_series": [0.0, 0.0, 10.9, 10.1, 0.0, 1.0, 6.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3, 0.0]}, {"name": "Malé Karpaty", "lat": 48.33, "lon": 17.22, "elevation": 361.0, "score": 71, "label": "good", "rain14_mm": 42.5, "rain_next3_mm": 1.1, "last_soaking_days": 11, "soil_moisture": 0.232, "temp_mean7": 8.2, "frost_nights7": 0, "rain_series": [0.0, 0.0, 9.1, 18.7, 0.0, 3.3, 9.2, 0.7, 0.0, 0.0, 0.0, 0.0, 1.5, 0.0]}, {"name": "Myjava", "lat": 48.76, "lon": 17.56, "elevation": 374.0, "score": 57, "label": "fair", "rain14_mm": 32.3, "rain_next3_mm": 0.0, "last_soaking_days": 11, "soil_moisture": 0.236, "temp_mean7": 7.4, "frost_nights7": 0, "rain_series": [0.0, 0.0, 1.0, 19.4, 0.0, 2.0, 9.6, 0.2, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0]}, {"name": "Malá Fatra", "lat": 49.12, "lon": 18.78, "elevation": 796.0, "score": 38, "label": "poor", "rain14_mm": 50.6, "rain_next3_mm": 0.0, "last_soaking_days": 11, "soil_moisture": 0.34, "temp_mean7": 4.5, "frost_nights7": 0, "rain_series": [0.0, 0.0, 0.0, 30.2, 0.0, 1.8, 6.1, 7.3, 0.0, 0.0, 0.0, 0.2, 3.9, 1.1]}, {"name": "Pohronie", "lat": 48.75, "lon": 19.2, "elevation": 445.0, "score": 32, "label": "poor", "rain14_mm": 23.6, "rain_next3_mm": 0.4, "last_soaking_days": 11, "soil_moisture": 0.245, "temp_mean7": 6.5, "frost_nights7": 2, "rain_series": [0.0, 0.0, 0.0, 15.0, 0.0, 3.4, 3.0, 2.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1]}, {"name": "Orava", "lat": 49.3, "lon": 19.35, "elevation": 797.0, "score": 13, "label": "very poor", "rain14_mm": 43.8, "rain_next3_mm": 1.6, "last_soaking_days": 11, "soil_moisture": 0.272, "temp_mean7": 3.3, "frost_nights7": 4, "rain_series": [0.0, 0.0, 0.0, 29.5, 0.0, 0.7, 3.8, 4.9, 0.0, 0.0, 0.0, 0.3, 4.5, 0.1]}, {"name": "Spiš", "lat": 48.92, "lon": 20.5, "elevation": 784.0, "score": 37, "label": "poor", "rain14_mm": 47.4, "rain_next3_mm": 0.0, "last_soaking_days": 7, "soil_moisture": 0.308, "temp_mean7": 4.3, "frost_nights7": 0, "rain_series": [0.0, 0.0, 0.0, 25.0, 0.0, 0.2, 3.0, 18.1, 0.0, 0.0, 0.0, 0.0, 1.0, 0.1]}, {"name": "Vihorlat", "lat": 48.95, "lon": 22.1, "elevation": 328.0, "score": 72, "label": "good", "rain14_mm": 40.4, "rain_next3_mm": 0.0, "last_soaking_days": 7, "soil_moisture": 0.325, "temp_mean7": 7.5, "frost_nights7": 0, "rain_series": [0.0, 0.0, 0.0, 20.2, 0.0, 0.0, 0.0, 19.7, 0.0, 0.0, 0.2, 0.3, 0.0, 0.0]}], "drought": {"source_url": "https://www.intersucho.sk/sk/", "period": "V nedeľu 1.11.2026 o 7 hodine ráno (informácie odrážajú zmeny v období od nedele 25.10.2026 do nedele 1.11.2026 ráno)", "report_date": "2026-11-01", "summary": "Sucho rôznej intenzity naďalej zasahuje stále takmer celé územie Slovenska. Extrémne sucho je na približne 13 % územia, a to najmä v Banskobystrickom, Košickom a Prešovskom kraji a lokálne aj v Žilinskom kraji. Lepšie vlahové podmienky sú v povrchovej vrstve do 40 cm, kde pozorujeme len lokálne výrazné až extrémne sucho. V hlbšej vrstve je extrémne sucho stále na približne ¾ územia. Najnižšie hodnoty relatívneho nasýtenia sú lokálne pod 10 % na juhu stredného a východného Slovenska. Deficit pôdnej vlahy je najvyšší -80 až -100 mm na krajnom východe a Horehroní. Na väčšine územia je deficit -20 až -60 mm. Nadbytok vlahy je lokálne v okolí Tatier do +20 mm.", "sections": [{"heading": "V nedeľu 1.11.2026 o 7 hodine ráno (informácie odrážajú zmeny v období od nedele 25.10.2026 do nedele 1.11.2026 ráno)", "text": "Sucho rôznej intenzity naďalej zasahuje stále takmer celé územie Slovenska. Extrémne sucho je na približne 13 % územia, a to najmä v Banskobystrickom, Košickom a Prešovskom kraji a lokálne aj v Žilinskom kraji. Lepšie vlahové podmienky sú v povrchovej vrstve do 40 cm, kde pozorujeme len lokálne výrazné až extrémne sucho. V hlbšej vrstve je extrémne sucho stále na približne ¾ územia. Najnižšie hodnoty relatívneho nasýtenia sú lokálne pod 10 % na juhu stredného a východného Slovenska. Deficit pôdnej vlahy je najvyšší -80 až -100 mm na krajnom východe a Horehroní. Na väčšine územia je deficit -20 až -60 mm. Nadbytok vlahy je lokálne v okolí Tatier do +20 mm."}, {"heading": "Intenzita pôdnej vlahy", "text": "Intenzita sucha (odchýlka od bežného stavu za obdobie 1961 až 2015) je na úrovni extrémneho sucha na približne 13 % územia. Extrémne sucho ostalo ojedinele v Banskobystrickom, Košickom a lokálne aj v Prešovskom a Žilinskom kraji. Sucho rôznej intenzity zasahuje takmer celé územie. V povrchovej vrstve je len lokálne na juhu stredného a východného Slovenska výrazné až extrémne sucho. V hlbšej vrstve je situácia stále veľmi nepriaznivá a extrémne sucho zasahuje približne ¾ územia."}, {"heading": "Popis meteorologických prvkov v uplynulom týždni a ich vplyv na vývoj sucha:", "text": "Uplynulý týždeň sa zrážky vyskytli prevažne v pondelok a sobotu. Najviac zrážok spadlo lokálne na Orave a v oblasti Západných Tatier, a to 20 až 30 mm. Úhrn zrážok nad 10 mm bol na Orave, Kysuciach, v oblasti Tatier, na Zamagurí, ale aj na krajnom severovýchode, východe a vo Vihorlate, lokálne v oblasti Malej Fatry a Slanských vrchov. Najvyššia teplota vzduchu bola okolo 18 °C v stredu lokálne na Gemeri. Najnižšie klesla teplota vzduchu na -5,3 °C v nedeľu ráno lokálne na Horehroní. Týždenná suma výparu bola najvyššia okolo 10,5 mm na dolnom Zemplíne a v okolí Košíc. Najnižší výpar bol okolo 3 mm v okolí Vranova nad Topľou. V percentách normálu 1991 - 2020 bol výpar od 69 % lokálne na hornom Zemplíne do 220 % lokálne na dolnom Zemplíne."}], "map_date": "2026-11-01", "maps": [{"key": "intensity", "label": "Drought intensity", "url": "https://www.intersucho.sk/runtime/cache/maps/sk/awp/2026_11_01/awp_2026_11_01_SK_country.png", "page": "https://www.intersucho.sk/sk/slovensko/aktualni-stav-intenzita-sucha/"}, {"key": "saturation", "label": "Soil saturation", "url": "https://www.intersucho.sk/runtime/cache/maps/sk/awr/2026_11_01/awr_2026_11_01_SK_country.png", "page": "https://www.intersucho.sk/sk/slovensko/aktualni-stav-nasyceni-pudy/"}, {"key": "deficit", "label": "Moisture deficit", "url": "https://www.intersucho.sk/runtime/cache/maps/sk/awd/2026_11_01/awd_2026_11_01_SK_country.png", "page": "https://www.intersucho.sk/sk/slovensko/aktualni-stav-deficit-vlahy/"}]}, "rain_maps": [{"date": "2026-11-01", "url": "https://www.shmu.sk/data/datakmis/poindex/z-20261101-0000-lr.jpg"}, {"date": "2026-10-31", "url": "https://www.shmu.sk/data/datakmis/poindex/z-20261031-0000-lr.jpg"}, {"date": "2026-10-30", "url": "https://www.shmu.sk/data/datakmis/poindex/z-20261030-0000-lr.jpg"}, {"date": "2026-10-29", "url": "https://www.shmu.sk/data/datakmis/poindex/z-20261029-0000-lr.jpg"}, {"date": "2026-10-28", "url": "https://www.shmu.sk/data/datakmis/poindex/z-20261028-0000-lr.jpg"}, {"date": "2026-10-27", "url": "https://www.shmu.sk/data/datakmis/poindex/z-20261027-0000-lr.jpg"}], "best": "Vihorlat"}};
+function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+const BASE = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/';
+let tileLayer = null, labelLayer = null;
+const map = L.map('map', { zoomControl: true, maxZoom: 17, minZoom: 6 }).setView([48.7, 19.5], 8);
+map.createPane('labels');
+map.getPane('labels').style.zIndex = 450;
+map.getPane('labels').style.pointerEvents = 'none';
+function applyTiles() {
+  if (tileLayer) map.removeLayer(tileLayer);
+  if (labelLayer) map.removeLayer(labelLayer);
+  const t = isDark() ? 'Dark' : 'Light';
+  tileLayer = L.tileLayer(BASE + 'World_' + t + '_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 17, maxNativeZoom: 16, attribution: 'Tiles &copy; Esri &mdash; Reports: <a href="' + attr(CONF.source) + '">nahuby.sk</a>'
+  }).addTo(map);
+  labelLayer = L.tileLayer(BASE + 'World_' + t + '_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 17, maxNativeZoom: 16, pane: 'labels'
+  }).addTo(map);
+}
+applyTiles();
+
+// Home + the "near you" radius used by the card.
+L.marker(CONF.home, { icon: L.divIcon({ className: 'mk', html: '<span class="home-dot" title="Home"></span>', iconSize: [0, 0] }),
+  interactive: false, keyboard: false }).addTo(map);
+L.circle(CONF.home, { radius: CONF.nearKm * 1000, className: 'near-ring', weight: 1, dashArray: '4 6',
+  fill: false, interactive: false }).addTo(map);
+
+const TODAY = new Date(CONF.today + 'T12:00:00');
+function ageDays(d) { return Math.round((TODAY - new Date(d.date + 'T12:00:00')) / 864e5); }
+function fmtDate(iso) {
+  const p = String(iso || '').split('-');
+  return p.length === 3 ? (+p[2]) + '. ' + (+p[1]) + '. ' + p[0] : iso;
+}
+function dotCls(d) { const a = ageDays(d); return 'dot' + (d.grew ? '' : ' no') + (a > 7 ? ' age2' : a > 3 ? ' age1' : ''); }
+function icon(d, on) {
+  return L.divIcon({ className: 'mk', html: '<span class="' + dotCls(d) + (on ? ' on' : '') + '"></span>', iconSize: [0, 0], popupAnchor: [0, -8] });
+}
+function title(d) { return [d.area, d.loc].filter(Boolean).join(' · '); }
+function spNames(d) { return (d.sp || []).map(k => SPECIES[k] ? SPECIES[k][0] + ' (' + SPECIES[k][1] + ')' : k); }
+function popupHtml(d) {
+  const photo = d.img ? '<a class="popup-img" href="' + attr(d.photo || CONF.source) + '" target="_blank" rel="noopener" tabindex="-1">'
+    + '<img src="' + attr(d.img) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></a>' : '';
+  const meta = [fmtDate(d.date), d.user, d.km != null ? Math.round(d.km) + ' km from home' : ''].filter(Boolean).join(' · ');
+  const approx = d.geo === 'area' ? '<div class="popup-approx">' + (d.loc ? 'Spot not found on the map: placed at ' : 'Placed at the region town ') + esc(d.area) + '</div>' : '';
+  const sp = spNames(d);
+  return photo + '<div class="popup-title">' + esc(title(d)) + '</div>'
+    + '<div class="popup-meta">' + esc(meta) + '</div>' + approx
+    + '<div class="popup-text"><span class="verdict ' + (d.grew ? 'yes">Found something' : 'no">Nothing grew') + '</span>'
+    + (d.text ? ' — ' + esc(d.text) : '') + '</div>'
+    + (sp.length ? '<div class="chips">' + sp.map(s => '<span>' + esc(s) + '</span>').join('') + '</div>' : '')
+    + '<div class="links">' + (d.photo ? '<a class="popup-link" href="' + attr(d.photo) + '" target="_blank" rel="noopener">Photo on nahuby.sk ↗</a>' : '')
+    + '<a class="popup-link" href="' + attr(CONF.source) + '" target="_blank" rel="noopener">All reports ↗</a></div>';
+}
+
+const cluster = L.markerClusterGroup({
+  maxClusterRadius: 36, spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false,
+  iconCreateFunction: c => {
+    const ms = c.getAllChildMarkers();
+    const n = ms.length, some = ms.some(m => m._d.grew);
+    const size = n < 10 ? 30 : n < 100 ? 36 : 42;
+    return L.divIcon({ html: '<span>' + n + '</span>', className: 'clu' + (some ? ' some' : ''), iconSize: [size, size] });
+  }
+});
+const SAME_SPOT_M = 300;
+cluster.on('clusterclick', e => {
+  const b = e.layer.getBounds();
+  const span = b.getNorthEast().distanceTo(b.getSouthWest());
+  if (span <= SAME_SPOT_M || map.getZoom() >= 14) { openPanel(e.layer.getAllChildMarkers()); return; }
+  map.fitBounds(b, { padding: [60, 60], maxZoom: 15 });
+});
+const markers = [];
+const seenSp = {};
+for (const d of DATA) {
+  const m = L.marker([d.lat, d.lon], { icon: icon(d, false) });
+  m._d = d; m._id = d.id;
+  m._hay = norm([d.area, d.loc, d.user, d.text, spNames(d).join(' ')].join(' '));
+  m.bindPopup(() => popupHtml(d), { maxWidth: 300 });
+  m.on('popupopen', () => m.setIcon(icon(d, true)));
+  m.on('popupclose', () => m.setIcon(icon(d, false)));
+  for (const k of d.sp || []) seenSp[k] = (seenSp[k] || 0) + 1;
+  markers.push(m);
+}
+map.addLayer(cluster);
+
+// ---- filters ------------------------------------------------------------
+const spSel = document.getElementById('species');
+Object.entries(seenSp).sort((a, b) => b[1] - a[1]).forEach(([k, n]) => {
+  const o = document.createElement('option');
+  o.value = k; o.textContent = (SPECIES[k] ? SPECIES[k][0] + ' · ' + SPECIES[k][1] : k) + ' (' + n + ')';
+  spSel.appendChild(o);
+});
+const perSel = document.getElementById('period');
+const resetBtn = document.getElementById('resetFilters');
+const searchInput = document.getElementById('search');
+const countEl = document.getElementById('count');
+const DEFAULTS = { yes: true, no: true, days: 7, sp: '' };
+const FKEY = 'mb-mush-filters';
+const flt = Object.assign({}, DEFAULTS);
+try { Object.assign(flt, JSON.parse(localStorage.getItem(FKEY) || '{}')); } catch (e) {}
+if (!spSel.querySelector('option[value="' + flt.sp + '"]')) flt.sp = '';
+function save() { try { localStorage.setItem(FKEY, JSON.stringify(flt)); } catch (e) {} }
+function passes(m, nq) {
+  const d = m._d;
+  if (!(d.grew ? flt.yes : flt.no)) return false;
+  if (flt.days && ageDays(d) >= flt.days) return false;
+  if (flt.sp && !(d.sp || []).includes(flt.sp)) return false;
+  if (nq && !m._hay.includes(nq)) return false;
+  return true;
+}
+function active() { return !flt.yes || !flt.no || flt.days !== DEFAULTS.days || !!flt.sp; }
+function applyFilter(fit) {
+  const nq = norm(searchInput.value.trim());
+  const keep = [], drop = [];
+  for (const m of markers) (passes(m, nq) ? keep : drop).push(m);
+  cluster.removeLayers(drop);
+  cluster.addLayers(keep.filter(m => !cluster.hasLayer(m)));
+  const found = keep.filter(m => m._d.grew).length;
+  countEl.textContent = keep.length + (keep.length === markers.length ? '' : ' of ' + markers.length) + ' reports · ' + found + ' found';
+  for (const b of document.querySelectorAll('.fbtn.kind')) b.setAttribute('aria-pressed', String(!!flt[b.dataset.kind]));
+  perSel.value = String(flt.days); perSel.classList.toggle('set', flt.days !== DEFAULTS.days);
+  spSel.value = flt.sp; spSel.classList.toggle('set', !!flt.sp);
+  resetBtn.hidden = !active();
+  if (fit && keep.length) map.fitBounds(L.latLngBounds(keep.map(m => m.getLatLng())), { padding: [50, 50], maxZoom: 11 });
+  if (!panel.hidden) renderPanel();
+}
+document.getElementById('filters').addEventListener('click', e => {
+  const b = e.target.closest('.fbtn.kind');
+  if (!b) return;
+  const k = b.dataset.kind, other = k === 'yes' ? 'no' : 'yes';
+  flt[k] = !flt[k];
+  if (!flt.yes && !flt.no) flt[other] = true;  // never an empty map
+  save(); applyFilter(false);
+});
+perSel.addEventListener('change', () => { flt.days = +perSel.value || 0; save(); applyFilter(false); });
+spSel.addEventListener('change', () => { flt.sp = spSel.value; save(); applyFilter(true); });
+resetBtn.addEventListener('click', () => { Object.assign(flt, DEFAULTS); save(); applyFilter(true); });
+searchInput.addEventListener('input', () => applyFilter(!!searchInput.value.trim()));
+
+// ---- list panel for stacked reports ---------------------------------------
+const panel = document.getElementById('panel');
+const panelList = document.getElementById('panelList');
+let panelMarkers = [], panelFocus = null;
+function openPanel(ms, focus) {
+  map.closePopup();
+  if (typeof closeCond === 'function') closeCond();
+  panelMarkers = ms.slice().sort((a, b) => (b._d.date > a._d.date ? 1 : b._d.date < a._d.date ? -1 : 0));
+  panelFocus = focus || null;
+  panel.hidden = false; document.body.classList.add('panel-open');
+  renderPanel();
+}
+function closePanel() { panel.hidden = true; document.body.classList.remove('panel-open'); panelMarkers = []; }
+function renderPanel() {
+  const nq = norm(searchInput.value.trim());
+  const rows = panelMarkers.filter(m => passes(m, nq) || m === panelFocus);
+  const found = rows.filter(m => m._d.grew).length;
+  document.getElementById('panelTitle').textContent = rows.length + (rows.length === 1 ? ' report' : ' reports') + ' · ' + found + ' found';
+  const areas = {};
+  for (const m of panelMarkers) areas[m._d.area] = (areas[m._d.area] || 0) + 1;
+  const top = Object.entries(areas).sort((a, b) => b[1] - a[1]);
+  document.getElementById('panelWhere').textContent = top.length ? top[0][0] + (top.length > 1 ? ' and nearby' : '') : '';
+  panelList.innerHTML = rows.length ? rows.map(m => {
+    const d = m._d;
+    const dot = '<span class="' + dotCls(d) + '"></span>';
+    const thumb = d.img ? '<span class="thumb"><img src="' + attr(d.img) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' + dot + '</span>'
+      : '<span class="thumb none">' + dot + '</span>';
+    const meta = [fmtDate(d.date), d.user, d.geo === 'area' && d.loc ? 'spot approx.' : ''].filter(Boolean).join(' · ');
+    return '<li class="row' + (m === panelFocus ? ' focus' : '') + '" data-id="' + attr(d.id) + '">' + thumb + '<div>'
+      + '<div class="row-title">' + esc(title(d)) + '</div><div class="row-meta">' + esc(meta) + '</div>'
+      + (d.text ? '<div class="row-text">' + esc(d.text) + '</div>' : '')
+      + '<div class="row-links">' + (d.photo ? '<a href="' + attr(d.photo) + '" target="_blank" rel="noopener">photo ↗</a>' : '')
+      + '<button type="button" data-open="' + attr(d.id) + '">details</button></div></div></li>';
+  }).join('') : '<li class="empty">No reports match the filters.</li>';
+  const f = panelList.querySelector('.row.focus');
+  if (f) f.scrollIntoView({ block: 'center' }); else panelList.scrollTop = 0;
+}
+panelList.addEventListener('click', e => {
+  const b = e.target.closest('button[data-open]');
+  if (!b) return;
+  const m = markers.find(x => x._id === b.dataset.open);
+  if (m) L.popup({ maxWidth: 300 }).setLatLng(m.getLatLng()).setContent(popupHtml(m._d)).openOn(map);
+});
+document.getElementById('panelClose').addEventListener('click', closePanel);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+map.on('click', closePanel);
+
+
+// ---- growing conditions (Open-Meteo index, Intersucho, SHMÚ rain maps) -----
+const COND = CONF.cond || {};
+const REGIONS = COND.regions || [];
+const DROUGHT = COND.drought || {};
+const RAIN = COND.rain_maps || [];
+const condPanel = document.getElementById('cond');
+const condBtn = document.getElementById('condBtn');
+const hasCond = REGIONS.length || RAIN.length || (DROUGHT.maps || []).length || DROUGHT.summary;
+function lvCls(r) { return String(r.label || '').replace(' ', '-'); }
+function regionText(r) {
+  return [r.label, 'rain 14 d ' + r.rain14_mm + ' mm',
+    r.last_soaking_days ? 'last soaking rain ' + r.last_soaking_days + ' d ago' : 'no soaking rain in 3 weeks',
+    r.soil_moisture != null ? 'soil ' + r.soil_moisture.toFixed(2) + ' m³/m³' : '',
+    r.temp_mean7 != null ? '7-day mean ' + r.temp_mean7 + ' °C' : '',
+    r.frost_nights7 ? r.frost_nights7 + ' frosty nights' : '',
+    r.rain_next3_mm >= 1 ? r.rain_next3_mm + ' mm rain in the next 3 days' : ''].filter(Boolean).join(' · ');
+}
+map.createPane('regions');
+map.getPane('regions').style.zIndex = 650;  // above the report markers (600)
+const rgLayer = L.layerGroup();
+for (const r of REGIONS) {
+  const m = L.marker([r.lat, r.lon], { icon: L.divIcon({ className: 'mk', iconSize: [0, 0],
+    html: '<span class="rg ' + attr(lvCls(r)) + '" title="' + attr(regionText(r)) + '"><i></i>' + esc(r.name) + ' ' + r.score + '</span>' }),
+    pane: 'regions', keyboard: false });
+  m.on('click', () => openCond());
+  rgLayer.addLayer(m);
+}
+// The area pills show with the conditions panel only (they would hide reports).
+function showRegions(on) {
+  if (!REGIONS.length) return;
+  if (!on) { map.removeLayer(rgLayer); return; }
+  rgLayer.addTo(map);
+  const phone = window.innerWidth <= 640;
+  map.fitBounds(L.latLngBounds(REGIONS.map(r => [r.lat, r.lon])), {
+    paddingTopLeft: [50, 50],
+    paddingBottomRight: phone ? [30, Math.round(window.innerHeight * 0.72) + 20] : [Math.min(460, window.innerWidth / 2) + 40, 50],
+    maxZoom: 9 });
+}
+
+function bars(series) {
+  const mx = Math.max(10, ...series);
+  return '<span class="bars" title="Daily rain, last 14 days (mm): ' + attr(series.join(' · ')) + '">'
+    + series.map(v => '<span style="height:' + Math.max(1, Math.round(v / mx * 18)) + 'px"></span>').join('') + '</span>';
+}
+function shotHtml(url, href, alt) {
+  return '<a class="shot" href="' + attr(href || url) + '" target="_blank" rel="noopener"><img src="' + attr(url)
+    + '" alt="' + attr(alt) + '" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.outerHTML=\'<p class=note>Map not available any more.</p>\'"></a>';
+}
+function renderCond() {
+  const out = [];
+  document.getElementById('condWhere').textContent = COND.date ? 'as of ' + fmtDate(COND.date) : '';
+  if (REGIONS.length) {
+    out.push('<h3>Mushroom weather</h3><p class="note">Rule-of-thumb index 0–100 per forest area (Open-Meteo): rain of the last 14 days and when the last soaking rain fell (mushrooms follow it by ~4–14 days), topsoil moisture, the 7-day mean temperature (best 10–18 °C) and frosty nights. Good ≥ 70, fair ≥ 45, poor ≥ 25.</p>');
+    out.push('<table class="rg-t"><tr><th>Area</th><th class="n">Index</th><th class="n">Rain 14 d</th><th>Daily rain</th><th class="n">°C</th></tr>'
+      + REGIONS.slice().sort((a, b) => b.score - a.score).map(r => '<tr title="' + attr(regionText(r)) + '"><td><span class="lv ' + attr(lvCls(r)) + '"></span>' + esc(r.name)
+        + '</td><td class="n sc">' + r.score + '</td><td class="n">' + r.rain14_mm + ' mm</td><td>' + bars(r.rain_series || [])
+        + '</td><td class="n">' + (r.temp_mean7 != null ? r.temp_mean7 : '–') + (r.frost_nights7 ? ' <span title="frosty nights">❄' + r.frost_nights7 + '</span>' : '') + '</td></tr>').join('')
+      + '</table>');
+  }
+  if (DROUGHT.summary || (DROUGHT.maps || []).length) {
+    out.push('<h3>Drought — Intersucho</h3>');
+    if (DROUGHT.period) out.push('<p class="note">' + esc(DROUGHT.period) + '</p>');
+    for (const s of (DROUGHT.sections || []).slice(0, 3)) {
+      const head = s.heading && s.heading !== DROUGHT.period ? '<b>' + esc(s.heading.replace(/:$/, '')) + '.</b> ' : '';
+      out.push('<p>' + head + esc(s.text) + '</p>');
+    }
+    const maps = DROUGHT.maps || [];
+    if (maps.length) {
+      out.push('<div class="tabs" id="dTabs">' + maps.map((m, i) => '<button type="button" data-i="' + i + '" aria-pressed="' + (i === 1) + '">' + esc(m.label) + '</button>').join('')
+        + '</div><div id="dShot">' + shotHtml(maps[Math.min(1, maps.length - 1)].url, maps[Math.min(1, maps.length - 1)].page, 'Intersucho map') + '</div>'
+        + '<p class="note">Map of ' + esc(fmtDate(DROUGHT.map_date || '')) + ' · <a class="popup-link" href="' + attr(DROUGHT.source_url || 'https://www.intersucho.sk/sk/') + '" target="_blank" rel="noopener">intersucho.sk ↗</a></p>');
+    }
+  }
+  if (RAIN.length) {
+    out.push('<h3>Rain by day — SHMÚ</h3><p class="note">Daily rainfall maps as shown on nahuby.sk “Počasie v uplynulom období”.</p>'
+      + '<div class="tabs" id="rTabs">' + RAIN.map((m, i) => '<button type="button" data-i="' + i + '" aria-pressed="' + (i === 0) + '">' + esc(fmtDate(m.date).replace(/ \d{4}$/, '')) + '</button>').join('')
+      + '</div><div id="rShot">' + shotHtml(RAIN[0].url, RAIN[0].url, 'SHMÚ rainfall map') + '</div>');
+  }
+  if (!out.length) out.push('<p class="empty">No condition data today.</p>');
+  document.getElementById('condBody').innerHTML = out.join('');
+}
+document.getElementById('condBody').addEventListener('click', e => {
+  const b = e.target.closest('.tabs button');
+  if (!b) return;
+  const tabs = b.parentNode, i = +b.dataset.i;
+  for (const x of tabs.querySelectorAll('button')) x.setAttribute('aria-pressed', String(x === b));
+  if (tabs.id === 'dTabs') { const m = DROUGHT.maps[i]; document.getElementById('dShot').innerHTML = shotHtml(m.url, m.page, 'Intersucho map'); }
+  else { const m = RAIN[i]; document.getElementById('rShot').innerHTML = shotHtml(m.url, m.url, 'SHMÚ rainfall map'); }
+});
+function openCond() {
+  closePanel(); map.closePopup();
+  renderCond();
+  condPanel.hidden = false; document.body.classList.add('cond-open'); condBtn.setAttribute('aria-pressed', 'true');
+  showRegions(true);
+  if (location.hash !== '#conditions') history.replaceState(null, '', '#conditions');
+}
+function closeCond() {
+  if (condPanel.hidden) return;
+  condPanel.hidden = true; document.body.classList.remove('cond-open'); condBtn.setAttribute('aria-pressed', 'false');
+  showRegions(false);
+  if (location.hash === '#conditions') history.replaceState(null, '', location.pathname + location.search);
+}
+if (hasCond) condBtn.hidden = false;
+condBtn.addEventListener('click', () => (condPanel.hidden ? openCond() : closeCond()));
+document.getElementById('condClose').addEventListener('click', closeCond);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCond(); });
+
+// ---- deep link #<report id> / #conditions ----------------------------------
+function zoomToId(id) {
+  if (id === 'conditions') { if (hasCond) { openCond(); return true; } return false; }
+  closeCond();
+  const m = markers.find(x => x._id === id);
+  if (!m) return false;
+  if (!passes(m, '')) { Object.assign(flt, DEFAULTS, { days: 0 }); applyFilter(false); }
+  map.setView(m.getLatLng(), 13, { animate: false });
+  setTimeout(() => {
+    const v = cluster.getVisibleParent(m);
+    if (!v || v === m) m.openPopup(); else openPanel(v.getAllChildMarkers(), m);
+  }, 300);
+  return true;
+}
+applyFilter(false);
+window.addEventListener('hashchange', () => zoomToId(decodeURIComponent(location.hash.slice(1))));
+if (!zoomToId(decodeURIComponent(location.hash.slice(1))) && markers.length) {
+  map.fitBounds(L.latLngBounds(markers.map(m => m.getLatLng())), { padding: [40, 40], maxZoom: 9, animate: false });
+}
+
+function esc(s) { return String(s || '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+function attr(s) { return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
+function norm(s) { return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+
+const KEY = 'mb-theme';
+const btn = document.getElementById('themeBtn');
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  btn.textContent = t === 'dark' ? '☀︎' : '☾︎';
+  applyTiles();
+}
+let stored = null;
+try { stored = localStorage.getItem(KEY); } catch (e) {}
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(stored || (prefersDark ? 'dark' : 'light'));
+btn.addEventListener('click', () => {
+  const next = isDark() ? 'light' : 'dark';
+  try { localStorage.setItem(KEY, next); } catch (e) {}
+  applyTheme(next);
+});
+function fitHead() {
+  document.documentElement.style.setProperty('--head', document.querySelector('header').offsetHeight + 'px');
+  map.invalidateSize();
+}
+window.addEventListener('resize', fitHead);
+fitHead();
+// Also published as archive/mushrooms_map.html (archived briefs link to it).
+if (location.pathname.indexOf('/archive/') !== -1) {
+  document.querySelector('header a.backlink').setAttribute('href', '../index.html');
+}
+</script>
+</body>
+</html>

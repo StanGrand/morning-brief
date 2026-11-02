@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jedlá – Daily Brief</title>
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%3E%3Ctext%20y='.9em'%20font-size='88'%3E%F0%9F%A5%97%3C/text%3E%3C/svg%3E">
+<!-- Apply the saved theme before first paint (same 'mb-theme' key as the brief). -->
+<script>(function(){var K='mb-theme',t=null;try{t=localStorage.getItem(K);}catch(e){}if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);})();</script>
+<link rel="stylesheet" href="meals.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1><span class="brand-dot" aria-hidden="true"></span>Jedlá</h1>
+    <div class="meta"><a href="../">&larr; Daily Brief</a></div>
+    <button type="button" id="themeToggle" class="theme-btn" aria-label="Prepnúť režim">&#9790;&#xFE0E;</button>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sekcie">
+    <a class="tab" role="tab" id="tab-plan" href="#plan" aria-controls="pane-plan" aria-selected="true">Plánovač týždňa</a>
+    <a class="tab" role="tab" id="tab-recipes" href="#recipes" aria-controls="pane-recipes" aria-selected="false">Recepty &amp; Jedlá<span class="count" id="mealCount"></span></a>
+    <a class="tab" role="tab" id="tab-shop" href="#shop" aria-controls="pane-shop" aria-selected="false">Nákupný zoznam</a>
+    <a class="tab" role="tab" id="tab-pantry" href="#pantry" aria-controls="pane-pantry" aria-selected="false">Špajza<span class="count" id="pantryCount"></span></a>
+  </nav>
+
+  <div id="storageNotice" class="notice" hidden>
+    Tento prehliadač nedovoľuje ukladať dáta (súkromné okno?). Zmeny sa stratia po zatvorení stránky.
+  </div>
+
+  <main>
+    <!-- ============ planner ============ -->
+    <section id="pane-plan" role="tabpanel" aria-labelledby="tab-plan">
+      <div class="planner">
+        <div class="plan-main">
+          <div class="weekbar">
+            <button type="button" class="btn icon" id="weekPrev" aria-label="Predchádzajúci týždeň">&lsaquo;</button>
+            <div class="weektitle"><strong id="weekRange"></strong><span id="weekWhen"></span></div>
+            <button type="button" class="btn icon" id="weekNext" aria-label="Nasledujúci týždeň">&rsaquo;</button>
+            <button type="button" class="btn quiet" id="weekToday" hidden>Tento týždeň</button>
+            <button type="button" class="btn quiet danger" id="weekClear">Vyčistiť týždeň</button>
+            <button type="button" class="btn" id="weekShare">Poslať plán</button>
+          </div>
+          <div class="days" id="days"></div>
+        </div>
+        <aside class="plan-side" aria-label="Nutričný sumár týždňa">
+          <div class="card summary" id="summary"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ recipes ============ -->
+    <section id="pane-recipes" role="tabpanel" aria-labelledby="tab-recipes" hidden>
+      <div class="toolbar">
+        <label class="search">
+          <span class="sr">Hľadať jedlo</span>
+          <input type="search" id="mealSearch" placeholder="Hľadať jedlo…" autocomplete="off">
+        </label>
+        <button type="button" class="btn primary" id="mealNew">+ Nové jedlo</button>
+        <button type="button" class="btn quiet" id="mealsRestore">Obnoviť vzorové recepty</button>
+      </div>
+      <div class="meals" id="meals"></div>
+    </section>
+
+    <!-- ============ shopping list ============ -->
+    <section id="pane-shop" role="tabpanel" aria-labelledby="tab-shop" hidden>
+      <div class="shopping">
+        <div class="card shop-list">
+          <h2>Nákupný zoznam<span class="sub" id="shopWeek"></span></h2>
+          <label class="toggle">
+            <input type="checkbox" id="shopPantry">
+            <span>Zobraziť bežné zásoby zo špajze (soľ, olej...)</span>
+          </label>
+          <div class="shop" id="shop"></div>
+        </div>
+        <aside class="card shop-export" aria-label="Export pre Google Keep">
+          <h2>Export</h2>
+          <button type="button" class="btn keep" id="shopCopy">Kopírovať do schránky pre Google Keep</button>
+          <p class="tip">Tip: V Google Keep vytvorte novú poznámku, do názvu napíšte „Nákupný zoznam“ a text vložte do tela poznámky (Ctrl+V). Potom v menu poznámky (⋮) kliknite na „Zobraziť začiarkavacie políčka“ – každý riadok sa zmení na samostatnú položku so zaškrtávacím políčkom.</p>
+          <details class="preview">
+            <summary>Náhľad textu</summary>
+            <pre id="shopText"></pre>
+          </details>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ pantry (what is at home) ============ -->
+    <section id="pane-pantry" role="tabpanel" aria-labelledby="tab-pantry" hidden>
+      <div class="shopping">
+        <div class="card">
+          <h2>Špajza<span class="sub" id="pantrySub"></span></h2>
+          <p class="lede">Suroviny, ktoré už máte doma. Kým sú v špajzi, v nákupnom zozname sa nezobrazia – bez ohľadu na množstvo.</p>
+          <form class="pantry-add" id="pantryForm" autocomplete="off" novalidate>
+            <label class="f p-name"><span>Surovina</span><input id="pantryName" list="ingNames" maxlength="120" placeholder="napr. Ryža basmati"></label>
+            <label class="f p-aisle"><span>Oddelenie</span><select id="pantryAisle"></select></label>
+            <button type="submit" class="btn primary">Pridať do špajze</button>
+          </form>
+          <p class="ferr" id="pantryError" role="alert" hidden></p>
+          <div class="shop" id="pantry"></div>
+        </div>
+        <aside class="card pantry-side" aria-label="Rýchle pridanie z plánu">
+          <h2>Z plánu<span class="sub" id="pantryWeek"></span></h2>
+          <p class="tip">Suroviny z naplánovaných jedál, ktoré v špajzi ešte nie sú. Kliknite na tie, ktoré máte doma.</p>
+          <div class="chips" id="pantrySuggest"></div>
+          <button type="button" class="btn quiet danger" id="pantryClear">Vyprázdniť špajzu</button>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot" id="foot"></footer>
+</div>
+
+<!-- add / edit meal -->
+<dialog id="mealDialog" class="dlg" aria-labelledby="mealDialogTitle">
+  <form id="mealForm" novalidate>
+    <div class="dlg-head">
+      <h2 id="mealDialogTitle">Nové jedlo</h2>
+      <button type="button" class="btn icon" data-close aria-label="Zavrieť">&times;</button>
+    </div>
+    <div class="dlg-body">
+      <div class="fgrid">
+        <label class="f f-name"><span>Názov jedla</span><input name="name" required maxlength="120" autocomplete="off"></label>
+        <label class="f f-serv"><span>Počet porcií</span><input name="defaultServings" type="number" min="1" max="99" step="1" inputmode="numeric" required></label>
+      </div>
+      <fieldset class="fs">
+        <legend>Nutričné hodnoty na 1 porciu</legend>
+        <div class="fgrid four">
+          <label class="f"><span>Energia (kcal)</span><input name="calories" type="number" min="0" step="any" inputmode="decimal"></label>
+          <label class="f"><span>Bielkoviny (g)</span><input name="protein" type="number" min="0" step="any" inputmode="decimal"></label>
+          <label class="f"><span>Sacharidy (g)</span><input name="carbs" type="number" min="0" step="any" inputmode="decimal"></label>
+          <label class="f"><span>Tuky (g)</span><input name="fat" type="number" min="0" step="any" inputmode="decimal"></label>
+        </div>
+      </fieldset>
+      <fieldset class="fs">
+        <legend>Suroviny <small>(množstvá pre zadaný počet porcií)</small></legend>
+        <div class="ing-head" aria-hidden="true">
+          <span>Surovina</span><span>Množstvo</span><span>Jednotka</span><span>Oddelenie</span><span title="Bežná zásoba (soľ, olej, korenie…)">Zásoba</span><span></span>
+        </div>
+        <div id="ingRows"></div>
+        <button type="button" class="btn quiet" id="ingAdd">+ Pridať surovinu</button>
+      </fieldset>
+      <p class="ferr" id="mealFormError" role="alert" hidden></p>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn quiet danger" id="mealDelete" hidden>Zmazať jedlo</button>
+      <span class="grow"></span>
+      <button type="button" class="btn quiet" data-close>Zrušiť</button>
+      <button type="submit" class="btn primary">Uložiť</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- confirm -->
+<dialog id="confirmDialog" class="dlg small" aria-labelledby="confirmTitle">
+  <form method="dialog">
+    <div class="dlg-body">
+      <h2 id="confirmTitle"></h2>
+      <p id="confirmText"></p>
+    </div>
+    <div class="dlg-foot">
+      <span class="grow"></span>
+      <button type="submit" class="btn quiet" value="cancel">Zrušiť</button>
+      <button type="submit" class="btn primary" value="ok" id="confirmOk">OK</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- send the week as a message with an import link -->
+<dialog id="shareDialog" class="dlg share" aria-labelledby="shareTitle">
+  <form method="dialog">
+    <div class="dlg-head">
+      <h2 id="shareTitle">Poslať plán</h2>
+      <button type="submit" class="btn icon" value="close" aria-label="Zavrieť">&times;</button>
+    </div>
+    <div class="dlg-body">
+      <p class="lede">Pošle sa správa so zoznamom jedál a odkazom. Kto odkaz otvorí, načíta si plán jedným klikom do svojej stránky Jedlá.</p>
+      <div class="share-opts">
+        <label class="f"><span>Od (meno, ktoré uvidí príjemca)</span><input id="shareFrom" maxlength="40" placeholder="napr. Zuzka" autocomplete="given-name"></label>
+        <label class="toggle"><input type="checkbox" id="shareShop"><span>Priložiť aj nákupný zoznam</span></label>
+      </div>
+      <pre class="share-text" id="shareText" aria-label="Text správy"></pre>
+      <p class="tip" id="shareNote" hidden></p>
+    </div>
+    <div class="dlg-foot share-foot">
+      <button type="button" class="btn primary" id="shareNative" hidden>Zdieľať…</button>
+      <button type="button" class="btn" id="shareWa">WhatsApp</button>
+      <button type="button" class="btn" id="shareMail">E-mail</button>
+      <button type="button" class="btn" id="shareCopy">Kopírovať</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- received plan (#import=…) -->
+<dialog id="importDialog" class="dlg share" aria-labelledby="importTitle">
+  <form method="dialog">
+    <div class="dlg-head">
+      <h2 id="importTitle">Načítať plán</h2>
+      <button type="submit" class="btn icon" value="cancel" aria-label="Zavrieť">&times;</button>
+    </div>
+    <div class="dlg-body">
+      <p class="lede" id="importMeta"></p>
+      <ul class="import-list" id="importList"></ul>
+      <p class="tip" id="importNew" hidden></p>
+      <fieldset class="fs import-mode" id="importMode" hidden>
+        <legend>Tento týždeň už máte niečo naplánované</legend>
+        <label class="toggle"><input type="radio" name="importMode" value="replace" checked><span>Nahradiť môj plán týmto</span></label>
+        <label class="toggle"><input type="radio" name="importMode" value="add"><span>Pridať k môjmu plánu</span></label>
+      </fieldset>
+    </div>
+    <div class="dlg-foot">
+      <span class="grow"></span>
+      <button type="submit" class="btn quiet" value="cancel">Zrušiť</button>
+      <button type="submit" class="btn primary" value="ok" id="importOk">Načítať plán</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<datalist id="ingNames"></datalist>
+<datalist id="units">
+  <option value="g"><option value="kg"><option value="ml"><option value="l">
+  <option value="ks"><option value="PL"><option value="ČL"><option value="štipka">
+  <option value="strúčik"><option value="konzerva"><option value="balenie"><option value="hrsť">
+</datalist>
+
+<script src="store.js"></script>
+<script src="share.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
