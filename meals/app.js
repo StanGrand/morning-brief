@@ -179,7 +179,11 @@
 
   function mealCard(m) {
     var n = m.nutrition;
-    return el('article', { cls: 'card meal', id: 'meal-' + m.id }, [
+    return el('article', { cls: 'card meal' + (m.image ? ' has-img' : ''), id: 'meal-' + m.id }, [
+      m.image ? el('figure', { cls: 'meal-img' }, [
+        el('img', { src: m.image, alt: '', loading: 'lazy', decoding: 'async', width: 480, height: 360 }),
+        m.imageCredit ? el('figcaption', { text: m.imageCredit }) : null
+      ]) : null,
       el('div', { cls: 'meal-head' }, [
         el('h3', { cls: 'meal-name', text: m.name }),
         Store.isSoup(m) ? el('span', { cls: 'kind-tag', text: 'Polievka' }) : null,
@@ -261,6 +265,7 @@
     var t = Store.nutritionFor(m, 1);
     return el('div', { cls: 'entry' + (Store.isSoup(m) ? ' soup' : '') }, [
       el('div', { cls: 'e-top' }, [
+        m.image ? el('img', { cls: 'e-img', src: m.image, alt: '', loading: 'lazy', decoding: 'async', width: 48, height: 36 }) : null,
         el('span', { cls: 'e-name' }, [
           Store.isSoup(m) ? el('span', { cls: 'kind-tag', text: 'Polievka' }) : null,
           m.name

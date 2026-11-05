@@ -429,3 +429,12 @@ footer.foot{color:var(--muted);font-size:.7rem;margin-top:22px;letter-spacing:.0
 .rec-warn{margin-top:6px}
 .rec-warn summary{cursor:pointer;color:var(--warn-ink,var(--muted))}
 .rec-warn ul{margin:6px 0 0;padding-left:18px}
+
+/* recipe photos (meals/img/, thumbnails from meals/data/foto) */
+.meal.has-img{padding-top:0;overflow:hidden}
+.meal-img{margin:0 -18px 12px;position:relative;aspect-ratio:16/9;background:var(--cell)}
+.meal-img img{display:block;width:100%;height:100%;object-fit:cover}
+.meal-img figcaption{position:absolute;right:6px;bottom:6px;font-size:.62rem;line-height:1.2;color:#fff;
+  background:rgba(0,0,0,.45);padding:2px 6px;border-radius:999px;max-width:calc(100% - 12px);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.e-img{flex:none;width:48px;height:36px;object-fit:cover;border-radius:6px;background:var(--cell)}

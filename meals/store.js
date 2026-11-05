@@ -100,6 +100,9 @@
       id: str(raw.id) || newId(),
       name: str(raw.name).trim() || 'Bez názvu',
       kind: raw.kind === 'soup' ? 'soup' : 'meal',
+      // thumbnail from recipes.js (relative URL, meals/img/...) and its credit
+      image: /^img\/[\w.-]+\.jpg(\?v=\d+)?$/.test(str(raw.image)) ? str(raw.image) : '',
+      imageCredit: str(raw.imageCredit).slice(0, 160),
       defaultServings: clampServings(raw.defaultServings),
       nutrition: {
         calories: Math.max(0, num(n.calories, 0)),

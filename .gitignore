@@ -12,3 +12,5 @@
 !meals/
 !meals/*
 !archive/dates.json
+!meals/img/
+!meals/img/*
