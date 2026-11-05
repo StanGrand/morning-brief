@@ -1,5 +1,11 @@
 /* Daily Brief – Meals: data model + localStorage store.
  *
+ * RECIPES are read-only here: they come from meals/data/jedla.xlsx, which
+ * services/meals_db.py turns into meals/recipes.js (window.MEALS_RECIPES) on
+ * every run of the brief. On load that list replaces data.meals (kept in
+ * localStorage so the brief's Agenda line and file:// use still have names);
+ * without recipes.js the last stored list is used.
+ *
  * Everything lives under ONE localStorage key, 'dailybrief_meals_data':
  *
  *   {
@@ -7,7 +13,8 @@
  *     meals: [Meal, ...],
  *     plan:  { 'YYYY-MM-DD' (Monday): Week },   // see normPlan below
  *     settings: { avgMode: 'week' | 'planned', showPantry: boolean,
- *                 senderName: string, shareShop: boolean,     // these two: "Poslať plán"
+ *                 senderName: string, shareShop: boolean,     // these three: "Poslať plán"
+ *                 sharePantry: boolean,
  *                 kcalTarget: number },                       // daily energy for the WHO ranges
  *     pantry: [{ key, name, aisle, added: 'YYYY-MM-DD' }]   // "Špajza"
  *   }
@@ -15,6 +22,7 @@
  * Meal = {
  *   id: string,
  *   name: string,
+ *   kind: 'meal' | 'soup',                           // soup = "Polievka" (own picker per day)
  *   defaultServings: number,
  *   nutrition: { calories, protein, carbs, fat },   // per ONE serving (kcal, g)
  *   ingredients: [
@@ -37,7 +45,7 @@
   'use strict';
 
   var STORAGE_KEY = 'dailybrief_meals_data';
-  var VERSION = 1;
+  var VERSION = 3;          // 2: Meal.kind; 3 (2026-11-05): recipes from recipes.js
 
   var AISLES = [
     'Ovocie a zelenina',
@@ -47,108 +55,14 @@
     'Korenie a dochucovadlá'
   ];
 
-  // ---- seed: 5 Slovak everyday meals, nutrition is per serving (approx.) ----
-  function ing(name, amount, unit, aisle, isPantry) {
-    return { name: name, amount: amount, unit: unit, aisle: AISLES[aisle], isPantry: !!isPantry };
-  }
-  var OVZ = 0, MAS = 1, MLI = 2, TRV = 3, KOR = 4;
-
-  function seedMeals() {
-    return [
-      {
-        id: 'seed-kuracie-prsia-ryza',
-        name: 'Kuracie prsia s ryžou a brokolicou',
-        defaultServings: 2,
-        nutrition: { calories: 620, protein: 56, carbs: 74, fat: 11 },
-        ingredients: [
-          ing('Kuracie prsia', 400, 'g', MAS),
-          ing('Ryža basmati', 150, 'g', TRV),
-          ing('Brokolica', 300, 'g', OVZ),
-          ing('Mrkva', 150, 'g', OVZ),
-          ing('Cesnak', 2, 'strúčik', OVZ),
-          ing('Olej', 1, 'PL', TRV, true),
-          ing('Sladká paprika mletá', 1, 'ČL', KOR),
-          ing('Soľ', 1, 'štipka', KOR, true),
-          ing('Čierne korenie', 1, 'štipka', KOR, true)
-        ]
-      },
-      {
-        id: 'seed-tuniakove-cestoviny',
-        name: 'Tuniakové cestoviny s paradajkami',
-        defaultServings: 2,
-        nutrition: { calories: 640, protein: 44, carbs: 90, fat: 10 },
-        ingredients: [
-          ing('Cestoviny penne', 200, 'g', TRV),
-          ing('Tuniak vo vlastnej šťave', 2, 'konzerva', MAS),
-          ing('Paradajková passata', 400, 'g', TRV),
-          ing('Cibuľa', 1, 'ks', OVZ),
-          ing('Cesnak', 2, 'strúčik', OVZ),
-          ing('Olivový olej', 1, 'PL', TRV, true),
-          ing('Oregano', 1, 'ČL', KOR, true),
-          ing('Soľ', 1, 'štipka', KOR, true),
-          ing('Čierne korenie', 1, 'štipka', KOR, true)
-        ]
-      },
-      {
-        id: 'seed-sosovicovy-privarok',
-        name: 'Šošovicový prívarok s vajíčkom',
-        defaultServings: 4,
-        nutrition: { calories: 400, protein: 26, carbs: 51, fat: 10 },
-        ingredients: [
-          ing('Hnedá šošovica', 300, 'g', TRV),
-          ing('Cibuľa', 1, 'ks', OVZ),
-          ing('Vajcia', 4, 'ks', MLI),
-          ing('Hladká múka', 2, 'PL', TRV, true),
-          ing('Olej', 2, 'PL', TRV, true),
-          ing('Ocot', 2, 'PL', KOR, true),
-          ing('Cukor', 1, 'ČL', TRV, true),
-          ing('Bobkový list', 2, 'ks', KOR, true),
-          ing('Soľ', 1, 'ČL', KOR, true)
-        ]
-      },
-      {
-        id: 'seed-ovsena-kasa',
-        name: 'Ovsená kaša s banánom a čučoriedkami',
-        defaultServings: 1,
-        nutrition: { calories: 510, protein: 17, carbs: 92, fat: 8 },
-        ingredients: [
-          ing('Ovsené vločky', 60, 'g', TRV),
-          ing('Mlieko polotučné', 250, 'ml', MLI),
-          ing('Banán', 1, 'ks', OVZ),
-          ing('Čučoriedky', 80, 'g', OVZ),
-          ing('Med', 1, 'ČL', TRV),
-          ing('Škorica', 1, 'štipka', KOR, true)
-        ]
-      },
-      {
-        id: 'seed-hovadzie-chilli',
-        name: 'Hovädzie chilli s fazuľou',
-        defaultServings: 4,
-        nutrition: { calories: 520, protein: 34, carbs: 40, fat: 24 },
-        ingredients: [
-          ing('Mleté hovädzie mäso', 500, 'g', MAS),
-          ing('Červená fazuľa (konzerva)', 2, 'konzerva', TRV),
-          ing('Drvené paradajky (konzerva)', 400, 'g', TRV),
-          ing('Kukurica (konzerva)', 1, 'konzerva', TRV),
-          ing('Cibuľa', 1, 'ks', OVZ),
-          ing('Červená paprika', 1, 'ks', OVZ),
-          ing('Cesnak', 3, 'strúčik', OVZ),
-          ing('Chilli korenie', 2, 'ČL', KOR),
-          ing('Údená paprika', 1, 'ČL', KOR),
-          ing('Rasca mletá', 1, 'ČL', KOR),
-          ing('Olej', 1, 'PL', TRV, true),
-          ing('Soľ', 1, 'ČL', KOR, true)
-        ]
-      }
-    ];
-  }
+  var KINDS = ['meal', 'soup'];   // main dish | soup ("Polievka")
 
   function freshData() {
-    return { version: VERSION, meals: seedMeals(), plan: {}, settings: defaultSettings(), pantry: [] };
+    return { version: VERSION, meals: [], plan: {}, settings: defaultSettings(), pantry: [] };
   }
   // avgMode: 'week' = ÷7, 'planned' = ÷ planned days; showPantry: list staples on the shopping list
   var KCAL_DEFAULT = 2000;
-  function defaultSettings() { return { avgMode: 'week', showPantry: false, senderName: '', shareShop: false, kcalTarget: KCAL_DEFAULT }; }
+  function defaultSettings() { return { avgMode: 'week', showPantry: false, senderName: '', shareShop: false, sharePantry: false, kcalTarget: KCAL_DEFAULT }; }
   function kcalTarget(v) {
     var n = Math.round(Number(v));
     return n >= 1000 && n <= 5000 ? n : KCAL_DEFAULT;
@@ -169,7 +83,7 @@
 
   function normIngredient(raw) {
     raw = raw || {};
-    var aisle = AISLES.indexOf(raw.aisle) >= 0 ? raw.aisle : AISLES[TRV];
+    var aisle = AISLES.indexOf(raw.aisle) >= 0 ? raw.aisle : AISLES[3];
     return {
       name: str(raw.name).trim(),
       amount: Math.max(0, num(raw.amount, 0)),
@@ -185,6 +99,7 @@
     return {
       id: str(raw.id) || newId(),
       name: str(raw.name).trim() || 'Bez názvu',
+      kind: raw.kind === 'soup' ? 'soup' : 'meal',
       defaultServings: clampServings(raw.defaultServings),
       nutrition: {
         calories: Math.max(0, num(n.calories, 0)),
@@ -264,6 +179,7 @@
         showPantry: s.showPantry === true,
         senderName: str(s.senderName).replace(/\s+/g, ' ').trim().slice(0, 40),
         shareShop: s.shareShop === true,
+        sharePantry: s.sharePantry === true,
         kcalTarget: kcalTarget(s.kcalTarget)
       },
       pantry: normPantry(raw.pantry)
@@ -306,30 +222,37 @@
       }
     }
     data = parsed || freshData();
-    save();          // first visit / corrupt: seed; otherwise store the normalised form
+    applyRecipes();
+    save();          // store the normalised form (and the current recipe list)
     return data;
   }
 
   function get() { return data || load(); }
 
+  // ---- recipes from meals/recipes.js (generated from jedla.xlsx) ----
+  var recipesInfo = { fromFile: false, generated: '', source: '', warnings: [] };
+  function applyRecipes() {
+    var rec = global.MEALS_RECIPES;
+    if (!rec || !Array.isArray(rec.meals)) return;      // keep the stored list
+    data.meals = rec.meals.map(normMeal);
+    data.plan = normPlan(data.plan, data.meals);         // drops entries of removed recipes
+    recipesInfo = {
+      fromFile: true,
+      generated: str(rec.generated),
+      source: str(rec.source) || 'jedla.xlsx',
+      warnings: Array.isArray(rec.warnings) ? rec.warnings.map(str) : []
+    };
+  }
+  function getRecipesInfo() { return recipesInfo; }
+
   // ---- meals ----
   function getMeals() { return get().meals.slice(); }
+  function isSoup(meal) { return !!meal && meal.kind === 'soup'; }
 
   function getMeal(id) {
     var m = get().meals;
     for (var i = 0; i < m.length; i++) if (m[i].id === id) return m[i];
     return null;
-  }
-
-  function upsertMeal(meal) {
-    var clean = normMeal(meal);
-    var meals = get().meals;
-    for (var i = 0; i < meals.length; i++) {
-      if (meals[i].id === clean.id) { meals[i] = clean; save(); return clean; }
-    }
-    meals.push(clean);
-    save();
-    return clean;
   }
 
   /** How many plan entries (any week) use this meal. */
@@ -339,36 +262,6 @@
       eachEntry(plan[k], function (e) { if (e.mealId === mealId) n++; });
     });
     return n;
-  }
-
-  /** Delete a meal and every plan entry that uses it. Returns true if it existed. */
-  function removeMeal(id) {
-    var d = get();
-    var before = d.meals.length;
-    d.meals = d.meals.filter(function (m) { return m.id !== id; });
-    if (d.meals.length === before) return false;
-    d.plan = normPlan(d.plan, d.meals);
-    save();
-    return true;
-  }
-
-  /** Put the 5 sample meals back as shipped (re-adds deleted ones, reverts
-   *  edits to them). The reader's own meals and the plan are kept. */
-  function restoreSamples() {
-    var d = get();
-    seedMeals().forEach(function (seed) {
-      var i = d.meals.findIndex(function (m) { return m.id === seed.id; });
-      if (i >= 0) d.meals[i] = seed; else d.meals.push(seed);
-    });
-    save();
-    return d.meals.length;
-  }
-
-  /** Throw away everything (meals AND plan) and start from the samples. */
-  function reset() {
-    data = freshData();
-    save();
-    return data;
   }
 
   // ---- week keys (local dates; never toISOString, that is UTC) ----
@@ -407,7 +300,8 @@
     if (plan[key] && weekIsEmpty(plan[key])) delete plan[key];
   }
 
-  /** slot: 0..6 (Mon..Sun) or 'pool'. Returns the new entry. */
+  /** slot: 0..6 (Mon..Sun) or 'pool'. Soups and dishes share the slot's
+   *  list (the planner shows soups first). Returns the new entry. */
   function addToPlan(key, slot, mealId, servings) {
     var meal = getMeal(mealId);
     if (!meal) return null;
@@ -635,6 +529,22 @@
     return d.pantry.length !== before;
   }
   function clearPantry() { get().pantry = []; save(); }
+  /* A Špajza received with a shared plan: items [{name, aisle}]; mode 'add'
+   * keeps what is here and adds the rest, 'replace' starts from the list.
+   * One save. Returns the number of items added. */
+  function importPantry(items, mode) {
+    var d = get();
+    if (mode === 'replace') d.pantry = [];
+    var have = pantrySet(), n = 0, today = isoDate(new Date());
+    (items || []).forEach(function (it) {
+      var name = str(it && it.name).replace(/\s+/g, ' ').trim().slice(0, 120), key = foldKey(name);
+      if (!key || have[key]) return;
+      var item = { key: key, name: name, aisle: AISLES.indexOf(it.aisle) >= 0 ? it.aisle : AISLES[3], added: today };
+      d.pantry.push(item); have[key] = item; n++;
+    });
+    save();
+    return n;
+  }
 
   function getSetting(name) { return get().settings[name]; }
   function setSetting(name, value) { get().settings[name] = value; save(); }
@@ -643,10 +553,10 @@
     STORAGE_KEY: STORAGE_KEY,
     VERSION: VERSION,
     AISLES: AISLES.slice(),
+    KINDS: KINDS.slice(), isSoup: isSoup,
     MAX_SERVINGS: MAX_SERVINGS,
-    load: load, save: save, get: get, reset: reset,
-    getMeals: getMeals, getMeal: getMeal, upsertMeal: upsertMeal,
-    removeMeal: removeMeal, planUses: planUses, restoreSamples: restoreSamples,
+    load: load, save: save, get: get,
+    getMeals: getMeals, getMeal: getMeal, planUses: planUses, getRecipesInfo: getRecipesInfo,
     newId: newId,
     weekKey: weekKey, shiftWeek: shiftWeek, parseKey: parseKey,
     getWeek: getWeek, addToPlan: addToPlan, setServings: setServings,
@@ -655,7 +565,7 @@
     whoTargets: whoTargets, kcalTarget: kcalTarget,
     shoppingList: shoppingList, foldKey: foldKey,
     getPantry: getPantry, inPantry: inPantry, addToPantry: addToPantry,
-    removeFromPantry: removeFromPantry, clearPantry: clearPantry,
+    removeFromPantry: removeFromPantry, clearPantry: clearPantry, importPantry: importPantry,
     knownIngredients: knownIngredients,
     getSetting: getSetting, setSetting: setSetting,
     isPersistent: function () { return persistent; }

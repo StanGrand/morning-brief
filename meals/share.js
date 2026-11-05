@@ -8,9 +8,11 @@
  * Payload v1 (compact on purpose, links get long):
  *   { v: 1, w: 'YYYY-MM-DD' (Monday), f: sender name,
  *     m: [[id, name, defaultServings, [kcal, protein, carbs, fat],
- *          [[name, amount, unit, aisleIndex, isPantry 0|1], ...]], ...],
+ *          [[name, amount, unit, aisleIndex, isPantry 0|1], ...], soup 0|1], ...],
+ *        (the 6th field, soup, was added 2026-11-05; links without it = dishes)
  *     d: [[[mealIndex, servings], ...] x7],   // Mon..Sun
- *     p: [[mealIndex, servings], ...] }       // "Týždenný výber"
+ *     p: [[mealIndex, servings], ...],        // "Týždenný výber"
+ *     s: [[name, aisleIndex], ...] }          // optional: the sender's Špajza (2026-11-05)
  *
  * Prefix 'z1.' = deflate-compressed (CompressionStream), 'j1.' = plain JSON
  * (fallback for browsers without CompressionStream). Exposes window.MealsShare.
@@ -48,7 +50,7 @@
   function round3(n) { return Math.round(n * 1000) / 1000; }
 
   // ---- pack: the week as shown in the planner -> payload object ----
-  function pack(key, from) {
+  function pack(key, from, withPantry) {
     var w = Store.getWeek(key);
     var idx = {}, meals = [];
     function ref(e) {
@@ -61,13 +63,16 @@
           [round3(n.calories), round3(n.protein), round3(n.carbs), round3(n.fat)],
           meal.ingredients.map(function (i) {
             return [i.name, round3(i.amount), i.unit, Math.max(0, Store.AISLES.indexOf(i.aisle)), i.isPantry ? 1 : 0];
-          })]);
+          }), Store.isSoup(meal) ? 1 : 0]);
       }
       return [idx[meal.id], e.servings];
     }
     function list(entries) { return entries.map(ref).filter(Boolean); }
     var out = { v: 1, w: key, m: meals, d: w.days.map(list), p: list(w.pool) };
     if (from) out.f = from;
+    if (withPantry) {
+      out.s = Store.getPantry().map(function (p) { return [p.name, Math.max(0, Store.AISLES.indexOf(p.aisle))]; });
+    }
     return out;
   }
 
@@ -85,6 +90,7 @@
       return {
         id: String(r[0] || '').slice(0, 80),
         name: String(r[1] || '').replace(/\s+/g, ' ').trim().slice(0, 120) || 'Bez názvu',
+        kind: r[5] === 1 ? 'soup' : 'meal',
         defaultServings: r[2],
         nutrition: { calories: n[0], protein: n[1], carbs: n[2], fat: n[3] },
         ingredients: (Array.isArray(r[4]) ? r[4] : []).slice(0, 100).map(function (i) {
@@ -104,7 +110,13 @@
     var days = [];
     for (var i = 0; i < 7; i++) days.push(list(Array.isArray(o.d) ? o.d[i] : null));
     var from = String(o.f || '').replace(/\s+/g, ' ').trim().slice(0, 40);
-    return { week: key, from: from, meals: meals, days: days, pool: list(o.p) };
+    // null = the link has no Špajza; [] = the sender's Špajza is empty
+    var pantry = Array.isArray(o.s) ? o.s.slice(0, 500).map(function (r) {
+      if (!Array.isArray(r)) return null;
+      var name = String(r[0] || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+      return name ? { name: name, aisle: Store.AISLES[r[1]] || Store.AISLES[3] } : null;
+    }).filter(Boolean) : null;
+    return { week: key, from: from, meals: meals, days: days, pool: list(o.p), pantry: pantry };
   }
 
   // ---- string codec ----

@@ -153,6 +153,14 @@ input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--accent);mar
 select.add{font-size:.76rem;color:var(--muted);background:transparent;border-style:dashed;cursor:pointer;
   width:auto;min-width:190px;max-width:100%;padding-top:5px;padding-bottom:5px}
 select.add:hover{color:var(--accent);border-color:var(--accent)}
+.adds{display:flex;flex-wrap:wrap;gap:6px;max-width:100%}
+/* soups: a small tag before the name, and the same tag on the recipe card */
+.kind-tag{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--accent-text);background:var(--accent-soft);border-radius:999px;padding:1px 6px;margin-right:6px;
+  vertical-align:1px;white-space:nowrap}
+.meal-head .kind-tag{margin-right:0;align-self:center}
+.kind-pick{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:10px 0 2px;font-size:.8rem}
+.kind-pick > span{color:var(--muted);font-weight:600}
 
 /* summary card */
 .summary{margin:0}
@@ -390,6 +398,7 @@ footer.foot{color:var(--muted);font-size:.7rem;margin-top:22px;letter-spacing:.0
   .day-kcal{margin:0 0 0 auto}
   .entries{grid-template-columns:minmax(0,1fr)}
   .day-body select.add{width:100%}
+  .adds{width:100%;flex-direction:column}
   .pantry-add .p-name{grid-column:1/-1}
 }
 @media (max-width:520px){
@@ -413,3 +422,10 @@ footer.foot{color:var(--muted);font-size:.7rem;margin-top:22px;letter-spacing:.0
   .dlg form{max-height:100dvh;height:100%}
   .dlg.small{height:auto;margin:auto;border-radius:var(--radius);width:calc(100vw - 24px)}
 }
+
+/* recipes come from jedla.xlsx: a short note above the list */
+.rec-info{font-size:.78rem;color:var(--muted);margin:-4px 0 14px}
+.rec-info p{margin:0}
+.rec-warn{margin-top:6px}
+.rec-warn summary{cursor:pointer;color:var(--warn-ink,var(--muted))}
+.rec-warn ul{margin:6px 0 0;padding-left:18px}

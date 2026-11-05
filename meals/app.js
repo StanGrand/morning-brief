@@ -182,6 +182,7 @@
     return el('article', { cls: 'card meal', id: 'meal-' + m.id }, [
       el('div', { cls: 'meal-head' }, [
         el('h3', { cls: 'meal-name', text: m.name }),
+        Store.isSoup(m) ? el('span', { cls: 'kind-tag', text: 'Polievka' }) : null,
         el('span', { cls: 'portions', text: portions(m.defaultServings) })
       ]),
       el('p', { cls: 'meal-sub', text: 'Na 1 porciu (orientačne)' }),
@@ -193,11 +194,7 @@
       ]),
       m.ingredients.length
         ? el('details', { cls: 'ingr' }, [el('summary', { text: 'Suroviny (' + m.ingredients.length + ')' })].concat(ingredientGroups(m.ingredients)))
-        : el('p', { cls: 'empty', text: 'Bez surovín.' }),
-      el('div', { cls: 'meal-actions' }, [
-        el('button', { type: 'button', cls: 'btn quiet', 'data-edit': m.id, 'data-focus': 'edit:' + m.id, text: 'Upraviť' }),
-        el('button', { type: 'button', cls: 'btn quiet danger', 'data-delete': m.id, text: 'Zmazať' })
-      ])
+        : el('p', { cls: 'empty', text: 'Bez surovín.' })
     ]);
   }
 
@@ -209,7 +206,7 @@
     box.textContent = '';
     if (!meals.length) {
       box.appendChild(el('div', { cls: 'card empty-card' }, [
-        el('p', { text: 'Zatiaľ žiadne jedlá. Pridaj nové alebo obnov vzorové recepty.' })
+        el('p', { text: 'Zatiaľ žiadne recepty. Doplň ich do meals/data/jedla.xlsx.' })
       ]));
     } else if (!shown.length) {
       box.appendChild(el('div', { cls: 'card empty-card' }, [
@@ -220,146 +217,30 @@
     $('mealCount').textContent = meals.length;
   }
 
-  async function deleteMeal(id) {
-    var m = Store.getMeal(id);
-    if (!m) return false;
-    var uses = Store.planUses(id);
-    var text = 'Jedlo „' + m.name + '“ sa natrvalo zmaže.' +
-      (uses ? ' Odstráni sa aj z plánu (' + uses + '×).' : '');
-    if (!(await confirmBox('Zmazať jedlo?', text, 'Zmazať'))) return false;
-    Store.removeMeal(id);
-    renderAll();
-    return true;
-  }
-
   $('mealSearch').addEventListener('input', function (e) { query = e.target.value; renderMeals(); });
-  $('mealNew').addEventListener('click', function () { openMealForm(null); });
-  $('mealsRestore').addEventListener('click', async function () {
-    var ok = await confirmBox('Obnoviť vzorové recepty?',
-      'Vzorové jedlá sa vrátia do pôvodného stavu: zmazané sa pridajú späť a ich úpravy sa zrušia. ' +
-      'Tvoje vlastné jedlá a plán týždňa zostanú.', 'Obnoviť');
-    if (!ok) return;
-    Store.restoreSamples();
-    renderAll();
-  });
-  $('meals').addEventListener('click', function (e) {
-    var b = e.target.closest('button');
-    if (!b) return;
-    if (b.dataset.edit) openMealForm(Store.getMeal(b.dataset.edit));
-    else if (b.dataset.delete) deleteMeal(b.dataset.delete);
-  });
 
-  // ---------------------------------------------------------- meal form
-  var mealDlg = $('mealDialog'), form = $('mealForm'), editingId = null;
-
-  function ingRow(i) {
-    i = i || { name: '', amount: '', unit: 'g', aisle: Store.AISLES[0], isPantry: false };
-    return el('div', { cls: 'ing-row' }, [
-      el('input', { cls: 'i-name', 'aria-label': 'Surovina', placeholder: 'napr. Cibuľa', value: i.name, maxlength: 80 }),
-      el('input', { cls: 'i-amount', type: 'number', min: 0, step: 'any', inputmode: 'decimal', 'aria-label': 'Množstvo', value: i.amount === '' ? '' : String(i.amount) }),
-      el('input', { cls: 'i-unit', list: 'units', 'aria-label': 'Jednotka', value: i.unit, maxlength: 20 }),
-      el('select', { cls: 'i-aisle', 'aria-label': 'Oddelenie' }, Store.AISLES.map(function (a) {
-        return el('option', { value: a, text: a, selected: a === i.aisle });
-      })),
-      el('label', { cls: 'i-pantry', title: 'Bežne doma (soľ, olej, korenie…)' }, [
-        el('input', { type: 'checkbox', checked: i.isPantry }), el('span', { text: 'Zásoba', title: 'Bežná zásoba (soľ, olej, korenie…)' })
-      ]),
-      el('button', { type: 'button', cls: 'btn icon i-del', 'aria-label': 'Odstrániť surovinu', text: '×' })
-    ]);
-  }
-
-  function openMealForm(meal) {
-    editingId = meal ? meal.id : null;
-    $('mealDialogTitle').textContent = meal ? 'Upraviť jedlo' : 'Nové jedlo';
-    $('mealDelete').hidden = !meal;
-    $('mealFormError').hidden = true;
-    var f = form.elements;
-    f.name.value = meal ? meal.name : '';
-    f.defaultServings.value = meal ? meal.defaultServings : 2;
-    ['calories', 'protein', 'carbs', 'fat'].forEach(function (k) {
-      f[k].value = meal ? meal.nutrition[k] : '';
-    });
-    var rows = $('ingRows');
-    rows.textContent = '';
-    (meal && meal.ingredients.length ? meal.ingredients : [null]).forEach(function (i) { rows.appendChild(ingRow(i)); });
-    mealDlg.showModal();
-    f.name.focus();
-  }
-
-  function formError(msg, field) {
-    var e = $('mealFormError');
-    e.textContent = msg;
-    e.hidden = false;
-    if (field) field.focus();
-  }
-
-  function readForm() {
-    var f = form.elements;
-    var name = f.name.value.trim();
-    if (!name) return formError('Zadaj názov jedla.', f.name);
-    var serv = Number(f.defaultServings.value);
-    if (!(serv >= 1 && serv <= Store.MAX_SERVINGS) || serv % 1) {
-      return formError('Počet porcií musí byť celé číslo od 1 do ' + Store.MAX_SERVINGS + '.', f.defaultServings);
+  // Where the recipes come from: meals/data/jedla.xlsx -> recipes.js (each brief run)
+  function renderRecipesInfo() {
+    var info = Store.getRecipesInfo(), box = $('recipesInfo');
+    box.textContent = '';
+    var when = '';
+    if (info.generated) {
+      var d = new Date(info.generated);
+      if (!isNaN(d)) when = d.getDate() + '. ' + (d.getMonth() + 1) + '. ' + d.getFullYear() + ' ' +
+        d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
     }
-    var nutrition = {};
-    var keys = ['calories', 'protein', 'carbs', 'fat'];
-    for (var k = 0; k < keys.length; k++) {
-      var raw = f[keys[k]].value.trim().replace(',', '.');
-      var v = raw === '' ? 0 : Number(raw);
-      if (!(v >= 0)) return formError('Nutričné hodnoty musia byť nezáporné čísla.', f[keys[k]]);
-      nutrition[keys[k]] = v;
+    box.appendChild(el('p', { text: info.fromFile
+      ? 'Recepty sa upravujú v súbore meals/data/' + info.source + ' a sem sa načítajú pri každom behu Daily Briefu' +
+        (when ? ' (naposledy ' + when + ').' : '.')
+      : 'Databáza receptov (recipes.js) sa nenačítala – zobrazujú sa naposledy uložené recepty. ' +
+        'Vytvorí sa pri najbližšom behu Daily Briefu z meals/data/jedla.xlsx.' }));
+    if (info.warnings.length) {
+      box.appendChild(el('details', { cls: 'rec-warn' }, [
+        el('summary', { text: 'Upozornenia z databázy (' + info.warnings.length + ')' }),
+        el('ul', null, info.warnings.map(function (w) { return el('li', { text: w }); }))
+      ]));
     }
-    var ingredients = [];
-    var rows = $('ingRows').querySelectorAll('.ing-row');
-    for (var r = 0; r < rows.length; r++) {
-      var row = rows[r];
-      var iname = row.querySelector('.i-name').value.trim();
-      var amountField = row.querySelector('.i-amount');
-      if (!iname) continue;                       // empty rows are ignored
-      var a = amountField.value.trim() === '' ? 0 : Number(amountField.value);
-      if (!(a >= 0)) return formError('Množstvo pri „' + iname + '“ musí byť nezáporné číslo.', amountField);
-      ingredients.push({
-        name: iname, amount: a,
-        unit: row.querySelector('.i-unit').value.trim(),
-        aisle: row.querySelector('.i-aisle').value,
-        isPantry: row.querySelector('.i-pantry input').checked
-      });
-    }
-    return { id: editingId || Store.newId(), name: name, defaultServings: serv,
-             nutrition: nutrition, ingredients: ingredients };
   }
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    var meal = readForm();
-    if (!meal) return;
-    var saved = Store.upsertMeal(meal);
-    mealDlg.close();
-    renderAll();
-    var card = $('meal-' + saved.id);
-    if (card && !$('pane-recipes').hidden) card.scrollIntoView({ block: 'nearest' });
-  });
-  $('ingAdd').addEventListener('click', function () {
-    var row = ingRow(null);
-    $('ingRows').appendChild(row);
-    row.querySelector('.i-name').focus();
-  });
-  $('ingRows').addEventListener('click', function (e) {
-    var b = e.target.closest('.i-del');
-    if (!b) return;
-    var rows = $('ingRows');
-    b.closest('.ing-row').remove();
-    if (!rows.children.length) rows.appendChild(ingRow(null));
-  });
-  mealDlg.addEventListener('click', function (e) {
-    if (e.target.closest('[data-close]')) mealDlg.close();
-    else if (e.target === mealDlg) mealDlg.close();       // click on the backdrop
-  });
-  $('mealDelete').addEventListener('click', async function () {
-    var id = editingId;
-    mealDlg.close();
-    if (!(await deleteMeal(id))) openMealForm(Store.getMeal(id));
-  });
 
   // ================================================================ planner
   var DAY_NAMES = ['Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota', 'Nedeľa'];
@@ -378,9 +259,12 @@
     // One portion: what one person eats (the servings only scale the
     // ingredients and the shopping list).
     var t = Store.nutritionFor(m, 1);
-    return el('div', { cls: 'entry' }, [
+    return el('div', { cls: 'entry' + (Store.isSoup(m) ? ' soup' : '') }, [
       el('div', { cls: 'e-top' }, [
-        el('span', { cls: 'e-name', text: m.name }),
+        el('span', { cls: 'e-name' }, [
+          Store.isSoup(m) ? el('span', { cls: 'kind-tag', text: 'Polievka' }) : null,
+          m.name
+        ]),
         el('button', { type: 'button', cls: 'btn icon x', 'data-remove': e.id,
                        'aria-label': 'Odstrániť ' + m.name + ' z plánu', text: '×' })
       ]),
@@ -402,12 +286,26 @@
     ]);
   }
 
-  function addSelect(slot, label) {
-    var meals = Store.getMeals().slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'sk'); });
-    return el('select', { cls: 'add', 'data-slot': String(slot), 'data-focus': 'add:' + slot, 'aria-label': label },
-      [el('option', { value: '', text: meals.length ? '+ Pridať jedlo…' : 'Najprv pridaj jedlá v Receptoch' })]
+  // kind 'meal' = main dishes, 'soup' = soups: each day has one picker of each
+  function addSelect(slot, label, kind) {
+    var soup = kind === 'soup';
+    var meals = Store.getMeals()
+      .filter(function (m) { return Store.isSoup(m) === soup; })
+      .sort(function (a, b) { return a.name.localeCompare(b.name, 'sk'); });
+    var prompt = soup ? (meals.length ? '+ Pridať polievku…' : 'Žiadne polievky v databáze')
+                      : (meals.length ? '+ Pridať jedlo…' : 'Žiadne jedlá v databáze');
+    return el('select', { cls: 'add' + (soup ? ' soup' : ''), 'data-slot': String(slot),
+                          'data-focus': (soup ? 'addsoup:' : 'add:') + slot, 'aria-label': label },
+      [el('option', { value: '', text: prompt })]
         .concat(meals.map(function (m) { return el('option', { value: m.id, text: m.name }); })));
   }
+  // soups first within a day (the order they are eaten), otherwise as added
+  function soupsFirst(list, mealOf) {
+    return list.map(function (e, i) { return { e: e, i: i, s: Store.isSoup(mealOf(e)) ? 0 : 1 }; })
+      .sort(function (a, b) { return a.s - b.s || a.i - b.i; })
+      .map(function (x) { return x.e; });
+  }
+  function byMealId(e) { return Store.getMeal(e.mealId); }
 
   function dayBlock(slot, title, sub, totals, entries, isToday) {
     var picked = slot !== 'pool' && selDay === slot;
@@ -423,8 +321,11 @@
         totals.calories ? el('span', { cls: 'day-kcal', text: int(totals.calories) + ' kcal' }) : null
       ]),
       el('div', { cls: 'day-body' }, [
-        el('div', { cls: 'entries' }, entries.map(entryRow)),
-        addSelect(slot, 'Pridať jedlo: ' + title)
+        el('div', { cls: 'entries' }, soupsFirst(entries, byMealId).map(entryRow)),
+        el('div', { cls: 'adds' }, [
+          addSelect(slot, 'Pridať polievku: ' + title, 'soup'),
+          addSelect(slot, 'Pridať jedlo: ' + title, 'meal')
+        ])
       ])
     ]);
   }
@@ -978,7 +879,7 @@
     var from = Store.getSetting('senderName') || '';
     var w = Store.getWeek(week);
     function named(list) {
-      return list.map(function (e) {
+      return soupsFirst(list, byMealId).map(function (e) {
         var m = Store.getMeal(e.mealId);
         return m ? { name: m.name, servings: e.servings } : null;
       }).filter(Boolean);
@@ -989,7 +890,12 @@
       var list = Store.shoppingList(week, Store.getSetting('showPantry') === true);
       if (list.count) lines.push('', 'Nákupný zoznam:', keepText(list).trim());
     }
-    var link = baseUrl() + '#import=' + await MealsShare.encode(MealsShare.pack(week, from));
+    var withPantry = Store.getSetting('sharePantry') === true;
+    if (withPantry) {
+      var pan = Store.getPantry();
+      lines.push('', 'Špajza (' + pan.length + '): ' + (pan.length ? pan.map(function (x) { return x.name; }).join(', ') : 'prázdna'));
+    }
+    var link = baseUrl() + '#import=' + await MealsShare.encode(MealsShare.pack(week, from, withPantry));
     lines.push('', 'Načítať plán do Jedál (klik na odkaz):', link);
     return { text: lines.join('\n'), link: link, subject: 'Plán jedál ' + rangeOf(week) };
   }
@@ -1017,6 +923,7 @@
     if (!Store.weekSummary(week).entries) return;
     $('shareFrom').value = Store.getSetting('senderName') || '';
     $('shareShop').checked = Store.getSetting('shareShop') === true;
+    $('sharePantry').checked = Store.getSetting('sharePantry') === true;
     $('shareNative').hidden = typeof navigator.share !== 'function';
     $('shareTitle').textContent = 'Poslať plán · ' + rangeOf(week);
     shareState = null;
@@ -1029,6 +936,10 @@
     Store.setSetting('senderName', e.target.value.replace(/\s+/g, ' ').trim().slice(0, 40));
     clearTimeout(shareTimer);
     shareTimer = setTimeout(refreshShare, 250);
+  });
+  $('sharePantry').addEventListener('change', function (e) {
+    Store.setSetting('sharePantry', e.target.checked);
+    refreshShare();
   });
   $('shareShop').addEventListener('change', function (e) {
     Store.setSetting('shareShop', e.target.checked);
@@ -1085,9 +996,11 @@
       return;
     }
     var count = p.pool.length + p.days.reduce(function (n, l) { return n + l.length; }, 0);
-    if (!count) { toast('Odkaz neobsahuje žiadne jedlá.', true); return; }
+    if (!count && !p.pantry) { toast('Odkaz neobsahuje žiadne jedlá.', true); return; }
 
     var name = function (e) { return { name: p.meals[e.meal].name, servings: e.servings }; };
+    var fromLink = function (e) { return p.meals[e.meal]; };
+    var shown = function (list) { return soupsFirst(list, fromLink).map(name).map(entryText).join(', '); };
     var when = whenOf(p.week);
     $('importTitle').textContent = p.from ? 'Plán jedál od: ' + p.from : 'Načítať plán jedál';
     $('importMeta').textContent = 'Týždeň ' + rangeOf(p.week) + (when ? ' (' + when + ')' : '') +
@@ -1095,15 +1008,27 @@
     var ul = $('importList');
     ul.textContent = '';
     p.days.forEach(function (list, i) {
-      if (list.length) ul.appendChild(el('li', null, [el('b', { text: DAY_NAMES[i] }), el('span', { text: list.map(name).map(entryText).join(', ') })]));
+      if (list.length) ul.appendChild(el('li', null, [el('b', { text: DAY_NAMES[i] }), el('span', { text: shown(list) })]));
     });
-    if (p.pool.length) ul.appendChild(el('li', null, [el('b', { text: 'Týždenný výber' }), el('span', { text: p.pool.map(name).map(entryText).join(', ') })]));
+    if (p.pool.length) ul.appendChild(el('li', null, [el('b', { text: 'Týždenný výber' }), el('span', { text: shown(p.pool) })]));
     var fresh = p.meals.filter(function (m) { return !matchMeal(m); }).map(function (m) { return m.name; });
     $('importNew').textContent = fresh.length
-      ? 'Do Receptov sa pridá ' + (fresh.length === 1 ? 'nový recept' : 'nové recepty') + ': ' + fresh.join(', ') + '.' : '';
+      ? 'Tieto jedlá nie sú vo vašej databáze receptov a nenačítajú sa: ' + fresh.join(', ') + '.' : '';
     $('importNew').hidden = !fresh.length;
-    var has = Store.weekSummary(p.week).entries > 0;
+    var has = count > 0 && Store.weekSummary(p.week).entries > 0;
     $('importMode').hidden = !has;
+    // the sender's Špajza, when the link carries one
+    var pf = $('importPantry');
+    pf.hidden = !p.pantry;
+    if (p.pantry) {
+      var newOnes = p.pantry.filter(function (x) { return !Store.inPantry(x.name); });
+      $('importPantryTitle').textContent = 'Špajza' + (p.from ? ' od: ' + p.from : '') + ' (' + p.pantry.length + ')';
+      $('importPantryList').textContent = p.pantry.length
+        ? p.pantry.map(function (x) { return x.name; }).join(', ') +
+          (newOnes.length ? ' – nové pre vás: ' + newOnes.length + '.' : ' – všetko už máte.')
+        : 'Špajza odosielateľa je prázdna.';
+      pf.querySelector('input[name="importPantry"][value="' + (p.pantry.length ? 'add' : 'keep') + '"]').checked = true;
+    }
     importDlg.querySelector('input[name="importMode"][value="replace"]').checked = true;
     pendingImport = p;
     importDlg.returnValue = '';
@@ -1115,25 +1040,33 @@
     var p = pendingImport;
     pendingImport = null;
     if (!p || importDlg.returnValue !== 'ok') return;
-    var ids = p.meals.map(function (m) {
-      var local = matchMeal(m);
-      if (local) return local.id;
-      var copy = { id: Store.getMeal(m.id) ? Store.newId('m') : m.id, name: m.name, defaultServings: m.defaultServings,
-                   nutrition: m.nutrition, ingredients: m.ingredients };
-      return Store.upsertMeal(copy).id;
-    });
-    function conv(list) { return list.map(function (e) { return { mealId: ids[e.meal], servings: e.servings }; }); }
+    // Recipes are read-only (jedla.xlsx): a meal the receiver does not have is skipped.
+    var ids = p.meals.map(function (m) { var local = matchMeal(m); return local ? local.id : null; });
+    function conv(list) {
+      return list.filter(function (e) { return ids[e.meal]; })
+        .map(function (e) { return { mealId: ids[e.meal], servings: e.servings }; });
+    }
     var mode = $('importMode').hidden ? 'add'
       : (importDlg.querySelector('input[name="importMode"]:checked') || {}).value || 'replace';
     var n = Store.importWeek(p.week, p.days.map(conv), conv(p.pool), mode);
+    var msg = n ? 'Plán načítaný: ' + n + '× jedlo, týždeň ' + rangeOf(p.week) + '.' : '';
+    if (p.pantry) {
+      var pmode = (importDlg.querySelector('input[name="importPantry"]:checked') || {}).value || 'add';
+      if (pmode !== 'keep') {
+        var k = Store.importPantry(p.pantry, pmode);
+        msg += pmode === 'replace' ? (msg ? ' ' : '') + 'Špajza nahradená (' + Store.getPantry().length + ').' : (msg ? ' ' : '') + 'Do špajze pridané: ' + k + '.';
+      }
+    }
     week = p.week; selDay = defaultDay();
     openIngredients = {};
     renderAll();
-    toast('Plán načítaný: ' + n + '× jedlo, týždeň ' + rangeOf(p.week) + '.');
+    if (typeof renderPantry === 'function') renderPantry();
+    toast(msg || 'Nič sa nezmenilo.');
   });
 
   // ================================================================== boot
   function renderAll() {
+    renderRecipesInfo();
     renderMeals();
     renderPlanner();
   }

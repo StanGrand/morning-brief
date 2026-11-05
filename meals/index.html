@@ -57,9 +57,8 @@
           <span class="sr">Hľadať jedlo</span>
           <input type="search" id="mealSearch" placeholder="Hľadať jedlo…" autocomplete="off">
         </label>
-        <button type="button" class="btn primary" id="mealNew">+ Nové jedlo</button>
-        <button type="button" class="btn quiet" id="mealsRestore">Obnoviť vzorové recepty</button>
       </div>
+      <div class="rec-info" id="recipesInfo"></div>
       <div class="meals" id="meals"></div>
     </section>
 
@@ -113,46 +112,6 @@
   <footer class="foot" id="foot"></footer>
 </div>
 
-<!-- add / edit meal -->
-<dialog id="mealDialog" class="dlg" aria-labelledby="mealDialogTitle">
-  <form id="mealForm" novalidate>
-    <div class="dlg-head">
-      <h2 id="mealDialogTitle">Nové jedlo</h2>
-      <button type="button" class="btn icon" data-close aria-label="Zavrieť">&times;</button>
-    </div>
-    <div class="dlg-body">
-      <div class="fgrid">
-        <label class="f f-name"><span>Názov jedla</span><input name="name" required maxlength="120" autocomplete="off"></label>
-        <label class="f f-serv"><span>Počet porcií</span><input name="defaultServings" type="number" min="1" max="99" step="1" inputmode="numeric" required></label>
-      </div>
-      <fieldset class="fs">
-        <legend>Nutričné hodnoty na 1 porciu</legend>
-        <div class="fgrid four">
-          <label class="f"><span>Energia (kcal)</span><input name="calories" type="number" min="0" step="any" inputmode="decimal"></label>
-          <label class="f"><span>Bielkoviny (g)</span><input name="protein" type="number" min="0" step="any" inputmode="decimal"></label>
-          <label class="f"><span>Sacharidy (g)</span><input name="carbs" type="number" min="0" step="any" inputmode="decimal"></label>
-          <label class="f"><span>Tuky (g)</span><input name="fat" type="number" min="0" step="any" inputmode="decimal"></label>
-        </div>
-      </fieldset>
-      <fieldset class="fs">
-        <legend>Suroviny <small>(množstvá pre zadaný počet porcií)</small></legend>
-        <div class="ing-head" aria-hidden="true">
-          <span>Surovina</span><span>Množstvo</span><span>Jednotka</span><span>Oddelenie</span><span title="Bežná zásoba (soľ, olej, korenie…)">Zásoba</span><span></span>
-        </div>
-        <div id="ingRows"></div>
-        <button type="button" class="btn quiet" id="ingAdd">+ Pridať surovinu</button>
-      </fieldset>
-      <p class="ferr" id="mealFormError" role="alert" hidden></p>
-    </div>
-    <div class="dlg-foot">
-      <button type="button" class="btn quiet danger" id="mealDelete" hidden>Zmazať jedlo</button>
-      <span class="grow"></span>
-      <button type="button" class="btn quiet" data-close>Zrušiť</button>
-      <button type="submit" class="btn primary">Uložiť</button>
-    </div>
-  </form>
-</dialog>
-
 <!-- confirm -->
 <dialog id="confirmDialog" class="dlg small" aria-labelledby="confirmTitle">
   <form method="dialog">
@@ -178,8 +137,9 @@
     <div class="dlg-body">
       <p class="lede">Pošle sa správa so zoznamom jedál a odkazom. Kto odkaz otvorí, načíta si plán jedným klikom do svojej stránky Jedlá.</p>
       <div class="share-opts">
-        <label class="f"><span>Od (meno, ktoré uvidí príjemca)</span><input id="shareFrom" maxlength="40" placeholder="napr. Zuzka" autocomplete="given-name"></label>
+        <label class="f"><span>Od (meno, ktoré uvidí príjemca)</span><input id="shareFrom" maxlength="40" placeholder="napr. Veronika" autocomplete="given-name"></label>
         <label class="toggle"><input type="checkbox" id="shareShop"><span>Priložiť aj nákupný zoznam</span></label>
+        <label class="toggle"><input type="checkbox" id="sharePantry"><span>Priložiť aj špajzu</span></label>
       </div>
       <pre class="share-text" id="shareText" aria-label="Text správy"></pre>
       <p class="tip" id="shareNote" hidden></p>
@@ -209,6 +169,13 @@
         <label class="toggle"><input type="radio" name="importMode" value="replace" checked><span>Nahradiť môj plán týmto</span></label>
         <label class="toggle"><input type="radio" name="importMode" value="add"><span>Pridať k môjmu plánu</span></label>
       </fieldset>
+      <fieldset class="fs import-mode" id="importPantry" hidden>
+        <legend id="importPantryTitle">Špajza</legend>
+        <p class="tip" id="importPantryList"></p>
+        <label class="toggle"><input type="radio" name="importPantry" value="add" checked><span>Pridať k mojej špajzi</span></label>
+        <label class="toggle"><input type="radio" name="importPantry" value="replace"><span>Nahradiť moju špajzu touto</span></label>
+        <label class="toggle"><input type="radio" name="importPantry" value="keep"><span>Moju špajzu nemeniť</span></label>
+      </fieldset>
     </div>
     <div class="dlg-foot">
       <span class="grow"></span>
@@ -221,12 +188,9 @@
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <datalist id="ingNames"></datalist>
-<datalist id="units">
-  <option value="g"><option value="kg"><option value="ml"><option value="l">
-  <option value="ks"><option value="PL"><option value="ČL"><option value="štipka">
-  <option value="strúčik"><option value="konzerva"><option value="balenie"><option value="hrsť">
-</datalist>
 
+<!-- recipes.js is generated from data/jedla.xlsx by services/meals_db.py (each brief run) -->
+<script src="recipes.js"></script>
 <script src="store.js"></script>
 <script src="share.js"></script>
 <script src="app.js"></script>
